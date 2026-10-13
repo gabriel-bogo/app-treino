@@ -10,6 +10,10 @@ import { Backup } from '../telas/Backup'
 import { Inicio } from '../telas/Inicio'
 import { Biblioteca } from '../telas/Biblioteca'
 import { ExercicioDetalhe } from '../telas/ExercicioDetalhe'
+import { Onboarding } from '../telas/Onboarding'
+import { Perfil } from '../telas/Perfil'
+import { useLiveQuery } from 'dexie-react-hooks'
+import { db } from '../db/banco'
 
 const ABAS: { caminho: string; rotulo: string; icone: ReactNode }[] = [
   { caminho: '/', rotulo: 'Início', icone: <IconeInicio /> },
@@ -79,7 +83,7 @@ function Conteudo({ partes }: { partes: string[] }) {
     case 'biblioteca':
       return partes[1] ? <ExercicioDetalhe id={partes[1]} /> : <Biblioteca />
     case 'perfil':
-      return <EmBreve titulo="Perfil" voltarPara="/mais" />
+      return <Perfil />
     case 'backup':
       return <Backup />
     default:
@@ -91,6 +95,13 @@ export function App() {
   const { caminho, partes } = useRota()
   // cada tela nova começa do topo
   useEffect(() => window.scrollTo(0, 0), [caminho])
+  // undefined = carregando; null = ainda não fez o onboarding
+  const perfil = useLiveQuery(async () => (await db.perfil.get('perfil')) ?? null)
+
+  if (perfil === undefined) return null
+  // Sem perfil: onboarding. Backup, Sobre e Instalar continuam acessíveis
+  // (para restaurar um backup antes de começar).
+  if (perfil === null && !['backup', 'sobre', 'instalar'].includes(partes[0] ?? '')) return <Onboarding />
   return (
     <div className="min-h-dvh pb-24">
       <Conteudo partes={partes} />

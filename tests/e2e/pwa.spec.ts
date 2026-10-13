@@ -1,4 +1,5 @@
 import { test, expect, type BrowserContext } from '@playwright/test'
+import { fazerOnboarding } from './ajudantes'
 
 // Critérios de aceite (seção 11):
 // - "Funciona em modo avião depois de instalado"
@@ -17,7 +18,7 @@ function vigiarRequisicoesExternas(context: BrowserContext, origem: string) {
 }
 
 test('abre e navega sem internet depois da primeira visita', async ({ page, context, baseURL }) => {
-  await page.goto('/')
+  await fazerOnboarding(page)
   await page.evaluate(() => navigator.serviceWorker.ready.then(() => true))
   await page.reload()
   await expect.poll(() => page.evaluate(() => !!navigator.serviceWorker.controller)).toBe(true)
@@ -38,6 +39,7 @@ test('abre e navega sem internet depois da primeira visita', async ({ page, cont
 
 test('nenhuma requisição para fora do próprio site', async ({ page, context, baseURL }) => {
   const externas = vigiarRequisicoesExternas(context, new URL(baseURL!).origin)
+  await fazerOnboarding(page)
   for (const rota of ROTAS) {
     await page.goto(new URL(rota, baseURL).toString())
     await expect(page.locator('h1').first()).toBeVisible()
