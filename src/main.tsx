@@ -2,6 +2,7 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'
 import { App } from './app/App'
+import { ProtecaoErro } from './components/ProtecaoErro'
 import { acompanharTemaDoSistema, aplicarTema } from './app/tema'
 import { pedirArmazenamentoPersistente } from './app/plataforma'
 import { obterConfiguracoes } from './db/banco'
@@ -15,6 +16,8 @@ void obterConfiguracoes()
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <App />
+    <ProtecaoErro>
+      <App />
+    </ProtecaoErro>
   </StrictMode>,
 )

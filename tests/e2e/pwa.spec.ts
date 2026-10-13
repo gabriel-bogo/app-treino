@@ -1,5 +1,5 @@
 import { test, expect, type BrowserContext } from '@playwright/test'
-import { fazerOnboarding } from './ajudantes'
+import { fazerOnboarding, fazerTreinoCompleto } from './ajudantes'
 
 // Critérios de aceite (seção 11):
 // - "Funciona em modo avião depois de instalado"
@@ -57,4 +57,28 @@ test('manifest permite instalar como app em tela cheia', async ({ request }) => 
   expect(m.icons.some((i: { sizes: string }) => i.sizes === '512x512')).toBe(true)
   const apple = await request.get('/icons/apple-touch-icon.png')
   expect(apple.ok()).toBe(true)
+})
+
+test('nenhuma requisição externa em uso normal completo: onboarding, treino, histórico, saúde, biblioteca (§11)', async ({ page, context, baseURL }) => {
+  const externas = vigiarRequisicoesExternas(context, new URL(baseURL!).origin)
+  await fazerOnboarding(page, { limitacoes: ['Ombro'] })
+  await fazerTreinoCompleto(page)
+  for (const rota of ['/#/historico', '/#/saude', '/#/plano', '/#/biblioteca/supino-reto-halter', '/#/backup', '/#/perfil']) {
+    await page.goto(new URL(rota, baseURL).toString())
+    await expect(page.locator('h1').first()).toBeVisible()
+  }
+  await page.waitForTimeout(500)
+  expect(externas).toEqual([])
+})
+
+test('treino completo em modo avião (offline depois da primeira visita)', async ({ page, context }) => {
+  await fazerOnboarding(page)
+  await page.evaluate(() => navigator.serviceWorker.ready.then(() => true))
+  await page.reload()
+  await expect.poll(() => page.evaluate(() => !!navigator.serviceWorker.controller)).toBe(true)
+  await context.setOffline(true)
+  await page.reload()
+  await fazerTreinoCompleto(page)
+  await page.getByRole('button', { name: 'Voltar ao início' }).click()
+  await expect(page.getByText('Próximo treino')).toBeVisible()
 })

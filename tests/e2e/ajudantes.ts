@@ -93,7 +93,7 @@ export async function fazerTreinoCompleto(page: Page) {
   await page.getByRole('button', { name: 'Começar treino' }).click()
   await expect(page.getByTestId('nome-exercicio')).toBeVisible()
   for (let i = 0; i < 80; i++) {
-    const botao = page.getByRole('button', { name: /Marcar série \d+ como feita/ }).first()
+    const botao = page.getByRole('button', { name: /^Marcar série .+ como feita$/ }).first()
     if (!(await botao.count())) break
     const cargaVazia = page.getByRole('textbox', { name: /carga da série \d+$/ }).first()
     if ((await cargaVazia.count()) && !(await cargaVazia.inputValue())) {
