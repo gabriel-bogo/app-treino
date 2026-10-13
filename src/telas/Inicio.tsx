@@ -1,7 +1,9 @@
-import { useState } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { navegar } from '../app/rotas'
-import { iniciarSessao, sessaoEmAndamento } from '../db/sessao'
+import { db } from '../db/banco'
+import { sessaoEmAndamento } from '../db/sessao'
+import { gruposTreinadosRecentemente, textoAviso48h } from '../domain/treino/descanso48h'
+import { ComecarTreino } from '../components/ComecarTreino'
 import { usePlano } from '../app/usePlano'
 import { dispensarMensagemFase } from '../db/plano'
 import { exercicioPorId } from '../domain/biblioteca'
@@ -14,10 +16,16 @@ import { RegistroPesoHoje } from '../components/RegistroPesoHoje'
 export function Inicio() {
   const dados = usePlano()
   const andamento = useLiveQuery(async () => (await sessaoEmAndamento()) ?? null)
-  const [iniciando, setIniciando] = useState(false)
+  const recentes = useLiveQuery(async () => {
+    const limite = new Date(Date.now() - 48 * 3600 * 1000).toISOString()
+    const sessoes = await db.sessoes.where('inicio').above(limite).filter((s) => s.status === 'concluida').toArray()
+    return sessoes.map((s) => ({ inicio: s.inicio, exercicios: s.estado.itens.filter((i) => i.papel === 'trabalho' && i.series.some((x) => x.feita)).map((i) => i.exercicioId) }))
+  })
   const plano = dados?.plano
   const proximo = dados?.dias.find((d) => d.ordem === plano?.proximoIndice)
   const exercicios = proximo ? dados!.exercicios.filter((e) => e.diaId === proximo.id && e.papel === 'trabalho').sort((a, b) => a.ordem - b.ordem) : []
+  // A11: só avisa se o próximo treino repete grupo treinado há menos de 48 h
+  const aviso48h = recentes ? gruposTreinadosRecentemente({ proximos: exercicios.map((e) => e.exercicioId), recentes, agora: new Date() }) : []
 
   return (
     <Tela titulo="Início">
@@ -58,22 +66,10 @@ export function Inicio() {
               </li>
             ))}
           </ul>
-          <Botao
-            grande
-            className="mt-4 w-full"
-            disabled={iniciando}
-            onClick={async () => {
-              setIniciando(true)
-              try {
-                await iniciarSessao()
-                navegar('/treino')
-              } finally {
-                setIniciando(false)
-              }
-            }}
-          >
-            Começar treino
-          </Botao>
+          {aviso48h.length > 0 && (
+            <p className="mt-3 rounded-lg bg-amber-50 px-3 py-2 text-sm text-amber-800 dark:bg-amber-950/40 dark:text-amber-200">{textoAviso48h(aviso48h)}</p>
+          )}
+          <ComecarTreino />
           <Botao variante="fantasma" className="mt-1 w-full" onClick={() => navegar('/plano')}>
             Ver plano da semana
           </Botao>

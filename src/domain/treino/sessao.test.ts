@@ -138,3 +138,78 @@ describe('treino em andamento (§3)', () => {
     expect(temTrabalhoFeito(e)).toBe(true)
   })
 })
+
+import { concluirAquecimentoGeral, iniciarAquecimentoGeral, idsDoDia, pularAquecimento, pularExercicio, substituirExercicio } from './sessao'
+
+describe('aquecimento no treino (§6.11)', () => {
+  function comAquecimento(): EstadoTreino {
+    return estadoInicialTreino([
+      criarItem({ exercicioId: 'rotacao-externa-elastico', papel: 'aquecimento_ombro', series: 2, repsMin: 15, repsMax: 15, descansoSeg: 0, cargaSugerida: null, alvo: 15 }),
+      criarItem({ exercicioId: 'leg-press', papel: 'trabalho', series: 2, repsMin: 8, repsMax: 12, descansoSeg: 150, cargaSugerida: 100, alvo: 10, aproximacao: [{ carga: 48, reps: 10 }, { carga: 68, reps: 5 }] }),
+    ])
+  }
+  it('séries de aproximação vêm antes, não contam no "x de y séries" e são opcionais', () => {
+    let e = comAquecimento()
+    const leg = e.itens[1]
+    expect(leg.series.map((s) => s.tipo)).toEqual(['aproximacao', 'aproximacao', 'trabalho', 'trabalho'])
+    expect(contadorSeries(leg)).toEqual({ feitas: 0, total: 2 })
+    e = irPara(e, leg.uid)
+    e = marcarSerie(e, leg.uid, leg.series[2].uid, t0)
+    e = marcarSerie(e, leg.uid, leg.series[3].uid, t0)
+    expect(e.itens[1].status).toBe('concluido')
+  })
+  it('marcar aquecimento não inicia timer de descanso', () => {
+    let e = comAquecimento()
+    e = marcarSerie(e, e.itens[0].uid, e.itens[0].series[0].uid, t0)
+    expect(e.timer).toBeNull()
+  })
+  it('timer opcional de 5 min do aquecimento geral', () => {
+    let e = iniciarAquecimentoGeral(comAquecimento(), t0)
+    expect(e.timer).toMatchObject({ tipo: 'aquecimento', duracaoSeg: 300 })
+    e = concluirAquecimentoGeral(e)
+    expect(e.aquecimentoGeral).toBe('feito')
+    expect(e.timer).toBeNull()
+  })
+  it('pular o aquecimento tira geral, ombro e aproximação', () => {
+    const e = pularAquecimento(comAquecimento())
+    expect(e.aquecimentoGeral).toBe('pulado')
+    expect(e.itens[0].status).toBe('pulado')
+    expect(e.itens[1].series.every((s) => s.tipo === 'trabalho')).toBe(true)
+    expect(e.atualUid).toBe(e.itens[1].uid)
+  })
+})
+
+describe('troca de exercício na sessão (§6.10)', () => {
+  it('mantém séries, faixa e descanso; usa a carga do substituto e registra o original', () => {
+    let e = treino()
+    const [i] = e.itens
+    e = substituirExercicio(e, i.uid, { exercicioId: 'supino-maquina', cargaSugerida: null, alvo: 8 }, 'ocupado')
+    const novo = e.itens[0]
+    expect(novo.exercicioId).toBe('supino-maquina')
+    expect(novo.originalId).toBe('supino-reto-halter')
+    expect(novo.motivoTroca).toBe('ocupado')
+    expect(novo.series).toHaveLength(3)
+    expect(novo.series.every((s) => s.carga === null && s.reps === 8)).toBe(true)
+    expect([novo.descansoSeg, novo.repsMin, novo.repsMax]).toEqual([150, 8, 12])
+    expect(e.atualUid).toBe(novo.uid)
+    expect(idsDoDia(e)).toContain('supino-reto-halter')
+  })
+  it('séries já feitas ficam no original; o substituto recebe só as que faltam', () => {
+    let e = treino()
+    const [i] = e.itens
+    e = marcarSerie(e, i.uid, i.series[0].uid, t0)
+    e = substituirExercicio(e, i.uid, { exercicioId: 'supino-maquina', cargaSugerida: 40, alvo: 9 }, 'dor')
+    expect(e.itens[0].status).toBe('concluido')
+    expect(e.itens[0].series).toHaveLength(1)
+    expect(e.itens[0].dor).toBe(true)
+    expect(e.itens[1].series).toHaveLength(2)
+    expect(e.itens[1].series[0].carga).toBe(40)
+  })
+  it('pular exercício', () => {
+    let e = treino()
+    e = pularExercicio(e, e.itens[0].uid)
+    expect(e.itens[0].status).toBe('pulado')
+    expect(e.atualUid).toBe(e.itens[1].uid)
+    expect(progresso(e).total).toBe(2)
+  })
+})

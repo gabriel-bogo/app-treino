@@ -19,6 +19,7 @@ export function PainelDescanso({
   aoAjustar: (delta: number) => void
   aoPular: () => void
 }) {
+  const nome = timer.tipo === 'aquecimento' ? 'Aquecimento' : 'Descanso'
   const restante = restanteTimer(timer, agora)
   const tocou = useRef<string | null>(null)
   useEffect(() => {
@@ -43,7 +44,7 @@ export function PainelDescanso({
     >
       <div className="mx-auto max-w-xl">
         <div className="flex items-baseline justify-between">
-          <span className="text-sm font-medium">{acabou ? 'Descanso terminado' : 'Descanso'}</span>
+          <span className="text-sm font-medium">{acabou ? `${nome} terminado` : nome}</span>
           <span className="text-4xl font-bold" style={{ fontVariantNumeric: 'tabular-nums' }}>
             {acabou ? (restante < 0 ? `+${formatarDuracao(-restante)}` : '0:00') : formatarDuracao(restante)}
           </span>
@@ -58,7 +59,7 @@ export function PainelDescanso({
             −15s
           </button>
           <button type="button" className={`${botao} ${acabou ? 'bg-white text-emerald-700 dark:bg-slate-950 dark:text-emerald-400' : 'bg-slate-900 text-white dark:bg-white dark:text-slate-900'}`} onClick={aoPular}>
-            {acabou ? 'Fechar' : 'Pular'}
+            {acabou ? 'Fechar' : timer.tipo === 'aquecimento' ? 'Concluir' : 'Pular'}
           </button>
           <button type="button" className={`${botao} ${acabou ? 'bg-white/20' : 'bg-slate-100 dark:bg-slate-800'}`} onClick={() => aoAjustar(SEGUNDOS_AJUSTE_TIMER)}>
             +15s

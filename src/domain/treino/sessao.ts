@@ -3,7 +3,7 @@
 // imediatamente no IndexedDB (nada se perde se o app fechar).
 
 import { novoId } from '../ids'
-import type { EstadoTreino, ItemTreino, SerieTreino, TimerDescanso } from '../tipos'
+import type { EstadoTreino, ItemTreino, MotivoTroca, SerieTreino, TimerDescanso } from '../tipos'
 
 export const SEGUNDOS_AJUSTE_TIMER = 15
 
@@ -27,8 +27,10 @@ export function contadorSeries(i: ItemTreino): { feitas: number; total: number }
   return { feitas: p.filter((s) => s.feita).length, total: p.length }
 }
 
+/** Concluído quando todas as séries (menos as de aproximação, que são opcionais) foram feitas. */
 export function itemCompleto(i: ItemTreino): boolean {
-  return i.series.length > 0 && i.series.every((s) => s.feita)
+  const obrigatorias = i.series.filter((s) => s.tipo !== 'aproximacao')
+  return obrigatorias.length > 0 && obrigatorias.every((s) => s.feita)
 }
 
 /** Barra de progresso geral: exercícios de trabalho concluídos / total. */
@@ -189,6 +191,8 @@ export interface DadosItem {
   cargaSugerida: number | null
   /** alvo de reps (null = peso do corpo sem alvo ainda) */
   alvo: number | null
+  /** séries de aproximação antes das de trabalho (§6.11) */
+  aproximacao?: { carga: number; reps: number }[]
 }
 
 export function criarItem(d: DadosItem): ItemTreino {
@@ -203,14 +207,17 @@ export function criarItem(d: DadosItem): ItemTreino {
     cargaSugerida: d.cargaSugerida,
     ...(d.alerta ? { alerta: d.alerta } : {}),
     status: 'pendente',
-    series: Array.from({ length: d.series }, () => ({
-      uid: novoId(),
-      tipo: aquecimento ? ('aquecimento' as const) : ('trabalho' as const),
-      carga: d.cargaSugerida,
-      reps: d.alvo,
-      repsAlvo: d.alvo,
-      feita: false,
-    })),
+    series: [
+      ...(d.aproximacao ?? []).map((a) => ({ uid: novoId(), tipo: 'aproximacao' as const, carga: a.carga, reps: a.reps, repsAlvo: a.reps, feita: false })),
+      ...Array.from({ length: d.series }, () => ({
+        uid: novoId(),
+        tipo: aquecimento ? ('aquecimento' as const) : ('trabalho' as const),
+        carga: d.cargaSugerida,
+        reps: d.alvo,
+        repsAlvo: d.alvo,
+        feita: false,
+      })),
+    ],
   }
 }
 
@@ -221,4 +228,110 @@ export function estadoInicialTreino(itens: ItemTreino[]): EstadoTreino {
 /** Há alguma série de trabalho feita? (sem nada feito, finalizar = descartar) */
 export function temTrabalhoFeito(e: EstadoTreino): boolean {
   return e.itens.some((i) => i.series.some((s) => (s.tipo === 'trabalho' || s.tipo === 'extra') && s.feita))
+}
+
+// ─────────────────────────── Aquecimento (§6.11) ───────────────────────────
+
+export const SEGUNDOS_AQUECIMENTO_GERAL = 5 * 60
+
+/** Timer opcional dos 5 min de cardio leve. */
+export function iniciarAquecimentoGeral(estado: EstadoTreino, agora: Date): EstadoTreino {
+  return { ...clonar(estado), timer: { tipo: 'aquecimento', inicio: agora.toISOString(), duracaoSeg: SEGUNDOS_AQUECIMENTO_GERAL, ajusteSeg: 0 } }
+}
+
+export function concluirAquecimentoGeral(estado: EstadoTreino): EstadoTreino {
+  const e = clonar(estado)
+  e.aquecimentoGeral = 'feito'
+  if (e.timer?.tipo === 'aquecimento') e.timer = null
+  return e
+}
+
+/** Pular todo o aquecimento: geral, específico de ombro e séries de aproximação. */
+export function pularAquecimento(estado: EstadoTreino): EstadoTreino {
+  const e = clonar(estado)
+  e.aquecimentoGeral = 'pulado'
+  if (e.timer?.tipo === 'aquecimento') e.timer = null
+  for (const i of e.itens) {
+    i.series = i.series.filter((s) => s.tipo !== 'aproximacao' || s.feita)
+    if (i.papel === 'aquecimento_ombro' && i.status === 'pendente') i.status = 'pulado'
+    atualizarStatus(e, i)
+  }
+  if (e.atualUid && itemPorUid(e, e.atualUid)?.status !== 'pendente') e.atualUid = proximoPendente(e)?.uid ?? null
+  return e
+}
+
+function itemPorUid(e: EstadoTreino, uid: string) {
+  return e.itens.find((i) => i.uid === uid)
+}
+
+// ─────────────────────────── Troca de exercício (§6.10) ───────────────────────────
+
+export interface DadosSubstituto {
+  exercicioId: string
+  /** última carga registrada no substituto; null = "comece leve" */
+  cargaSugerida: number | null
+  alvo: number | null
+  /** séries de aproximação do substituto, se houver */
+  aproximacao?: { carga: number; reps: number }[]
+}
+
+/**
+ * Troca o exercício mantendo séries, faixa de reps e descanso do original.
+ * Séries já feitas ficam registradas no original (que fica concluído) e o
+ * substituto entra logo depois com as séries que faltavam.
+ */
+export function substituirExercicio(estado: EstadoTreino, itemUid: string, sub: DadosSubstituto, motivo: MotivoTroca): EstadoTreino {
+  const e = clonar(estado)
+  const original = item(e, itemUid)
+  const pendentes = original.series.filter((s) => !s.feita && s.tipo !== 'aproximacao')
+  const feitas = original.series.filter((s) => s.feita)
+  if (!pendentes.length) return estado
+  const novo: ItemTreino = {
+    uid: novoId(),
+    exercicioId: sub.exercicioId,
+    papel: original.papel,
+    originalId: original.originalId ?? original.exercicioId,
+    motivoTroca: motivo,
+    descansoSeg: original.descansoSeg,
+    repsMin: original.repsMin,
+    repsMax: original.repsMax,
+    cargaSugerida: sub.cargaSugerida,
+    status: 'pendente',
+    series: [
+      ...(sub.aproximacao ?? []).map((a) => ({ uid: novoId(), tipo: 'aproximacao' as const, carga: a.carga, reps: a.reps, repsAlvo: a.reps, feita: false })),
+      ...pendentes.map((s) => ({
+        uid: novoId(),
+        tipo: s.tipo,
+        carga: sub.cargaSugerida,
+        reps: s.tipo === 'aquecimento' ? s.reps : sub.alvo,
+        repsAlvo: s.tipo === 'aquecimento' ? s.repsAlvo : sub.alvo,
+        feita: false,
+      })),
+    ],
+  }
+  if (motivo === 'dor') original.dor = true
+  const idx = e.itens.indexOf(original)
+  if (feitas.length) {
+    original.series = feitas
+    original.status = 'concluido'
+    e.itens.splice(idx + 1, 0, novo)
+  } else {
+    e.itens.splice(idx, 1, novo)
+  }
+  e.atualUid = novo.uid
+  return e
+}
+
+/** "Pular exercício" (§6.10 regra 6). */
+export function pularExercicio(estado: EstadoTreino, itemUid: string): EstadoTreino {
+  const e = clonar(estado)
+  const i = item(e, itemUid)
+  i.status = 'pulado'
+  if (e.atualUid === itemUid) e.atualUid = proximoPendente(e, itemUid)?.uid ?? null
+  return e
+}
+
+/** Ids de todos os exercícios do treino do dia, inclusive os originais já trocados. */
+export function idsDoDia(estado: EstadoTreino): string[] {
+  return [...new Set(estado.itens.flatMap((i) => [i.exercicioId, ...(i.originalId ? [i.originalId] : [])]))]
 }

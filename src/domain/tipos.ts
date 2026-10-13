@@ -255,6 +255,8 @@ export interface ItemTreino {
 }
 
 export interface TimerDescanso {
+  /** descanso entre séries ou o aquecimento geral de 5 min (§6.11) */
+  tipo?: 'descanso' | 'aquecimento'
   /** ISO de quando começou */
   inicio: string
   duracaoSeg: number

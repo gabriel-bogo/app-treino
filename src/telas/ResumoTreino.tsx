@@ -1,9 +1,11 @@
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '../db/banco'
+import { dispensarOferta, escolherCargaExtra, trocarExercicioNoPlano } from '../db/progressao'
+import { mapaAjustes, exercicioPermitido } from '../domain/biblioteca'
 import { navegar } from '../app/rotas'
 import { exercicioPorId } from '../domain/biblioteca'
 import { formatarDuracao } from '../domain/datas'
-import { descreverCarga, formatarKg } from '../domain/progressao/carga'
+import { descreverCarga } from '../domain/progressao/carga'
 import type { EstadoProgressao, EventoProgressao, Exercicio } from '../domain/tipos'
 import { Botao, Cartao, Tela, Texto } from '../components/ui'
 
@@ -36,7 +38,13 @@ export function ResumoTreino({ id }: { id: string }) {
   const sessao = useLiveQuery(() => db.sessoes.get(id), [id])
   const eventos = useLiveQuery(() => db.eventosProgressao.filter((e) => e.sessaoId === id).toArray(), [id])
   const estados = useLiveQuery(() => db.progressao.toArray())
-  if (!sessao || !eventos || !estados) return <Tela titulo="Resumo">{null}</Tela>
+  const perfil = useLiveQuery(() => db.perfil.get('perfil'))
+  const ajustes = mapaAjustes(useLiveQuery(() => db.ajustesExercicio.toArray()))
+  if (!sessao || !eventos || !estados || !perfil) return <Tela titulo="Resumo">{null}</Tela>
+  const permitido = (id: string | undefined) => {
+    const x = id ? exercicioPorId(id) : undefined
+    return x && exercicioPermitido(x, perfil.limitacoes, ajustes) ? x : undefined
+  }
   const trabalho = sessao.estado.itens.filter((i) => i.papel === 'trabalho')
   const series = trabalho.reduce((s, i) => s + i.series.filter((x) => x.feita && x.tipo !== 'aproximacao').length, 0)
   return (
@@ -65,16 +73,51 @@ export function ResumoTreino({ id }: { id: string }) {
                 ))}
                 {!evs.length && i.series.some((s) => s.feita) && prox && <p className="text-sm text-slate-500 dark:text-slate-400">Repete a meta: {prox}.</p>}
                 {!i.series.some((s) => s.feita) && <p className="text-sm text-slate-500 dark:text-slate-400">Não foi feito hoje.</p>}
-                {estado?.sugerirAssistida && ex.versaoAssistida?.length ? (
-                  <p className="text-sm text-sky-700 dark:text-sky-300">
-                    Dica: experimente a versão assistida ({exercicioPorId(ex.versaoAssistida[0])?.nome}).
-                  </p>
-                ) : null}
-                {estado?.noTeto && (
-                  <p className="text-sm text-sky-700 dark:text-sky-300">
-                    Você chegou ao teto de {ex.tetoReps ?? formatarKg(0)} reps. Dá para adicionar carga ou passar para uma variação mais difícil.
-                  </p>
-                )}
+                {estado?.sugerirAssistida && (() => {
+                  const assistida = ex.versaoAssistida?.map(permitido).find(Boolean)
+                  if (!assistida) return null
+                  return (
+                    <div className="mt-2 rounded-xl bg-sky-50 p-3 dark:bg-sky-950/30">
+                      <p className="text-sm">Abaixo de 5 repetições, a versão assistida ajuda a progredir: {assistida.nome}.</p>
+                      <div className="mt-2 flex gap-2">
+                        <Botao className="min-h-10 flex-1 text-sm" onClick={() => trocarExercicioNoPlano(ex.id, assistida.id)}>
+                          Usar no plano
+                        </Botao>
+                        <Botao variante="secundario" className="min-h-10 flex-1 text-sm" onClick={() => dispensarOferta(ex.id)}>
+                          Continuar assim
+                        </Botao>
+                      </div>
+                    </div>
+                  )
+                })()}
+                {estado?.noTeto && (() => {
+                  const dificil = permitido(ex.variacaoMaisDificil)
+                  return (
+                    <div className="mt-2 rounded-xl bg-sky-50 p-3 dark:bg-sky-950/30">
+                      <p className="text-sm">
+                        {ex.assistido
+                          ? 'Você não precisa mais de ajuda na máquina!'
+                          : `Você chegou ao teto de ${ex.tetoReps ?? 12} repetições.`}{' '}
+                        Como quer continuar?
+                      </p>
+                      <div className="mt-2 flex flex-col gap-2">
+                        {!ex.assistido && ex.tipoCarga === 'pesoCorpo' && (
+                          <Botao className="min-h-10 text-sm" onClick={() => escolherCargaExtra(ex.id)}>
+                            Adicionar carga (cinto, colete ou halter)
+                          </Botao>
+                        )}
+                        {dificil && (
+                          <Botao variante="secundario" className="min-h-10 text-sm" onClick={() => trocarExercicioNoPlano(ex.id, dificil.id)}>
+                            Passar para {dificil.nome}
+                          </Botao>
+                        )}
+                        <Botao variante="fantasma" className="min-h-10 text-sm" onClick={() => dispensarOferta(ex.id)}>
+                          Decidir depois
+                        </Botao>
+                      </div>
+                    </div>
+                  )
+                })()}
               </li>
             )
           })}

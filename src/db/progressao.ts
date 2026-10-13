@@ -1,7 +1,7 @@
 import { db } from './banco'
 import { novoId } from '../domain/ids'
 import { exercicioPorId, mapaAjustes } from '../domain/biblioteca'
-import { aplicarTreino, estadoInicial, faixaDaFase, prepararParaFase, type SerieFeita } from '../domain/progressao/ciclo'
+import { aplicarTreino, estadoInicial, faixaDaFase, passarParaCargaExtra, prepararParaFase, type SerieFeita } from '../domain/progressao/ciclo'
 import { aplicarPausa, regraDePausa, type RegraPausa } from '../domain/progressao/pausa'
 import { configDoExercicio } from '../domain/progressao/sugestao'
 import { diasEntre } from '../domain/datas'
@@ -85,4 +85,25 @@ export async function aplicarPausaNosExercicios(regra: RegraPausa & { ultimaSess
     const config = await db.configuracoes.get('app')
     if (config) await db.configuracoes.put({ ...config, pausaAplicadaApos: regra.ultimaSessaoId })
   })
+}
+
+// ───────────── Escolhas do peso do corpo (§6.13) ─────────────
+
+/** No teto: adicionar carga (cinto/colete/halter) e entrar no ciclo 6.8 em 8 reps. */
+export async function escolherCargaExtra(exercicioId: string) {
+  const e = await db.progressao.get(exercicioId)
+  if (e) await db.progressao.put(passarParaCargaExtra(e))
+}
+
+/** Usa outro exercício no lugar deste nos próximos treinos (variação mais difícil ou versão assistida). */
+export async function trocarExercicioNoPlano(origemId: string, destinoId: string) {
+  const config = await db.configuracoes.get('app')
+  if (config) await db.configuracoes.put({ ...config, trocasNoPlano: { ...config.trocasNoPlano, [origemId]: destinoId } })
+  const e = await db.progressao.get(origemId)
+  if (e) await db.progressao.put({ ...e, noTeto: false, sugerirAssistida: false })
+}
+
+export async function dispensarOferta(exercicioId: string) {
+  const e = await db.progressao.get(exercicioId)
+  if (e) await db.progressao.put({ ...e, noTeto: false, sugerirAssistida: false })
 }

@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
-import { db } from '../db/banco'
-import { descartarSessao, finalizarSessao, salvarEstado, sessaoEmAndamento } from '../db/sessao'
+import { atualizarConfiguracoes, db } from '../db/banco'
+import { atualizarSessao, dadosSubstituto, descartarSessao, finalizarSessao, salvarEstado, sessaoEmAndamento } from '../db/sessao'
+import { salvarAjuste } from '../db/ajustes'
 import { navegar } from '../app/rotas'
 import { useAgora } from '../app/useAgora'
 import { useTelaLigada } from '../app/telaLigada'
@@ -14,14 +15,20 @@ import {
   adicionarSerie,
   ajustarTimer,
   alterarSerie,
+  concluirAquecimentoGeral,
   contadorSeries,
   deixarParaDepois,
+  idsDoDia,
+  iniciarAquecimentoGeral,
   irPara,
   itemAtual,
   marcarSerie,
   progresso,
+  pularAquecimento,
+  pularExercicio,
   pularTimer,
   removerSerie,
+  substituirExercicio,
   temTrabalhoFeito,
 } from '../domain/treino/sessao'
 import type { EstadoTreino, ItemTreino, Sessao } from '../domain/tipos'
@@ -30,6 +37,7 @@ import { Dialogo } from '../components/Dialogo'
 import { ComoFazer } from '../components/ComoFazer'
 import { LinhaSerie } from '../components/treino/LinhaSerie'
 import { PainelDescanso } from '../components/treino/PainelDescanso'
+import { DialogoTroca, type EscolhaTroca } from '../components/treino/DialogoTroca'
 
 /**
  * Estado do treino na tela, salvo no IndexedDB a cada toque. Mantém uma cópia
@@ -70,6 +78,8 @@ export function Treino() {
   const [finalizar, setFinalizar] = useState(false)
   const [confirmarDescarte, setConfirmarDescarte] = useState(false)
   const [salvando, setSalvando] = useState(false)
+  const [troca, setTroca] = useState<string | null>(null)
+  const [confirmarPularAquec, setConfirmarPularAquec] = useState(false)
   useTelaLigada(!!sessao)
 
   if (sessao === undefined || perfil === undefined) return null
@@ -90,6 +100,24 @@ export function Treino() {
   const prog = progresso(estado)
   const decorrido = (agora.getTime() - new Date(sessao.inicio).getTime()) / 1000
   const som = config?.som ?? true
+
+  async function trocar(itemUid: string, escolha: EscolhaTroca) {
+    const item = estado!.itens.find((i) => i.uid === itemUid)
+    if (!item) return
+    const originalId = item.originalId ?? item.exercicioId
+    const dados = await dadosSubstituto(escolha.substitutoId, item, perfil!, sessao!.fase)
+    aplicar((e) => substituirExercicio(e, itemUid, dados, escolha.motivo))
+    // registra no histórico que houve substituição (original, substituto, motivo)
+    await atualizarSessao(sessao!.id, {
+      substituicoes: [...sessao!.substituicoes, { originalId, substitutoId: escolha.substitutoId, motivo: escolha.motivo, escopo: escolha.escopo, em: new Date().toISOString() }],
+    })
+    if (escolha.escopo === 'plano') {
+      const atual = (await db.configuracoes.get('app'))?.trocasNoPlano ?? {}
+      await atualizarConfiguracoes({ trocasNoPlano: { ...atual, [originalId]: escolha.substitutoId } })
+    }
+    if (escolha.marcarIndisponivel) await salvarAjuste(originalId, { indisponivel: true })
+    setTroca(null)
+  }
 
   async function concluir() {
     setSalvando(true)
@@ -127,6 +155,27 @@ export function Treino() {
       </header>
 
       <main className="flex flex-col gap-4 px-4 py-4">
+        {sessao.ajustePausa && (
+          <Cartao destaque="info" titulo="Retorno após pausa">
+            <Texto>{sessao.ajustePausa.texto}</Texto>
+          </Cartao>
+        )}
+
+        {estado.aquecimentoGeral === 'pendente' && (
+          <Cartao destaque="info" titulo="Aquecimento">
+            <Texto>5 minutos de cardio leve (esteira, bike ou elíptico).</Texto>
+            <div className="mt-3 grid grid-cols-2 gap-2">
+              <Botao variante="secundario" onClick={() => (desbloquearAudio(), aplicar((e) => iniciarAquecimentoGeral(e, new Date())))}>
+                Timer 5:00
+              </Botao>
+              <Botao onClick={() => aplicar((e) => concluirAquecimentoGeral(e))}>Feito</Botao>
+            </div>
+            <Botao variante="fantasma" className="mt-1 w-full text-sm" onClick={() => setConfirmarPularAquec(true)}>
+              Pular aquecimento
+            </Botao>
+          </Cartao>
+        )}
+
         {atual ? (
           <CartaoExercicio
             key={atual.uid}
@@ -137,6 +186,7 @@ export function Treino() {
               return ex ? configDoExercicio(ex, perfil, ajustes.get(ex.id), sessao.fase).incremento : 1
             })()}
             cargaReferencia={estadosProgressao?.find((p) => p.exercicioId === atual.exercicioId)?.cargaReferencia ?? null}
+            modoCarga={estadosProgressao?.find((p) => p.exercicioId === atual.exercicioId)?.modo === 'carga'}
             pesoBarraKg={ajustes.get(atual.exercicioId)?.pesoBarraKg}
             aoMarcar={(serieUid) => {
               desbloquearAudio()
@@ -147,6 +197,7 @@ export function Treino() {
             aoRemover={() => aplicar((e) => removerSerie(e, atual.uid))}
             aoDepois={() => aplicar((e) => deixarParaDepois(e, atual.uid))}
             aoComoFazer={() => setComoFazer(atual.exercicioId)}
+            aoTrocar={atual.papel === 'trabalho' && atual.series.some((s) => !s.feita && s.tipo !== 'aproximacao') ? () => setTroca(atual.uid) : undefined}
           />
         ) : (
           <Cartao destaque="sucesso" titulo="Todos os exercícios concluídos!">
@@ -205,9 +256,45 @@ export function Treino() {
           agora={agora}
           som={som}
           aoAjustar={(d) => aplicar((e) => ajustarTimer(e, d, new Date()))}
-          aoPular={() => aplicar((e) => pularTimer(e))}
+          aoPular={() => aplicar((e) => (e.timer?.tipo === 'aquecimento' ? concluirAquecimentoGeral(e) : pularTimer(e)))}
         />
       )}
+
+      {troca && estado.itens.find((i) => i.uid === troca) && (
+        <DialogoTroca
+          original={exercicioPorId(estado.itens.find((i) => i.uid === troca)!.exercicioId)!}
+          idsDoDia={idsDoDia(estado)}
+          perfil={perfil}
+          aoFechar={() => setTroca(null)}
+          aoEscolher={(escolha) => void trocar(troca, escolha)}
+          aoPular={() => {
+            aplicar((e) => pularExercicio(e, troca))
+            setTroca(null)
+          }}
+        />
+      )}
+
+      <Dialogo
+        aberto={confirmarPularAquec}
+        titulo="Pular o aquecimento?"
+        aoFechar={() => setConfirmarPularAquec(false)}
+        acoes={
+          <>
+            <Botao
+              variante="secundario"
+              onClick={() => {
+                aplicar((e) => pularAquecimento(e))
+                setConfirmarPularAquec(false)
+              }}
+            >
+              Pular mesmo assim
+            </Botao>
+            <Botao onClick={() => setConfirmarPularAquec(false)}>Vou aquecer</Botao>
+          </>
+        }
+      >
+        <p>Aquecer prepara músculos e articulações e ajuda a evitar lesões. Isso pula o cardio, o aquecimento de ombro e as séries de aproximação de hoje.</p>
+      </Dialogo>
 
       <Dialogo
         aberto={!!comoFazer}
@@ -291,6 +378,8 @@ function CartaoExercicio({
   aoRemover,
   aoDepois,
   aoComoFazer,
+  aoTrocar,
+  modoCarga,
 }: {
   item: ItemTreino
   sessao: Sessao
@@ -303,14 +392,19 @@ function CartaoExercicio({
   aoRemover: () => void
   aoDepois: () => void
   aoComoFazer: () => void
+  aoTrocar?: () => void
+  /** peso do corpo que já passou para carga extra (§6.13) */
+  modoCarga?: boolean
 }) {
   const ex = exercicioPorId(item.exercicioId)
   if (!ex) return null
   const aquecimento = item.papel === 'aquecimento_ombro'
-  const mostrarCarga = ex.tipoCarga !== 'pesoCorpo' || item.cargaSugerida !== null || item.series.some((s) => s.carga !== null)
+  const mostrarCarga = ex.tipoCarga !== 'pesoCorpo' || !!modoCarga || item.cargaSugerida !== null || item.series.some((s) => s.carga !== null)
   const c = contadorSeries(item)
   const alvo = item.series.find((s) => s.tipo === 'trabalho')?.repsAlvo ?? null
-  const cargaExemplo = item.series.find((s) => !s.feita && s.carga !== null)?.carga ?? null
+  // total na barra: carga das séries de trabalho (não da aproximação)
+  const trabalho = item.series.filter((s) => s.tipo === 'trabalho' || s.tipo === 'extra')
+  const cargaExemplo = (trabalho.find((s) => !s.feita && s.carga !== null) ?? trabalho.find((s) => s.carga !== null))?.carga ?? null
   let numeroTrabalho = 0
   let numeroAquec = 0
 
@@ -318,10 +412,11 @@ function CartaoExercicio({
     <Cartao>
       <div className="flex items-start gap-2">
         <div className="flex-1">
-          <h2 className="text-xl font-bold leading-tight">{ex.nome}</h2>
+          <h2 className="text-xl font-bold leading-tight" data-testid="nome-exercicio">{ex.nome}</h2>
           <div className="mt-1 flex flex-wrap gap-1">
             <Etiqueta>{NOME_EQUIPAMENTO[ex.equipamento]}</Etiqueta>
             {aquecimento && <Etiqueta cor="marca">Aquecimento de ombro</Etiqueta>}
+            {item.originalId && <Etiqueta>No lugar de {exercicioPorId(item.originalId)?.nome}</Etiqueta>}
             {ex.unilateral && <Etiqueta>Reps por lado</Etiqueta>}
           </div>
         </div>
@@ -403,6 +498,11 @@ function CartaoExercicio({
         <Botao variante="secundario" className="text-sm" onClick={aoDepois}>
           Deixar pra depois
         </Botao>
+        {aoTrocar && (
+          <Botao variante="secundario" className="col-span-2 text-sm" onClick={aoTrocar}>
+            ⇄ Trocar exercício
+          </Botao>
+        )}
       </div>
     </Cartao>
   )
