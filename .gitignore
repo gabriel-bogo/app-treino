@@ -1,0 +1,25 @@
+# Dependências e build
+node_modules/
+dist/
+dev-dist/
+*.tsbuildinfo
+
+# Testes
+coverage/
+test-results/
+playwright-report/
+
+# Segredos (o app não usa nenhum; nunca commitar se um dia existir)
+.env
+.env.*
+
+# Backups do app: NUNCA subir o próprio backup para o repositório
+app-treino-backup-*.json
+
+# Cache da curadoria (dataset baixado na hora de gerar)
+scripts/curadoria/.cache/
+
+# Sistema
+.DS_Store
+Thumbs.db
+.vercel
