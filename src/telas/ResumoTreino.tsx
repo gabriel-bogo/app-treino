@@ -72,6 +72,7 @@ export function ResumoTreino({ id }: { id: string }) {
                   </p>
                 ))}
                 {!evs.length && i.series.some((s) => s.feita) && prox && <p className="text-sm text-slate-500 dark:text-slate-400">Repete a meta: {prox}.</p>}
+                {!evs.length && i.series.some((s) => s.feita) && !prox && <p className="text-sm text-slate-500 dark:text-slate-400">Registrado.</p>}
                 {!i.series.some((s) => s.feita) && <p className="text-sm text-slate-500 dark:text-slate-400">Não foi feito hoje.</p>}
                 {estado?.sugerirAssistida && (() => {
                   const assistida = ex.versaoAssistida?.map(permitido).find(Boolean)

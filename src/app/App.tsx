@@ -5,7 +5,7 @@ import { Mais } from '../telas/Mais'
 import { Sobre } from '../telas/Sobre'
 import { Instalar } from '../telas/Instalar'
 import { Configuracoes } from '../telas/Configuracoes'
-import { EmBreve } from '../telas/EmBreve'
+import { NaoEncontrada } from '../telas/NaoEncontrada'
 import { Backup } from '../telas/Backup'
 import { Inicio } from '../telas/Inicio'
 import { Biblioteca } from '../telas/Biblioteca'
@@ -17,6 +17,9 @@ import { PlanoSemana } from '../telas/PlanoSemana'
 import { Treino } from '../telas/Treino'
 import { ResumoTreino } from '../telas/ResumoTreino'
 import { RetomadaTreino } from '../components/RetomadaTreino'
+import { Historico } from '../telas/Historico'
+import { HistoricoSessao } from '../telas/HistoricoSessao'
+import { HistoricoExercicio } from '../telas/HistoricoExercicio'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '../db/banco'
 
@@ -76,7 +79,8 @@ function Conteudo({ partes }: { partes: string[] }) {
     case 'treino':
       return partes[1] === 'resumo' && partes[2] ? <ResumoTreino id={partes[2]} /> : <Treino />
     case 'historico':
-      return <EmBreve titulo="Histórico" />
+      if (partes[1] === 'exercicio' && partes[2]) return <HistoricoExercicio id={partes[2]} />
+      return partes[1] ? <HistoricoSessao id={partes[1]} /> : <Historico />
     case 'saude':
       return <Saude />
     case 'mais':
@@ -94,7 +98,7 @@ function Conteudo({ partes }: { partes: string[] }) {
     case 'backup':
       return <Backup />
     default:
-      return <EmBreve titulo="Página não encontrada" voltarPara="/" />
+      return <NaoEncontrada />
   }
 }
 

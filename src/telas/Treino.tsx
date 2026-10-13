@@ -396,6 +396,7 @@ function CartaoExercicio({
   /** peso do corpo que já passou para carga extra (§6.13) */
   modoCarga?: boolean
 }) {
+  const [pedirReps, setPedirReps] = useState<string | null>(null)
   const ex = exercicioPorId(item.exercicioId)
   if (!ex) return null
   const aquecimento = item.papel === 'aquecimento_ombro'
@@ -478,12 +479,26 @@ function CartaoExercicio({
               serie={s}
               mostrarCarga={mostrarCarga}
               incremento={incremento}
-              aoMudar={(v) => aoMudar(s.uid, v)}
-              aoMarcar={() => aoMarcar(s.uid)}
+              aoMudar={(v) => {
+                if (v.reps !== undefined && v.reps !== null) setPedirReps(null)
+                aoMudar(s.uid, v)
+              }}
+              aoMarcar={() => {
+                // sem repetições não há o que registrar (ex: 1º treino de peso do corpo)
+                if (!s.feita && s.reps === null) {
+                  setPedirReps(s.uid)
+                  document.querySelector<HTMLInputElement>(`input[aria-label="repetições da série ${numero}"]`)?.focus()
+                  return
+                }
+                setPedirReps(null)
+                aoMarcar(s.uid)
+              }}
             />
           )
         })}
       </div>
+
+      {pedirReps && <p className="mt-2 text-sm font-medium text-sky-700 dark:text-sky-300" role="alert">Digite quantas repetições você fez antes de marcar a série.</p>}
 
       <div className="mt-3 grid grid-cols-2 gap-2">
         <Botao variante="secundario" className="text-sm" onClick={aoAdicionar}>

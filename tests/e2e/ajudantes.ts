@@ -87,3 +87,29 @@ export async function importarBackup(page: Page, tabelas: Record<string, unknown
   await page.getByRole('button', { name: 'Substituir tudo' }).click()
   await expect(page.getByText('Backup importado com sucesso.')).toBeVisible()
 }
+
+/** Faz o treino do dia marcando todas as séries (preenche carga vazia com 10) e finaliza. */
+export async function fazerTreinoCompleto(page: Page) {
+  await page.getByRole('button', { name: 'Começar treino' }).click()
+  await expect(page.getByTestId('nome-exercicio')).toBeVisible()
+  for (let i = 0; i < 80; i++) {
+    const botao = page.getByRole('button', { name: /Marcar série \d+ como feita/ }).first()
+    if (!(await botao.count())) break
+    const cargaVazia = page.getByRole('textbox', { name: /carga da série \d+$/ }).first()
+    if ((await cargaVazia.count()) && !(await cargaVazia.inputValue())) {
+      await cargaVazia.fill('10')
+      await cargaVazia.blur()
+    }
+    const repsVazias = page.getByRole('textbox', { name: /repetições da série \d+$/ })
+    for (const r of await repsVazias.all()) {
+      if (!(await r.inputValue())) {
+        await r.fill('12')
+        await r.blur()
+      }
+    }
+    await botao.click()
+  }
+  await page.getByRole('button', { name: 'Finalizar', exact: true }).click()
+  await page.getByRole('button', { name: 'Finalizar e salvar' }).click()
+  await expect(page.getByText('Treino concluído')).toBeVisible()
+}
