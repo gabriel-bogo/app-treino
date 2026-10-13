@@ -6,6 +6,8 @@ import { Sobre } from '../telas/Sobre'
 import { Instalar } from '../telas/Instalar'
 import { Configuracoes } from '../telas/Configuracoes'
 import { EmBreve } from '../telas/EmBreve'
+import { Backup } from '../telas/Backup'
+import { Inicio } from '../telas/Inicio'
 
 const ABAS: { caminho: string; rotulo: string; icone: ReactNode }[] = [
   { caminho: '/', rotulo: 'Início', icone: <IconeInicio /> },
@@ -57,7 +59,7 @@ function BarraInferior({ ativa }: { ativa: string }) {
 function Conteudo({ partes }: { partes: string[] }) {
   switch (partes[0]) {
     case undefined:
-      return <EmBreve titulo="Início" />
+      return <Inicio />
     case 'plano':
       return <EmBreve titulo="Plano da semana" />
     case 'historico':
@@ -77,7 +79,7 @@ function Conteudo({ partes }: { partes: string[] }) {
     case 'perfil':
       return <EmBreve titulo="Perfil" voltarPara="/mais" />
     case 'backup':
-      return <EmBreve titulo="Backup" voltarPara="/mais" />
+      return <Backup />
     default:
       return <EmBreve titulo="Página não encontrada" voltarPara="/" />
   }
