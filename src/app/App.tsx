@@ -12,6 +12,7 @@ import { Biblioteca } from '../telas/Biblioteca'
 import { ExercicioDetalhe } from '../telas/ExercicioDetalhe'
 import { Onboarding } from '../telas/Onboarding'
 import { Perfil } from '../telas/Perfil'
+import { Saude } from '../telas/Saude'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '../db/banco'
 
@@ -71,7 +72,7 @@ function Conteudo({ partes }: { partes: string[] }) {
     case 'historico':
       return <EmBreve titulo="Histórico" />
     case 'saude':
-      return <EmBreve titulo="Saúde" />
+      return <Saude />
     case 'mais':
       return <Mais />
     case 'sobre':

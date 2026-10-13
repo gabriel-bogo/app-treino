@@ -38,3 +38,52 @@ export async function fazerOnboarding(page: Page, o: OpcoesOnboarding = {}) {
   await page.getByRole('button', { name: 'Criar meu plano' }).click()
   await expect(page.getByRole('navigation', { name: 'Navegação principal' })).toBeVisible()
 }
+
+/** Perfil fictício para montar backups de teste. */
+export function perfilFicticio(mudancas: Record<string, unknown> = {}) {
+  return {
+    id: 'perfil',
+    nome: 'Pessoa Teste',
+    sexo: 'masculino',
+    nascimento: '1988-03-15',
+    alturaCm: 178,
+    pesoInicialKg: 86,
+    nivel: 'intermediario',
+    objetivo: 'hipertrofia',
+    enfase: 'equilibrado',
+    diasSemana: 4,
+    duracaoMin: 60,
+    limitacoes: [],
+    nConfirmacoes: 2,
+    avisoSaudeAceitoEm: '2026-01-01T10:00:00.000Z',
+    criadoEm: '2026-01-01T10:00:00.000Z',
+    atualizadoEm: '2026-01-01T10:00:00.000Z',
+    ...mudancas,
+  }
+}
+
+function dataLocal(d: Date) {
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+}
+
+/** Pesos fictícios nos últimos `dias` (oscilando em torno de uma tendência de queda). */
+export function pesosFicticios(dias: number, inicio = 86, cinturaCm?: number) {
+  const hoje = new Date()
+  const r = []
+  for (let i = dias; i >= 1; i--) {
+    const d = new Date(hoje)
+    d.setDate(d.getDate() - i)
+    const ruido = ((i * 37) % 11) / 10 - 0.5
+    r.push({ data: dataLocal(d), pesoKg: Math.round((inicio - (dias - i) * 0.05 + ruido) * 10) / 10, ...(cinturaCm && i % 7 === 0 ? { cinturaCm } : {}) })
+  }
+  return r
+}
+
+/** Carrega dados pelo fluxo de importação de backup (mesmo caminho do usuário). */
+export async function importarBackup(page: Page, tabelas: Record<string, unknown[]>) {
+  await page.goto('/#/backup')
+  const conteudo = JSON.stringify({ app: 'app-treino', schemaVersion: 1, exportadoEm: new Date().toISOString(), versaoApp: 'teste', tabelas })
+  await page.getByTestId('arquivo-backup').setInputFiles({ name: 'backup.json', mimeType: 'application/json', buffer: Buffer.from(conteudo) })
+  await page.getByRole('button', { name: 'Substituir tudo' }).click()
+  await expect(page.getByText('Backup importado com sucesso.')).toBeVisible()
+}
