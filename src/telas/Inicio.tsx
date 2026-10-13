@@ -1,4 +1,7 @@
+import { useState } from 'react'
+import { useLiveQuery } from 'dexie-react-hooks'
 import { navegar } from '../app/rotas'
+import { iniciarSessao, sessaoEmAndamento } from '../db/sessao'
 import { usePlano } from '../app/usePlano'
 import { dispensarMensagemFase } from '../db/plano'
 import { exercicioPorId } from '../domain/biblioteca'
@@ -10,6 +13,8 @@ import { RegistroPesoHoje } from '../components/RegistroPesoHoje'
 // lembretes de backup e de peso.
 export function Inicio() {
   const dados = usePlano()
+  const andamento = useLiveQuery(async () => (await sessaoEmAndamento()) ?? null)
+  const [iniciando, setIniciando] = useState(false)
   const plano = dados?.plano
   const proximo = dados?.dias.find((d) => d.ordem === plano?.proximoIndice)
   const exercicios = proximo ? dados!.exercicios.filter((e) => e.diaId === proximo.id && e.papel === 'trabalho').sort((a, b) => a.ordem - b.ordem) : []
@@ -26,7 +31,16 @@ export function Inicio() {
       )}
       <LembreteBackup />
 
-      {proximo && (
+      {andamento && (
+        <Cartao destaque="info" titulo="Treino em andamento">
+          <Texto>{andamento.nomeDia}</Texto>
+          <Botao grande className="mt-3 w-full" onClick={() => navegar('/treino')}>
+            Continuar treino
+          </Botao>
+        </Cartao>
+      )}
+
+      {proximo && !andamento && (
         <Cartao>
           <div className="flex items-center gap-2">
             <p className="text-sm text-slate-500 dark:text-slate-400">Próximo treino</p>
@@ -44,7 +58,20 @@ export function Inicio() {
               </li>
             ))}
           </ul>
-          <Botao grande className="mt-4 w-full" onClick={() => navegar('/treino')}>
+          <Botao
+            grande
+            className="mt-4 w-full"
+            disabled={iniciando}
+            onClick={async () => {
+              setIniciando(true)
+              try {
+                await iniciarSessao()
+                navegar('/treino')
+              } finally {
+                setIniciando(false)
+              }
+            }}
+          >
             Começar treino
           </Botao>
           <Botao variante="fantasma" className="mt-1 w-full" onClick={() => navegar('/plano')}>

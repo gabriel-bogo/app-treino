@@ -14,6 +14,9 @@ import { Onboarding } from '../telas/Onboarding'
 import { Perfil } from '../telas/Perfil'
 import { Saude } from '../telas/Saude'
 import { PlanoSemana } from '../telas/PlanoSemana'
+import { Treino } from '../telas/Treino'
+import { ResumoTreino } from '../telas/ResumoTreino'
+import { RetomadaTreino } from '../components/RetomadaTreino'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '../db/banco'
 
@@ -71,7 +74,7 @@ function Conteudo({ partes }: { partes: string[] }) {
     case 'plano':
       return <PlanoSemana />
     case 'treino':
-      return <EmBreve titulo="Treino" voltarPara="/" />
+      return partes[1] === 'resumo' && partes[2] ? <ResumoTreino id={partes[2]} /> : <Treino />
     case 'historico':
       return <EmBreve titulo="Histórico" />
     case 'saude':
@@ -106,10 +109,13 @@ export function App() {
   // Sem perfil: onboarding. Backup, Sobre e Instalar continuam acessíveis
   // (para restaurar um backup antes de começar).
   if (perfil === null && !['backup', 'sobre', 'instalar'].includes(partes[0] ?? '')) return <Onboarding />
+  // durante o treino a tela é cheia (sem a barra de navegação)
+  const telaTreino = partes[0] === 'treino' && partes[1] !== 'resumo'
   return (
-    <div className="min-h-dvh pb-24">
+    <div className={`min-h-dvh ${telaTreino ? '' : 'pb-24'}`}>
       <Conteudo partes={partes} />
-      <BarraInferior ativa={abaAtiva(partes)} />
+      {!telaTreino && <BarraInferior ativa={abaAtiva(partes)} />}
+      {perfil && <RetomadaTreino naTelaDeTreino={telaTreino} />}
     </div>
   )
 }

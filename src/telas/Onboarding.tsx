@@ -43,6 +43,8 @@ export function Onboarding() {
 
   async function concluir() {
     setSalvando(true)
+    // vai para o início antes de salvar: assim que o perfil existe a tela principal aparece
+    navegar('/', { substituir: true })
     await salvarPerfilInicial({
       nome: r.nome!.trim(),
       sexo: r.sexo!,
@@ -58,7 +60,6 @@ export function Onboarding() {
       nConfirmacoes: r.nConfirmacoes ?? 2,
       avisoSaudeAceitoEm: new Date().toISOString(),
     })
-    navegar('/', { substituir: true })
   }
 
   return (
