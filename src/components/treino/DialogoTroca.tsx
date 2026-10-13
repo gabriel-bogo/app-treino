@@ -39,16 +39,19 @@ export function DialogoTroca({
   aoFechar,
   aoEscolher,
   aoPular,
+  noPlano = false,
 }: {
   original: Exercicio
   idsDoDia: string[]
   perfil: Perfil
   aoFechar: () => void
   aoEscolher: (e: EscolhaTroca) => void
-  aoPular: () => void
+  aoPular?: () => void
+  /** C5: troca feita na revisão do plano (sem motivo e sem "só hoje") */
+  noPlano?: boolean
 }) {
   const ajustes = mapaAjustes(useLiveQuery(() => db.ajustesExercicio.toArray()))
-  const [motivo, setMotivo] = useState<MotivoTroca | null>(null)
+  const [motivo, setMotivo] = useState<MotivoTroca | null>(noPlano ? 'outro' : null)
   const [filtro, setFiltro] = useState<FiltroEquipamento>('todos')
   const [verTodos, setVerTodos] = useState(false)
   const [aberto, setAberto] = useState<string | null>(null)
@@ -117,6 +120,7 @@ export function DialogoTroca({
 
   return (
     <Dialogo aberto titulo={`Trocar ${original.nome}`} aoFechar={aoFechar} acoes={<Botao variante="secundario" onClick={aoFechar}>Cancelar</Botao>}>
+      {noPlano && <p className="text-sm text-slate-500 dark:text-slate-400">A troca vale para todos os treinos em que ele aparece.</p>}
       <div className="flex gap-2" role="radiogroup" aria-label="Filtro de equipamento">
         {FILTROS.map((f) => (
           <button
@@ -137,7 +141,7 @@ export function DialogoTroca({
       {lista.length === 0 ? (
         <div className="rounded-xl bg-slate-50 p-3 dark:bg-slate-800/60">
           <p>Nenhum substituto disponível{filtro !== 'todos' ? ' com esse filtro' : ''}.</p>
-          {filtro === 'todos' && (
+          {filtro === 'todos' && aoPular && (
             <Botao variante="secundario" className="mt-2 w-full" onClick={aoPular}>
               Pular exercício
             </Botao>
@@ -155,7 +159,11 @@ export function DialogoTroca({
                 <Botao variante="fantasma" className="min-h-10 px-2 text-sm" onClick={() => setAberto(aberto === e.id ? null : e.id)}>
                   Como fazer
                 </Botao>
-                <Botao className="min-h-10 px-3 text-sm" onClick={() => setEscolhido(e.id)} aria-label={`Escolher ${e.nome}`}>
+                <Botao
+                  className="min-h-10 px-3 text-sm"
+                  onClick={() => (noPlano ? aoEscolher({ substitutoId: e.id, motivo, escopo: 'plano', marcarIndisponivel: false }) : setEscolhido(e.id))}
+                  aria-label={`Escolher ${e.nome}`}
+                >
                   Escolher
                 </Botao>
               </div>

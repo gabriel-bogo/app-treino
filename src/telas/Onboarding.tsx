@@ -3,7 +3,7 @@ import { AVISO_SAUDE } from '../app/textos'
 import { navegar } from '../app/rotas'
 import { dataLocal } from '../domain/datas'
 import { salvarPerfilInicial } from '../db/perfil'
-import { lerNumero, validarDadosPessoais, validarTreino, type ErrosPerfil, type RascunhoPerfil } from '../domain/perfil'
+import { DURACAO, lerNumero, validarDadosPessoais, validarTreino, type ErrosPerfil, type RascunhoPerfil } from '../domain/perfil'
 import { Botao, Cartao, Texto } from '../components/ui'
 import { CamposPessoais, CamposTreino, CamposLimitacoes } from '../components/FormPerfil'
 
@@ -15,7 +15,7 @@ const PASSOS = ['Boas-vindas', 'Sobre você', 'Seu treino', 'Limitações'] as c
 export function Onboarding() {
   const [passo, setPasso] = useState(0)
   const [aceite, setAceite] = useState(false)
-  const [r, setR] = useState<RascunhoPerfil>({ limitacoes: [], nConfirmacoes: 2 })
+  const [r, setR] = useState<RascunhoPerfil>({ limitacoes: [], nConfirmacoes: 2, objetivos: [], enfases: [], duracaoMin: DURACAO.padrao })
   const [textos, setTextos] = useState({ altura: '', peso: '' })
   const [erros, setErros] = useState<ErrosPerfil>({})
   const [salvando, setSalvando] = useState(false)
@@ -43,8 +43,8 @@ export function Onboarding() {
 
   async function concluir() {
     setSalvando(true)
-    // vai para o início antes de salvar: assim que o perfil existe a tela principal aparece
-    navegar('/', { substituir: true })
+    // vai para a proposta do plano antes de salvar: assim que o perfil existe ela aparece (C5)
+    navegar('/plano/proposta', { substituir: true })
     await salvarPerfilInicial({
       nome: r.nome!.trim(),
       sexo: r.sexo!,
@@ -52,8 +52,8 @@ export function Onboarding() {
       alturaCm: r.alturaCm!,
       pesoInicialKg: r.pesoInicialKg!,
       nivel: r.nivel!,
-      objetivo: r.objetivo!,
-      enfase: r.enfase!,
+      objetivos: r.objetivos!,
+      enfases: r.enfases ?? [],
       diasSemana: r.diasSemana!,
       duracaoMin: r.duracaoMin!,
       limitacoes: r.limitacoes ?? [],

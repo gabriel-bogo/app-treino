@@ -65,17 +65,21 @@ export function Multipla<T extends string>({
   opcoes,
   aoMudar,
   rotuloNenhuma,
+  recomendados = [],
 }: {
   rotulo: string
   ajuda?: ReactNode
   valores: T[]
-  opcoes: { valor: T; rotulo: string }[]
+  opcoes: { valor: T; rotulo: string; descricao?: string }[]
   aoMudar: (v: T[]) => void
   rotuloNenhuma?: string
+  /** opções com o rótulo em negrito e a etiqueta "recomendado" */
+  recomendados?: readonly T[]
 }) {
   const alternar = (v: T) => aoMudar(valores.includes(v) ? valores.filter((x) => x !== v) : [...valores, v])
+  const comDescricao = opcoes.some((o) => o.descricao)
   const estilo = (sel: boolean) =>
-    `min-h-12 rounded-xl border px-3 font-medium ${
+    `min-h-12 rounded-xl border px-3 py-2 ${comDescricao ? 'text-left' : ''} ${
       sel
         ? 'border-emerald-600 bg-emerald-50 ring-2 ring-emerald-600 dark:border-emerald-500 dark:bg-emerald-950/50 dark:ring-emerald-500'
         : 'border-slate-300 bg-white dark:border-slate-700 dark:bg-slate-900'
@@ -87,17 +91,66 @@ export function Multipla<T extends string>({
       </legend>
       <div className="grid grid-cols-2 gap-2">
         {rotuloNenhuma && (
-          <button type="button" aria-pressed={valores.length === 0} onClick={() => aoMudar([])} className={estilo(valores.length === 0)}>
+          <button type="button" aria-pressed={valores.length === 0} onClick={() => aoMudar([])} className={`${estilo(valores.length === 0)} font-medium`}>
             {rotuloNenhuma}
           </button>
         )}
-        {opcoes.map((o) => (
-          <button key={o.valor} type="button" aria-pressed={valores.includes(o.valor)} onClick={() => alternar(o.valor)} className={estilo(valores.includes(o.valor))}>
-            {o.rotulo}
-          </button>
-        ))}
+        {opcoes.map((o) => {
+          const recomendado = recomendados.includes(o.valor)
+          return (
+            <button key={o.valor} type="button" aria-pressed={valores.includes(o.valor)} onClick={() => alternar(o.valor)} className={estilo(valores.includes(o.valor))}>
+              <span className={`block ${recomendado ? 'font-extrabold' : 'font-medium'}`}>{o.rotulo}</span>
+              {o.descricao && <span className="block text-xs text-slate-500 dark:text-slate-400">{o.descricao}</span>}
+              {recomendado && <span className="mt-1 block text-xs font-bold uppercase tracking-wide text-emerald-700 dark:text-emerald-400">Recomendado</span>}
+            </button>
+          )
+        })}
       </div>
     </fieldset>
+  )
+}
+
+/** Barra deslizante com o valor escolhido em destaque (ex: duração do treino). */
+export function Deslizante({
+  rotulo,
+  ajuda,
+  valor,
+  min,
+  max,
+  passo,
+  formatar,
+  aoMudar,
+}: {
+  rotulo: string
+  ajuda?: ReactNode
+  valor: number
+  min: number
+  max: number
+  passo: number
+  formatar: (v: number) => string
+  aoMudar: (v: number) => void
+}) {
+  return (
+    <label className="block">
+      <Rotulo ajuda={ajuda}>{rotulo}</Rotulo>
+      <span className="mb-1 block text-center text-3xl font-bold" aria-hidden="true" style={{ fontVariantNumeric: 'tabular-nums' }}>
+        {formatar(valor)}
+      </span>
+      <input
+        type="range"
+        min={min}
+        max={max}
+        step={passo}
+        value={valor}
+        aria-valuetext={formatar(valor)}
+        onChange={(e) => aoMudar(Number(e.target.value))}
+        className="h-12 w-full cursor-pointer accent-emerald-600 dark:accent-emerald-500"
+      />
+      <span className="flex justify-between text-sm text-slate-500 dark:text-slate-400" aria-hidden="true">
+        <span>{formatar(min)}</span>
+        <span>{formatar(max)}</span>
+      </span>
+    </label>
   )
 }
 

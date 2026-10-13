@@ -98,7 +98,15 @@ export async function escolherCargaExtra(exercicioId: string) {
 /** Usa outro exercício no lugar deste nos próximos treinos (variação mais difícil ou versão assistida). */
 export async function trocarExercicioNoPlano(origemId: string, destinoId: string) {
   const config = await db.configuracoes.get('app')
-  if (config) await db.configuracoes.put({ ...config, trocasNoPlano: { ...config.trocasNoPlano, [origemId]: destinoId } })
+  if (config) {
+    // se o exercício já era um substituto (A → B) e agora vira C, a troca fica A → C;
+    // voltar ao original desfaz a troca
+    const trocas = { ...config.trocasNoPlano }
+    const chave = Object.keys(trocas).find((k) => trocas[k] === origemId) ?? origemId
+    if (chave === destinoId) delete trocas[chave]
+    else trocas[chave] = destinoId
+    await db.configuracoes.put({ ...config, trocasNoPlano: trocas })
+  }
   const e = await db.progressao.get(origemId)
   if (e) await db.progressao.put({ ...e, noTeto: false, sugerirAssistida: false })
 }

@@ -1,6 +1,7 @@
 import { CHAVES, TABELAS, VERSAO_SCHEMA, type BancoTreino, type NomeTabela } from './banco'
 import { dataLocal, diasEntre } from '../domain/datas'
 import type { Configuracoes, Sessao } from '../domain/tipos'
+import { normalizarPerfil } from '../domain/perfil'
 
 // Backup manual (seção 8): exportar todos os dados num arquivo JSON e importar
 // de volta ("substituir tudo").
@@ -105,7 +106,9 @@ export async function restaurarBackup(banco: BancoTreino, backup: ArquivoBackup)
   await banco.transaction('rw', TABELAS.map((t) => banco.table(t)), async () => {
     for (const t of TABELAS) {
       await banco.table(t).clear()
-      const linhas = backup.tabelas[t] ?? []
+      let linhas = backup.tabelas[t] ?? []
+      // backup de versão anterior (schemaVersion 1): perfil no formato antigo
+      if (t === 'perfil') linhas = linhas.map((p) => normalizarPerfil(p as object))
       if (linhas.length) await banco.table(t).bulkAdd(linhas)
     }
   })

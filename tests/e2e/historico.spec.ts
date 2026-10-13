@@ -2,12 +2,12 @@ import { test, expect } from '@playwright/test'
 import { fazerOnboarding, fazerTreinoCompleto } from './ajudantes'
 
 test('histórico mostra o treino feito, as séries e a evolução por exercício', async ({ page }) => {
-  await fazerOnboarding(page, { nivel: 'Intermediário', dias: '4', duracao: '45 min' })
+  await fazerOnboarding(page, { nivel: 'Intermediário', dias: '4', duracao: 45 })
   await fazerTreinoCompleto(page)
   await page.getByRole('button', { name: 'Voltar ao início' }).click()
   await page.getByRole('button', { name: 'Histórico' }).click()
-  await expect(page.getByText('Superior A')).toBeVisible()
-  await page.getByText('Superior A').click()
+  await expect(page.getByText('Treino A · Superior')).toBeVisible()
+  await page.getByText('Treino A · Superior').click()
   await expect(page.getByRole('cell', { name: '1ª' }).first()).toBeVisible()
   await expect(page.getByRole('cell', { name: '10 kg' }).first()).toBeVisible()
 
@@ -20,7 +20,7 @@ test('histórico mostra o treino feito, as séries e a evolução por exercício
 })
 
 test('peso do corpo no 1º treino: pede as repetições antes de marcar e define o alvo', async ({ page }) => {
-  await fazerOnboarding(page, { nivel: 'Intermediário', dias: '4', duracao: '45 min' })
+  await fazerOnboarding(page, { nivel: 'Intermediário', dias: '4', duracao: 45 })
   await page.getByRole('button', { name: 'Começar treino' }).click()
   await page.getByRole('button', { name: /Abdominal/ }).click()
   await expect(page.getByTestId('nome-exercicio')).toHaveText('Abdominal (crunch)')

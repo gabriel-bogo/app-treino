@@ -213,50 +213,76 @@ export function exigeLiberacaoMedica(classe: ClasseIMC): boolean {
 export interface MensagemObjetivo {
   tipo: 'info' | 'aviso' | 'perigo'
   texto: string
+  /** trecho do texto mostrado em negrito (a classificação, C7) */
+  destaque?: string
 }
 
-/** Contexto mostrado ao escolher o objetivo no onboarding (§10, "Coerência com o objetivo"). */
-export function mensagensObjetivo(av: AvaliacaoPeso, objetivo: Objetivo | undefined): MensagemObjetivo[] {
-  const msgs: MensagemObjetivo[] = []
-  if (av.faixa === 'menor') {
-    msgs.push({
-      tipo: 'info',
-      texto: `Seu IMC é ${av.imc.toFixed(1).replace('.', ',')}. Para menores de 18 anos o IMC depende de curvas por idade; recomendamos avaliação com um profissional.`,
-    })
-    return msgs
-  }
-  const nome = NOME_CLASSE[av.classe].toLowerCase()
-  const imcTxt = av.imc.toFixed(1).replace('.', ',')
+/** C7: objetivos que combinam com a classificação do IMC (aparecem em negrito nas opções). */
+export function objetivosRecomendados(av: Pick<AvaliacaoPeso, 'classe' | 'faixa'>): Objetivo[] {
+  if (av.faixa === 'menor') return []
   switch (av.classe) {
     case 'abaixo':
     case 'baixo_peso_idoso':
-      msgs.push({ tipo: 'info', texto: `Pelo IMC (${imcTxt}), sua classificação é ${nome}. Hipertrofia ou saúde geral costumam combinar melhor.` })
-      break
-    case 'adequado':
-    case 'adequado_idoso':
-      msgs.push({ tipo: 'info', texto: `Pelo IMC (${imcTxt}), seu peso está na faixa adequada. Escolha o objetivo que mais combina com você.` })
-      break
+      return ['hipertrofia', 'saude']
     case 'sobrepeso':
     case 'sobrepeso_idoso':
     case 'obesidade1':
-      msgs.push({ tipo: 'info', texto: `Pelo IMC (${imcTxt}), sua classificação é ${nome}. Emagrecimento pode ser um bom objetivo para você.` })
-      break
     case 'obesidade2':
     case 'obesidade3':
-      msgs.push({ tipo: 'info', texto: `Pelo IMC (${imcTxt}), sua classificação é ${nome}. Emagrecimento pode ser um bom objetivo para você.` })
-      msgs.push({
-        tipo: 'aviso',
-        texto: 'Recomendamos liberação médica antes de começar. O app vai iniciar com a fase de readaptação (3 semanas de treinos mais leves), mesmo se você já treina.',
-      })
-      break
-    case 'nao_classificado':
-      break
+      return ['emagrecimento']
+    default:
+      return []
   }
-  if (objetivo === 'emagrecimento' && emagrecimentoDesaconselhado(av)) {
-    msgs.push({
+}
+
+/**
+ * Contexto do IMC mostrado ANTES das opções de objetivo no onboarding (§10,
+ * "Coerência com o objetivo"; C7: fora da faixa adequada, em vermelho e com a
+ * classificação em destaque).
+ */
+export function mensagensClassificacao(av: AvaliacaoPeso): MensagemObjetivo[] {
+  const imcTxt = av.imc.toFixed(1).replace('.', ',')
+  if (av.faixa === 'menor') {
+    return [{ tipo: 'info', texto: `Seu IMC é ${imcTxt}. Para menores de 18 anos o IMC depende de curvas por idade; recomendamos avaliação com um profissional.` }]
+  }
+  const nome = NOME_CLASSE[av.classe].toUpperCase()
+  const classificacao = (complemento: string): MensagemObjetivo => ({
+    tipo: 'perigo',
+    texto: `Pelo IMC (${imcTxt}), sua classificação é ${nome}. ${complemento}`,
+    destaque: nome,
+  })
+  switch (av.classe) {
+    case 'abaixo':
+    case 'baixo_peso_idoso':
+      return [classificacao('Hipertrofia ou saúde geral costumam combinar melhor.')]
+    case 'adequado':
+    case 'adequado_idoso':
+      return [{ tipo: 'info', texto: `Pelo IMC (${imcTxt}), seu peso está na faixa adequada. Escolha o objetivo que mais combina com você.` }]
+    case 'sobrepeso':
+    case 'sobrepeso_idoso':
+    case 'obesidade1':
+      return [classificacao('Emagrecimento pode ser um bom objetivo para você.')]
+    case 'obesidade2':
+    case 'obesidade3':
+      return [
+        classificacao('Emagrecimento pode ser um bom objetivo para você.'),
+        {
+          tipo: 'aviso',
+          texto: 'Recomendamos liberação médica antes de começar. O app vai iniciar com a fase de readaptação (3 semanas de treinos mais leves), mesmo se você já treina.',
+        },
+      ]
+    case 'nao_classificado':
+      return []
+  }
+}
+
+/** Alerta que depende dos objetivos marcados (mostrado DEPOIS das opções, §10). */
+export function alertasObjetivo(av: AvaliacaoPeso, objetivos: readonly Objetivo[] | undefined): MensagemObjetivo[] {
+  if (!objetivos?.includes('emagrecimento') || !emagrecimentoDesaconselhado(av)) return []
+  return [
+    {
       tipo: 'perigo',
       texto: 'Com o seu peso atual, emagrecer não é recomendado sem acompanhamento. Converse com um médico ou nutricionista. Sugestão: escolha "saúde geral" ou "hipertrofia".',
-    })
-  }
-  return msgs
+    },
+  ]
 }

@@ -51,12 +51,28 @@ export const MULT_DESCANSO_FEMININO = 0.85
 /** A3: a série conta 1 para o grupo principal e 0,5 para cada grupo secundário. */
 export const PESO_SECUNDARIO = 0.5
 
-/** §6.3 + B19: grupos que recebem a ênfase. */
+/** §6.3 + B17: grupos que recebem cada ênfase. */
 export const GRUPOS_DA_ENFASE: Record<Enfase, Grupo[]> = {
-  equilibrado: [],
   inferior: ['quadriceps', 'posteriores', 'gluteos', 'panturrilha'],
   superior: ['peito', 'costas', 'ombros', 'biceps', 'triceps'],
   gluteos: ['gluteos'],
+}
+
+/**
+ * C2: grupos com ênfase para as partes marcadas (vazio = equilibrado).
+ * Superior + inferior juntos cobrem o corpo todo e se anulam; glúteos, se
+ * marcado também, continua valendo.
+ */
+export function gruposDaEnfase(enfases: readonly Enfase[]): Grupo[] {
+  const anula = enfases.includes('superior') && enfases.includes('inferior')
+  const efetivas = anula ? enfases.filter((e) => e === 'gluteos') : enfases
+  return [...new Set(efetivas.flatMap((e) => GRUPOS_DA_ENFASE[e]))]
+}
+
+/** §6.2 + A12: a ênfase efetiva é só de membros inferiores (inferior e/ou glúteos). */
+export function enfaseSoInferior(enfases: readonly Enfase[]): boolean {
+  const grupos = gruposDaEnfase(enfases)
+  return grupos.length > 0 && grupos.every((g) => GRUPOS_DA_ENFASE.inferior.includes(g))
 }
 
 /** A3: grupos grandes. */
@@ -97,8 +113,10 @@ export function arredondar5(seg: number): number {
   return Math.round(seg / 5) * 5
 }
 
-export function descansoSegundos(objetivo: Objetivo, tipo: 'composto' | 'isolado', sexo: Sexo, fase: Fase): number {
-  const base = DESCANSO[fase === 'readaptacao' ? 'saude' : objetivo][tipo]
+/** C1: com mais de um objetivo, o descanso é a média dos descansos de cada um. */
+export function descansoSegundos(objetivos: readonly Objetivo[], tipo: 'composto' | 'isolado', sexo: Sexo, fase: Fase): number {
+  const usados: readonly Objetivo[] = fase === 'readaptacao' || !objetivos.length ? ['saude'] : objetivos
+  const base = usados.reduce((soma, o) => soma + DESCANSO[o][tipo], 0) / usados.length
   return arredondar5(sexo === 'feminino' ? base * MULT_DESCANSO_FEMININO : base)
 }
 

@@ -9,7 +9,7 @@ import { Botao, Cartao, ItemLista, Lista, Tela, Texto } from '../components/ui'
 import { CampoN, CamposLimitacoes, CamposPessoais, CamposTreino } from '../components/FormPerfil'
 
 // Tela de perfil (§3 tela 7): tudo editável depois do onboarding.
-export function Perfil() {
+export function Perfil({ voltarPara }: { voltarPara?: string } = {}) {
   const perfil = useLiveQuery(() => db.perfil.get('perfil'))
   const marcados = useLiveQuery(() => db.ajustesExercicio.filter((a) => !!a.indisponivel || !!a.evitar).count()) ?? 0
   const [r, setR] = useState<RascunhoPerfil | null>(null)
@@ -26,7 +26,7 @@ export function Perfil() {
     }
   }, [perfil, r])
 
-  if (!perfil || !r) return <Tela titulo="Perfil" voltarPara="/mais">{null}</Tela>
+  if (!perfil || !r) return <Tela titulo="Perfil" voltarPara={voltarPara ?? '/mais'}>{null}</Tela>
 
   const mudar = (m: RascunhoPerfil) => {
     setSalvo(false)
@@ -42,11 +42,13 @@ export function Perfil() {
       return
     }
     await atualizarPerfil({ ...comNumeros, nome: comNumeros.nome!.trim() } as Parameters<typeof atualizarPerfil>[0])
+    // veio da proposta do plano: volta para ela, já com o plano refeito
+    if (voltarPara) return navegar(voltarPara, { substituir: true })
     setSalvo(true)
   }
 
   return (
-    <Tela titulo="Perfil" voltarPara="/mais">
+    <Tela titulo="Perfil" voltarPara={voltarPara ?? '/mais'}>
       <Texto fraco>
         {idadeEm(perfil.nascimento, hoje)} anos · aviso de saúde aceito em {formatarData(perfil.avisoSaudeAceitoEm)}
       </Texto>
@@ -80,7 +82,7 @@ export function Perfil() {
         </Cartao>
       )}
       <Botao grande onClick={salvar}>
-        Salvar alterações
+        {voltarPara ? 'Salvar e ver o plano' : 'Salvar alterações'}
       </Botao>
     </Tela>
   )

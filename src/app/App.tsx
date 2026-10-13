@@ -14,6 +14,7 @@ import { Onboarding } from '../telas/Onboarding'
 import { Perfil } from '../telas/Perfil'
 import { Saude } from '../telas/Saude'
 import { PlanoSemana } from '../telas/PlanoSemana'
+import { PropostaPlano } from '../telas/PropostaPlano'
 import { Treino } from '../telas/Treino'
 import { ResumoTreino } from '../telas/ResumoTreino'
 import { RetomadaTreino } from '../components/RetomadaTreino'
@@ -75,7 +76,7 @@ function Conteudo({ partes }: { partes: string[] }) {
     case undefined:
       return <Inicio />
     case 'plano':
-      return <PlanoSemana />
+      return partes[1] === 'proposta' ? <PropostaPlano /> : <PlanoSemana />
     case 'treino':
       return partes[1] === 'resumo' && partes[2] ? <ResumoTreino id={partes[2]} /> : <Treino />
     case 'historico':
@@ -94,7 +95,8 @@ function Conteudo({ partes }: { partes: string[] }) {
     case 'biblioteca':
       return partes[1] ? <ExercicioDetalhe id={partes[1]} /> : <Biblioteca />
     case 'perfil':
-      return <Perfil />
+      // "/perfil/proposta": veio de "Mudar minhas escolhas" na proposta do plano (C5)
+      return <Perfil voltarPara={partes[1] === 'proposta' ? '/plano/proposta' : undefined} />
     case 'backup':
       return <Backup />
     default:

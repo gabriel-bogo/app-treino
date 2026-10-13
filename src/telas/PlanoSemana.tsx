@@ -5,14 +5,17 @@ import { usePlano } from '../app/usePlano'
 import { NOME_GRUPO, GRUPOS } from '../domain/biblioteca'
 import { calcularAlvos, volumeDoPlano } from '../domain/motor/gerar'
 import { totalTreinosReadaptacao } from '../domain/motor/regras'
-import { Cartao, Etiqueta, Tela, Texto } from '../components/ui'
-import { ListaExerciciosDia } from '../components/ListaExerciciosDia'
+import { definirDivisao } from '../domain/motor/divisao'
+import { Cartao, Tela, Texto } from '../components/ui'
+import { CartaoTreino, textoSequencia, treinosUnicos } from '../components/PlanoAgrupado'
+import { TrocaNoPlano } from '../components/TrocaNoPlano'
 
 // Plano da semana (§3 tela 3): todos os dias de treino gerados.
 export function PlanoSemana() {
   const dados = usePlano()
   const perfil = useLiveQuery(() => db.perfil.get('perfil'))
   const [verVolume, setVerVolume] = useState(false)
+  const [troca, setTroca] = useState<{ exercicioId: string; ids: string[] } | null>(null)
   if (!dados?.plano || !perfil) return <Tela titulo="Plano da semana">{null}</Tela>
   const { plano, dias, exercicios } = dados
   const readaptacao = plano.fase === 'readaptacao'
@@ -26,12 +29,13 @@ export function PlanoSemana() {
         {readaptacao ? (
           <Texto>
             Fase de readaptação: treino {Math.min(plano.treinosNaFase + 1, totalTreinosReadaptacao(perfil.diasSemana))} de{' '}
-            {totalTreinosReadaptacao(perfil.diasSemana)}. Use cargas leves e termine cada série com 3 a 4 repetições sobrando.
+            {totalTreinosReadaptacao(perfil.diasSemana)}. Use cargas leves e termine cada série com 3 a 4 repetições sobrando. Depois o
+            app passa para {definirDivisao({ diasSemana: perfil.diasSemana, nivel: perfil.nivel, enfases: perfil.enfases, fase: 'normal' }).nome}.
           </Texto>
         ) : (
           <Texto>Ciclo de 8 a 12 repetições. Termine cada série com 1 a 3 repetições sobrando.</Texto>
         )}
-        <Texto fraco>O próximo treino é sempre o seguinte da sequência, não importa o dia da semana.</Texto>
+        <Texto fraco>Ordem dos treinos: {textoSequencia(dias)}. O próximo é sempre o seguinte da lista, não importa o dia da semana.</Texto>
       </Cartao>
 
       {plano.avisos.map((a) => (
@@ -40,19 +44,13 @@ export function PlanoSemana() {
         </Cartao>
       ))}
 
-      {dias.map((d) => (
-        <Cartao
+      {treinosUnicos(dias).map((d) => (
+        <CartaoTreino
           key={d.id}
-          titulo={
-            <span className="flex flex-wrap items-center gap-2">
-              {d.ordem + 1}. {d.nome}
-              {d.ordem === plano.proximoIndice && <Etiqueta cor="marca">Próximo</Etiqueta>}
-              <span className="ml-auto text-sm font-normal text-slate-500 dark:text-slate-400">~{d.minutosEstimados} min</span>
-            </span>
-          }
-        >
-          <ListaExerciciosDia exercicios={exercicios.filter((e) => e.diaId === d.id)} />
-        </Cartao>
+          treino={{ ...d, exercicios: exercicios.filter((e) => e.diaId === d.id).sort((x, y) => x.ordem - y.ordem) }}
+          proximo={dias[plano.proximoIndice]?.variante === d.variante}
+          aoTrocar={(exercicioId, ids) => setTroca({ exercicioId, ids })}
+        />
       ))}
 
       {!readaptacao && (
@@ -83,6 +81,7 @@ export function PlanoSemana() {
           <Texto fraco>Série de exercício que trabalha o grupo como secundário conta meia série.</Texto>
         </Cartao>
       )}
+      <TrocaNoPlano alvo={troca} aoFechar={() => setTroca(null)} />
     </Tela>
   )
 }

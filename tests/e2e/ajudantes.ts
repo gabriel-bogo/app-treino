@@ -8,11 +8,15 @@ export interface OpcoesOnboarding {
   altura?: string
   peso?: string
   nivel?: 'Iniciante' | 'Retornando' | 'Intermediário'
-  objetivo?: 'Hipertrofia' | 'Emagrecimento' | 'Saúde geral'
-  enfase?: 'Equilibrado' | 'Inferiores' | 'Superiores' | 'Glúteos'
+  objetivos?: ('Hipertrofia' | 'Emagrecimento' | 'Saúde geral')[]
+  /** vazio = equilibrado */
+  enfases?: ('Inferiores' | 'Superiores' | 'Glúteos')[]
   dias?: '2' | '3' | '4' | '5' | '6'
-  duracao?: '30 min' | '45 min' | '60 min' | '75 min' | '90 min'
+  /** minutos (30 a 120, de 5 em 5); padrão 60 */
+  duracao?: number
   limitacoes?: ('Joelho' | 'Lombar' | 'Ombro' | 'Punho')[]
+  /** false = para na proposta do plano, sem aprovar */
+  aprovar?: boolean
 }
 
 export async function fazerOnboarding(page: Page, o: OpcoesOnboarding = {}) {
@@ -28,15 +32,21 @@ export async function fazerOnboarding(page: Page, o: OpcoesOnboarding = {}) {
   await page.getByRole('button', { name: 'Continuar' }).click()
 
   await page.getByRole('radio', { name: new RegExp('^' + (o.nivel ?? 'Intermediário')) }).click()
-  await page.getByRole('radio', { name: new RegExp('^' + (o.objetivo ?? 'Hipertrofia')) }).click()
-  await page.getByRole('radio', { name: new RegExp('^' + (o.enfase ?? 'Equilibrado')) }).click()
+  for (const obj of o.objetivos ?? ['Hipertrofia']) await page.getByRole('button', { name: new RegExp('^' + obj) }).click()
+  for (const e of o.enfases ?? []) await page.getByRole('button', { name: new RegExp('^' + e) }).click()
   await page.getByRole('radiogroup', { name: 'Dias por semana' }).getByRole('radio', { name: o.dias ?? '4', exact: true }).click()
-  await page.getByRole('radio', { name: o.duracao ?? '60 min' }).click()
+  if (o.duracao) await page.getByRole('slider', { name: /Duração de cada treino/ }).fill(String(o.duracao))
   await page.getByRole('button', { name: 'Continuar' }).click()
 
   for (const l of o.limitacoes ?? []) await page.getByRole('button', { name: l, exact: true }).click()
   await page.getByRole('button', { name: 'Criar meu plano' }).click()
+  // C5: o app apresenta o plano para aprovar
+  await expect(page.getByRole('heading', { name: 'Seu plano de treino' })).toBeVisible()
+  await expect(page.getByTestId('treino-do-plano').first()).toBeVisible()
+  if (o.aprovar === false) return
+  await page.getByRole('button', { name: 'Aprovar plano' }).click()
   await expect(page.getByRole('navigation', { name: 'Navegação principal' })).toBeVisible()
+  await expect(page.getByRole('button', { name: 'Começar treino' })).toBeVisible()
 }
 
 /** Perfil fictício para montar backups de teste. */
@@ -49,8 +59,8 @@ export function perfilFicticio(mudancas: Record<string, unknown> = {}) {
     alturaCm: 178,
     pesoInicialKg: 86,
     nivel: 'intermediario',
-    objetivo: 'hipertrofia',
-    enfase: 'equilibrado',
+    objetivos: ['hipertrofia'],
+    enfases: [],
     diasSemana: 4,
     duracaoMin: 60,
     limitacoes: [],
@@ -82,7 +92,7 @@ export function pesosFicticios(dias: number, inicio = 86, cinturaCm?: number) {
 /** Carrega dados pelo fluxo de importação de backup (mesmo caminho do usuário). */
 export async function importarBackup(page: Page, tabelas: Record<string, unknown[]>) {
   await page.goto('/#/backup')
-  const conteudo = JSON.stringify({ app: 'app-treino', schemaVersion: 1, exportadoEm: new Date().toISOString(), versaoApp: 'teste', tabelas })
+  const conteudo = JSON.stringify({ app: 'app-treino', schemaVersion: 2, exportadoEm: new Date().toISOString(), versaoApp: 'teste', tabelas })
   await page.getByTestId('arquivo-backup').setInputFiles({ name: 'backup.json', mimeType: 'application/json', buffer: Buffer.from(conteudo) })
   await page.getByRole('button', { name: 'Substituir tudo' }).click()
   await expect(page.getByText('Backup importado com sucesso.')).toBeVisible()

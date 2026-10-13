@@ -13,6 +13,7 @@ import type {
   RegistroSerie,
   Sessao,
 } from '../domain/tipos'
+import { normalizarPerfil } from '../domain/perfil'
 
 // Banco local (IndexedDB via Dexie), seção 7 da especificação.
 // Correspondência com os nomes da spec:
@@ -31,7 +32,7 @@ import type {
 // Versionamento: cada mudança de estrutura cria um novo db.version(n) abaixo.
 // VERSAO_SCHEMA vai junto no arquivo de backup.
 
-export const VERSAO_SCHEMA = 1
+export const VERSAO_SCHEMA = 2
 export const NOME_BANCO = 'app-treino'
 
 export class BancoTreino extends Dexie {
@@ -64,6 +65,21 @@ export class BancoTreino extends Dexie {
       configuracoes: 'id',
       registrosCorpo: 'data',
     })
+    // v2: perfil com vários objetivos e ênfases e duração livre (C1 a C3).
+    // Mesmas tabelas e índices; só converte o perfil salvo.
+    this.version(2)
+      .stores({})
+      .upgrade((tx) =>
+        tx
+          .table('perfil')
+          .toCollection()
+          .modify((p) => {
+            const novo = normalizarPerfil(p)
+            delete p.objetivo
+            delete p.enfase
+            Object.assign(p, novo)
+          }),
+      )
   }
 }
 

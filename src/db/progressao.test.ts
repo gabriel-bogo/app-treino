@@ -1,13 +1,13 @@
 import 'fake-indexeddb/auto'
 import { beforeEach, describe, expect, it } from 'vitest'
 import { apagarTudo, db } from './banco'
-import { aplicarPausaNosExercicios, aplicarProgressaoDaSessao, pausaPendente } from './progressao'
+import { aplicarPausaNosExercicios, aplicarProgressaoDaSessao, pausaPendente, trocarExercicioNoPlano } from './progressao'
 import type { ItemTreino, Perfil, SerieTreino, Sessao } from '../domain/tipos'
 
 // Dados fictícios.
 const perfil: Perfil = {
   id: 'perfil', nome: 'Pessoa Teste', sexo: 'feminino', nascimento: '1990-01-01', alturaCm: 165, pesoInicialKg: 60,
-  nivel: 'intermediario', objetivo: 'hipertrofia', enfase: 'equilibrado', diasSemana: 4, duracaoMin: 60, limitacoes: [],
+  nivel: 'intermediario', objetivos: ['hipertrofia'], enfases: [], diasSemana: 4, duracaoMin: 60, limitacoes: [],
   nConfirmacoes: 1, avisoSaudeAceitoEm: 'x', criadoEm: 'x', atualizadoEm: 'x',
 }
 
@@ -75,5 +75,17 @@ describe('retorno após pausa aplicado uma vez (§6.12)', () => {
   it('sem pausa (menos de 10 dias) não faz nada', async () => {
     await db.sessoes.put(sessao('s1', '2026-03-01T10:00:00.000Z', []))
     expect(await pausaPendente(new Date('2026-03-08T10:00:00'))).toBeNull()
+  })
+})
+
+describe('trocar no plano (§6.10, C5)', () => {
+  it('trocar de novo um substituto mantém uma troca só; voltar ao original desfaz', async () => {
+    await db.configuracoes.put({ id: 'app', primeiroUsoEm: '2026-01-01T00:00:00.000Z', som: true, trocasNoPlano: {} })
+    await trocarExercicioNoPlano('supino-reto-barra', 'supino-reto-halter')
+    expect((await db.configuracoes.get('app'))!.trocasNoPlano).toEqual({ 'supino-reto-barra': 'supino-reto-halter' })
+    await trocarExercicioNoPlano('supino-reto-halter', 'supino-maquina')
+    expect((await db.configuracoes.get('app'))!.trocasNoPlano).toEqual({ 'supino-reto-barra': 'supino-maquina' })
+    await trocarExercicioNoPlano('supino-maquina', 'supino-reto-barra')
+    expect((await db.configuracoes.get('app'))!.trocasNoPlano).toEqual({})
   })
 })

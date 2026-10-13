@@ -6,10 +6,12 @@
 export type Sexo = 'feminino' | 'masculino'
 export type Nivel = 'iniciante' | 'retornando' | 'intermediario'
 export type Objetivo = 'hipertrofia' | 'emagrecimento' | 'saude'
-export type Enfase = 'equilibrado' | 'inferior' | 'superior' | 'gluteos'
+/** Parte do corpo com mais volume. Nenhuma marcada = equilibrado (C2). */
+export type Enfase = 'inferior' | 'superior' | 'gluteos'
 export type Limitacao = 'joelho' | 'lombar' | 'ombro' | 'punho'
 export type DiasSemana = 2 | 3 | 4 | 5 | 6
-export type DuracaoMin = 30 | 45 | 60 | 75 | 90
+/** Minutos por treino: 30 a 120, de 5 em 5 (C3). */
+export type DuracaoMin = number
 /** N de treinos para confirmar cada degrau da progressão (§6.8): 1 a 3, padrão 2 */
 export type NConfirmacoes = 1 | 2 | 3
 
@@ -22,8 +24,10 @@ export interface Perfil {
   alturaCm: number
   pesoInicialKg: number
   nivel: Nivel
-  objetivo: Objetivo
-  enfase: Enfase
+  /** um ou mais (C1: descanso = média dos objetivos marcados) */
+  objetivos: Objetivo[]
+  /** vazio = equilibrado (C2) */
+  enfases: Enfase[]
   diasSemana: DiasSemana
   duracaoMin: DuracaoMin
   /** vazio = "nenhuma" (§6.7: padrão no onboarding) */

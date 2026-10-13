@@ -1,18 +1,20 @@
-import { CampoTexto, Multipla, Opcoes } from './Campos'
+import { CampoTexto, Deslizante, Multipla, Opcoes } from './Campos'
 import { Cartao, Texto } from './ui'
 import {
+  DURACAO,
   OPCOES_DIAS,
-  OPCOES_DURACAO,
   OPCOES_ENFASE,
   OPCOES_LIMITACAO,
   OPCOES_N,
   OPCOES_NIVEL,
   OPCOES_OBJETIVO,
   OPCOES_SEXO,
+  avisoEnfases,
+  textoDuracao,
   type ErrosPerfil,
   type RascunhoPerfil,
 } from '../domain/perfil'
-import { avaliarPeso, mensagensObjetivo } from '../domain/saude'
+import { alertasObjetivo, avaliarPeso, mensagensClassificacao, objetivosRecomendados, type MensagemObjetivo } from '../domain/saude'
 
 // Partes do formulário de perfil (§4), usadas no onboarding e na tela Perfil.
 
@@ -20,6 +22,24 @@ const CORES = { info: 'info', aviso: 'aviso', perigo: 'perigo' } as const
 
 function Erro({ texto }: { texto?: string }) {
   return texto ? <p className="-mt-3 text-sm text-red-600 dark:text-red-400">{texto}</p> : null
+}
+
+/** Mensagem do IMC; a classificação (C7) fica em negrito e, fora da faixa adequada, num bloco vermelho. */
+function Mensagem({ m, forte }: { m: MensagemObjetivo; forte?: boolean }) {
+  const partes = m.destaque ? m.texto.split(m.destaque) : [m.texto]
+  const conteudo = partes.flatMap((p, i) => (i === 0 ? [p] : [<strong key={i}>{m.destaque}</strong>, p]))
+  if (forte && m.tipo === 'perigo') {
+    return (
+      <section className="rounded-2xl bg-red-600 p-4 text-white dark:bg-red-700" data-testid="mensagem-imc">
+        <p className="leading-relaxed">{conteudo}</p>
+      </section>
+    )
+  }
+  return (
+    <Cartao destaque={CORES[m.tipo]}>
+      <Texto>{conteudo}</Texto>
+    </Cartao>
+  )
 }
 
 export function CamposPessoais({
@@ -56,23 +76,48 @@ export function CamposTreino({ r, mudar, erros, hoje }: { r: RascunhoPerfil; mud
     r.pesoInicialKg && r.alturaCm && r.nascimento && r.sexo
       ? avaliarPeso({ pesoKg: r.pesoInicialKg, alturaCm: r.alturaCm, nascimento: r.nascimento, sexo: r.sexo, hoje })
       : null
-  const msgs = avaliacao ? mensagensObjetivo(avaliacao, r.objetivo) : []
+  const enfases = r.enfases ?? []
+  const aviso = avisoEnfases(enfases)
   return (
     <>
       <Opcoes rotulo="Nível" valor={r.nivel} opcoes={OPCOES_NIVEL} aoMudar={(v) => mudar({ nivel: v })} colunas={2} />
       <Erro texto={erros.nivel} />
-      <Opcoes rotulo="Objetivo" valor={r.objetivo} opcoes={OPCOES_OBJETIVO} aoMudar={(v) => mudar({ objetivo: v })} />
-      <Erro texto={erros.objetivo} />
-      {msgs.map((m) => (
-        <Cartao key={m.texto} destaque={CORES[m.tipo]}>
-          <Texto>{m.texto}</Texto>
+      {/* C7: o contexto do IMC vem antes das opções de objetivo */}
+      {avaliacao && mensagensClassificacao(avaliacao).map((m) => <Mensagem key={m.texto} m={m} forte />)}
+      <Multipla
+        rotulo="Objetivo"
+        ajuda="Pode marcar mais de um."
+        valores={r.objetivos ?? []}
+        opcoes={OPCOES_OBJETIVO}
+        recomendados={avaliacao ? objetivosRecomendados(avaliacao) : []}
+        aoMudar={(v) => mudar({ objetivos: v })}
+      />
+      <Erro texto={erros.objetivos} />
+      {avaliacao && alertasObjetivo(avaliacao, r.objetivos).map((m) => <Mensagem key={m.texto} m={m} />)}
+      <Multipla
+        rotulo="Ênfase (opcional)"
+        ajuda="Onde você quer um pouco mais de volume. Sem nada marcado, o treino é equilibrado."
+        valores={enfases}
+        opcoes={OPCOES_ENFASE}
+        aoMudar={(v) => mudar({ enfases: v })}
+      />
+      {aviso && (
+        <Cartao destaque="info">
+          <Texto>{aviso}</Texto>
         </Cartao>
-      ))}
-      <Opcoes rotulo="Ênfase" ajuda="Onde você quer um pouco mais de volume." valor={r.enfase} opcoes={OPCOES_ENFASE} aoMudar={(v) => mudar({ enfase: v })} />
-      <Erro texto={erros.enfase} />
+      )}
       <Opcoes rotulo="Dias por semana" valor={r.diasSemana} opcoes={OPCOES_DIAS} aoMudar={(v) => mudar({ diasSemana: v })} colunas={5} />
       <Erro texto={erros.diasSemana} />
-      <Opcoes rotulo="Duração de cada treino" valor={r.duracaoMin} opcoes={OPCOES_DURACAO} aoMudar={(v) => mudar({ duracaoMin: v })} colunas={3} />
+      <Deslizante
+        rotulo="Duração de cada treino"
+        ajuda="Inclui uns 8 minutos de aquecimento."
+        valor={r.duracaoMin ?? DURACAO.padrao}
+        min={DURACAO.min}
+        max={DURACAO.max}
+        passo={DURACAO.passo}
+        formatar={textoDuracao}
+        aoMudar={(v) => mudar({ duracaoMin: v })}
+      />
       <Erro texto={erros.duracaoMin} />
     </>
   )

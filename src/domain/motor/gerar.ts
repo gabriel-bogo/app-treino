@@ -11,7 +11,8 @@
 //  3. Insere o aquecimento específico de ombro quando precisa (§6.11).
 //  4. Se o dia passa da duração, corta séries na ordem de menor importância
 //     respeitando os pisos de volume (A2, §6.3).
-//  5. Ordena: compostos grandes > compostos menores > isolados > core (§6.4).
+//  5. Ordena agrupando por músculo (C4): músculos grandes antes dos pequenos,
+//     composto antes de isolado dentro do músculo, core no fim.
 
 import { BIBLIOTECA, contraindicacaoPara, exercicioPermitido, exercicioPorId, textoAlerta, NOME_GRUPO } from '../biblioteca'
 import type { AjusteExercicio, Exercicio, Fase, Grupo, Perfil, TipoDia } from '../tipos'
@@ -22,7 +23,6 @@ import {
   FAIXA_NORMAL,
   FAIXA_READAPTACAO,
   GRANDES,
-  GRUPOS_DA_ENFASE,
   GRUPOS_DO_DIA,
   MIN_AQUECIMENTO,
   MIN_AQUECIMENTO_OMBRO,
@@ -35,12 +35,13 @@ import {
   VOLUME_INICIAL_GRANDE,
   VOLUME_MINIMO,
   descansoSegundos,
+  gruposDaEnfase,
   niveisCompativeis,
   seriesReadaptacao,
 } from './regras'
 
 export interface ContextoMotor {
-  perfil: Pick<Perfil, 'sexo' | 'nivel' | 'objetivo' | 'enfase' | 'diasSemana' | 'duracaoMin' | 'limitacoes'>
+  perfil: Pick<Perfil, 'sexo' | 'nivel' | 'objetivos' | 'enfases' | 'diasSemana' | 'duracaoMin' | 'limitacoes'>
   fase: Fase
   /** 0, 1 ou 2 (semana atual da readaptação) */
   semanaReadaptacao: number
@@ -107,7 +108,7 @@ const ehEmpurrar = (e: Exercicio) => e.padrao === 'empurrar_horizontal' || e.pad
 export function calcularAlvos(ctx: ContextoMotor): { alvos: Record<Grupo, number>; semEnfase: Record<Grupo, number> } {
   const alvos = zeros()
   const semEnfase = zeros()
-  const enfase = GRUPOS_DA_ENFASE[ctx.perfil.enfase]
+  const enfase = gruposDaEnfase(ctx.perfil.enfases)
   const sexo = ctx.perfil.sexo === 'feminino' ? MULT_VOLUME_FEMININO : 1
   for (const g of TODOS_GRUPOS) {
     const base = GRANDES.includes(g) ? (ctx.nivelVolume[g] ?? VOLUME_INICIAL_GRANDE) : VOLUME_MINIMO
@@ -278,7 +279,7 @@ function preencherVolume(dias: DiaTrabalho[], alvos: Record<Grupo, number>, sel:
 
 /** Corta séries até cada dia caber na duração (A2: duração é teto). */
 function cortarAteCaber(ctx: ContextoMotor, dias: DiaTrabalho[], alvos: Record<Grupo, number>, semEnfase: Record<Grupo, number>) {
-  const enfase = GRUPOS_DA_ENFASE[ctx.perfil.enfase]
+  const enfase = gruposDaEnfase(ctx.perfil.enfases)
   const piso = (etapa: number, g: Grupo) => {
     if (etapa === 3) return 0
     if (enfase.includes(g)) return etapa === 1 ? alvos[g] : semEnfase[g]
@@ -397,23 +398,31 @@ function aquecimentoOmbro(ctx: ContextoMotor): Exercicio[] {
   return [rotacao, face].filter((e): e is Exercicio => !!e)
 }
 
-// ───────────────────────── Ordenação (§6.4) ─────────────────────────
+// ───────────────────── Ordenação (§6.4 + C4) ─────────────────────
 
-function ordenar(ctx: ContextoMotor, itens: Item[]): Item[] {
-  const enfase = GRUPOS_DA_ENFASE[ctx.perfil.enfase]
-  const camada = (i: Item) => {
+/**
+ * C4: o treino fica agrupado por músculo, como numa ficha de academia
+ * (todo o peito, depois ombros, depois tríceps…):
+ *  - aquecimento específico de ombro primeiro;
+ *  - músculos grandes antes dos pequenos (bíceps, tríceps, panturrilha) e core no fim;
+ *  - entre músculos do mesmo porte, os com ênfase primeiro e depois a ordem de ORDEM_PREENCHIMENTO;
+ *  - dentro do músculo, composto antes de isolado (§6.4).
+ */
+function ordenar(enfases: Perfil['enfases'], itens: Item[]): Item[] {
+  const enfase = gruposDaEnfase(enfases)
+  const porte = (i: Item) => {
     if (i.papel === 'aquecimento_ombro') return -1
-    if (i.ex.grupo === 'core') return 3
-    if (i.ex.tipo === 'isolado') return 2
-    return GRANDES.includes(i.ex.grupo) && i.ex.grupo !== 'ombros' ? 0 : 1
+    if (i.ex.grupo === 'core') return 2
+    return GRANDES.includes(i.ex.grupo) ? 0 : 1
   }
   return itens
     .map((i, pos) => ({ i, pos }))
     .sort(
       (a, b) =>
-        camada(a.i) - camada(b.i) ||
+        porte(a.i) - porte(b.i) ||
         Number(enfase.includes(b.i.ex.grupo)) - Number(enfase.includes(a.i.ex.grupo)) ||
         ORDEM_PREENCHIMENTO.indexOf(a.i.ex.grupo) - ORDEM_PREENCHIMENTO.indexOf(b.i.ex.grupo) ||
+        Number(isolado(a.i.ex)) - Number(isolado(b.i.ex)) ||
         a.pos - b.pos,
     )
     .map((x) => x.i)
@@ -423,7 +432,7 @@ function ordenar(ctx: ContextoMotor, itens: Item[]): Item[] {
 
 export function gerarPlano(ctx: ContextoMotor): PlanoGerado {
   const { perfil, fase } = ctx
-  const divisao = definirDivisao({ diasSemana: perfil.diasSemana, nivel: perfil.nivel, enfase: perfil.enfase, fase })
+  const divisao = definirDivisao({ diasSemana: perfil.diasSemana, nivel: perfil.nivel, enfases: perfil.enfases, fase })
   const avisos: string[] = []
 
   // um "dia de trabalho" por variante; variantes repetidas (A/B/A/B) são o mesmo treino
@@ -468,7 +477,7 @@ export function gerarPlano(ctx: ContextoMotor): PlanoGerado {
     nome: d.nome,
     tipo: d.tipo,
     minutosEstimados: minutos(ctx, d),
-    exercicios: ordenar(ctx, d.itens).map((i) => {
+    exercicios: ordenar(perfil.enfases, d.itens).map((i) => {
       if (i.papel === 'aquecimento_ombro') {
         return { exercicioId: i.ex.id, papel: i.papel, series: i.series, repsMin: AQUECIMENTO_OMBRO.reps, repsMax: AQUECIMENTO_OMBRO.reps, descansoSeg: 0 }
       }
@@ -480,7 +489,7 @@ export function gerarPlano(ctx: ContextoMotor): PlanoGerado {
         series: i.series,
         repsMin: pesoCorpo ? MINIMO_PESO_CORPO : faixa.min,
         repsMax: pesoCorpo ? (i.ex.tetoReps ?? FAIXA_NORMAL.max) : faixa.max,
-        descansoSeg: descansoSegundos(perfil.objetivo, i.ex.tipo, perfil.sexo, fase),
+        descansoSeg: descansoSegundos(perfil.objetivos, i.ex.tipo, perfil.sexo, fase),
         ...(textoAlerta(i.ex, perfil.limitacoes) ? { alerta: textoAlerta(i.ex, perfil.limitacoes) } : {}),
       }
     }),

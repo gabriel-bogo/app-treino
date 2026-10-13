@@ -31,8 +31,8 @@ function assinatura(ctx: ContextoMotor): string {
   return JSON.stringify([
     p.sexo,
     p.nivel,
-    p.objetivo,
-    p.enfase,
+    [...p.objetivos].sort(),
+    [...p.enfases].sort(),
     p.diasSemana,
     p.duracaoMin,
     [...p.limitacoes].sort(),
@@ -66,8 +66,9 @@ export async function garantirPlano(agora: Date = new Date()): Promise<void> {
       if ((await db.sessoes.where('status').equals('andamento').count()) > 0) return
 
       let plano = await db.plano.get('atual')
+      const faseDoPerfil = async (): Promise<Fase> => (precisaReadaptacao(perfil, await pesoAtual(perfil, hoje), hoje) ? 'readaptacao' : 'normal')
       if (!plano) {
-        const fase: Fase = precisaReadaptacao(perfil, await pesoAtual(perfil, hoje), hoje) ? 'readaptacao' : 'normal'
+        const fase = await faseDoPerfil()
         plano = {
           id: 'atual',
           fase,
@@ -82,6 +83,13 @@ export async function garantirPlano(agora: Date = new Date()): Promise<void> {
           assinatura: '',
           mensagemFase: null,
         }
+      }
+
+      // C6: antes do primeiro treino, a fase acompanha o perfil (ex: mudou o nível
+      // de "iniciante" para "intermediário" na revisão do plano)
+      if (plano.treinosNaFase === 0 && (await db.sessoes.where('status').equals('concluida').count()) === 0) {
+        const fase = await faseDoPerfil()
+        if (fase !== plano.fase) plano = { ...plano, fase, inicioFase: iso, treinosNaFase: 0, proximoIndice: 0, mensagemFase: null }
       }
 
       // §6.1: ao final da readaptação, o app avisa e passa para a divisão normal

@@ -1,18 +1,18 @@
 import { describe, expect, it } from 'vitest'
 import { gerarPlano, minutosDoDia, type ContextoMotor, type PlanoGerado } from './gerar'
-import { descansoSegundos, GRUPOS_DO_DIA } from './regras'
+import { descansoSegundos, GRANDES, GRUPOS_DO_DIA, gruposDaEnfase } from './regras'
 import { BIBLIOTECA, contraindicacaoPara, exercicioPorId } from '../biblioteca'
-import type { AjusteExercicio, DiasSemana, DuracaoMin, Enfase, Exercicio, Limitacao, Nivel, Sexo } from '../tipos'
+import type { AjusteExercicio, DiasSemana, DuracaoMin, Enfase, Exercicio, Limitacao, Nivel, Objetivo, Sexo } from '../tipos'
 
 // Critério da seção 11: "Gera plano coerente para todas as combinações de dias
-// (2-6) e duração (30-90)". E: "Com limitação ombro, nenhum exercício da lista
-// proibida aparece em plano".
+// (2-6) e duração" (C3: agora de 30 a 120 min, de 5 em 5). E: "Com limitação
+// ombro, nenhum exercício da lista proibida aparece em plano".
 
 const PROIBIDOS_OMBRO = ['desenvolvimento-nuca', 'puxada-nuca', 'remada-alta', 'mergulho-paralela', 'mergulho-banco', 'mergulho-maquina']
 
 function contexto(perfil: Partial<ContextoMotor['perfil']> = {}, extra: Partial<ContextoMotor> = {}): ContextoMotor {
   return {
-    perfil: { sexo: 'masculino', nivel: 'intermediario', objetivo: 'hipertrofia', enfase: 'equilibrado', diasSemana: 4, duracaoMin: 60, limitacoes: [], ...perfil },
+    perfil: { sexo: 'masculino', nivel: 'intermediario', objetivos: ['hipertrofia'], enfases: [], diasSemana: 4, duracaoMin: 60, limitacoes: [], ...perfil },
     fase: 'normal',
     semanaReadaptacao: 0,
     nivelVolume: {},
@@ -42,16 +42,18 @@ function problemas(ctx: ContextoMotor, plano: PlanoGerado): string[] {
     const temEmpurrar = trabalho.some((e) => ['empurrar_horizontal', 'empurrar_vertical'].includes(ex(e.exercicioId).padrao))
     if (perfil.limitacoes.includes('ombro') && temEmpurrar && !temAquecOmbro) p.push(`${dia.nome}: falta aquecimento de ombro`)
     if (temAquecOmbro && !(perfil.limitacoes.includes('ombro') && temEmpurrar)) p.push(`${dia.nome}: aquecimento de ombro sem necessidade`)
-    let camadaAnterior = -2
+    let aquecendo = true
+    const blocos: string[] = []
     for (const e of dia.exercicios) {
       const x = ex(e.exercicioId)
       if (contraindicacaoPara(x, perfil.limitacoes) === 'forte') p.push(`${dia.nome}: ${x.id} contraindicado`)
       if (perfil.limitacoes.includes('ombro') && PROIBIDOS_OMBRO.includes(x.id)) p.push(`${dia.nome}: ${x.id} proibido p/ ombro`)
       if (ctx.ajustes.get(x.id)?.indisponivel || ctx.ajustes.get(x.id)?.evitar) p.push(`${dia.nome}: ${x.id} marcado`)
       if (e.papel === 'aquecimento_ombro') {
-        if (camadaAnterior > -1) p.push(`${dia.nome}: aquecimento fora do início`)
+        if (!aquecendo) p.push(`${dia.nome}: aquecimento fora do início`)
         continue
       }
+      aquecendo = false
       if (x.soAquecimento) p.push(`${dia.nome}: ${x.id} é só aquecimento`)
       if (perfil.nivel === 'iniciante' && x.nivel !== 'iniciante') p.push(`${dia.nome}: ${x.id} nível ${x.nivel}`)
       if (x.nivel === 'avancado') p.push(`${dia.nome}: ${x.id} avançado`)
@@ -60,49 +62,61 @@ function problemas(ctx: ContextoMotor, plano: PlanoGerado): string[] {
         const faixa = fase === 'readaptacao' ? [12, 15] : [8, 12]
         if (e.repsMin !== faixa[0] || e.repsMax !== faixa[1]) p.push(`${dia.nome}: ${x.id} faixa ${e.repsMin}-${e.repsMax}`)
       }
-      if (e.descansoSeg !== descansoSegundos(perfil.objetivo, x.tipo, perfil.sexo, fase)) p.push(`${dia.nome}: ${x.id} descanso ${e.descansoSeg}`)
+      if (e.descansoSeg !== descansoSegundos(perfil.objetivos, x.tipo, perfil.sexo, fase)) p.push(`${dia.nome}: ${x.id} descanso ${e.descansoSeg}`)
       if (x.grupo !== 'core' && !GRUPOS_DO_DIA[dia.tipo].includes(x.grupo)) p.push(`${dia.nome}: ${x.id} fora do agrupamento`)
       if (dia.tipo === 'push' && x.categoria === 'pull') p.push(`${dia.nome}: ${x.id} é pull`)
       if (dia.tipo === 'pull' && x.categoria === 'push') p.push(`${dia.nome}: ${x.id} é push`)
-      // §6.4: compostos grandes > compostos menores > isolados > core
-      const camada = x.grupo === 'core' ? 3 : x.tipo === 'isolado' ? 2 : ['quadriceps', 'posteriores', 'gluteos', 'peito', 'costas'].includes(x.grupo) ? 0 : 1
-      if (camada < camadaAnterior) p.push(`${dia.nome}: ordem errada em ${x.id}`)
-      camadaAnterior = camada
+      if (blocos[blocos.length - 1] !== x.grupo) blocos.push(x.grupo)
       if (contraindicacaoPara(x, perfil.limitacoes) === 'leve' && !e.alerta) p.push(`${dia.nome}: ${x.id} sem alerta`)
+    }
+    // C4: cada músculo num bloco só; grandes antes dos pequenos; core no fim;
+    // dentro do músculo, composto antes de isolado
+    if (new Set(blocos).size !== blocos.length) p.push(`${dia.nome}: músculo espalhado (${blocos.join(' > ')})`)
+    const porte = (g: string) => (g === 'core' ? 2 : GRANDES.includes(g as never) ? 0 : 1)
+    if (blocos.some((g, i) => i > 0 && porte(g) < porte(blocos[i - 1]))) p.push(`${dia.nome}: ordem de músculos errada (${blocos.join(' > ')})`)
+    const trabalhoEx = trabalho.map((e) => ex(e.exercicioId))
+    for (const g of blocos) {
+      const tipos = trabalhoEx.filter((x) => x.grupo === g).map((x) => x.tipo)
+      if (tipos.indexOf('isolado') >= 0 && tipos.lastIndexOf('composto') > tipos.indexOf('isolado')) p.push(`${dia.nome}: ${g} com isolado antes de composto`)
     }
   }
   return p
 }
 
 const DIAS: DiasSemana[] = [2, 3, 4, 5, 6]
-const DURACOES: DuracaoMin[] = [30, 45, 60, 75, 90]
+const DURACOES: DuracaoMin[] = Array.from({ length: 19 }, (_, i) => 30 + 5 * i) // 30, 35, … 120
 const NIVEIS: Nivel[] = ['iniciante', 'retornando', 'intermediario']
-const ENFASES: Enfase[] = ['equilibrado', 'inferior', 'superior', 'gluteos']
+/** C2: todas as combinações de ênfase (vazio = equilibrado) */
+const ENFASES: Enfase[][] = [[], ['inferior'], ['superior'], ['gluteos'], ['superior', 'gluteos'], ['superior', 'inferior'], ['inferior', 'gluteos'], ['inferior', 'superior', 'gluteos']]
+/** C1: combinações de objetivo (variam junto com o resto para não multiplicar o teste) */
+const OBJETIVOS: Objetivo[][] = [['hipertrofia'], ['emagrecimento'], ['saude'], ['hipertrofia', 'emagrecimento'], ['emagrecimento', 'saude'], ['hipertrofia', 'emagrecimento', 'saude']]
 const SEXOS: Sexo[] = ['feminino', 'masculino']
 const LIMITACOES: Limitacao[][] = [[], ['ombro'], ['joelho', 'lombar', 'ombro', 'punho']]
 
 describe('motor: todas as combinações (§11)', () => {
-  it('gera plano coerente para dias 2-6 × duração 30-90 × nível × ênfase × sexo × limitações × fase', () => {
+  it('gera plano coerente para dias 2-6 × duração 30-120 × nível × ênfases × sexo × limitações × fase', () => {
     const falhas: string[] = []
     let total = 0
     for (const diasSemana of DIAS)
       for (const duracaoMin of DURACOES)
         for (const nivel of NIVEIS)
-          for (const enfase of ENFASES)
+          for (const enfases of ENFASES)
             for (const sexo of SEXOS)
               for (const limitacoes of LIMITACOES)
                 for (const [fase, semana] of [['normal', 0], ['readaptacao', 0], ['readaptacao', 2]] as const) {
-                  const ctx = contexto({ diasSemana, duracaoMin, nivel, enfase, sexo, limitacoes }, { fase, semanaReadaptacao: semana })
+                  const objetivos = OBJETIVOS[total % OBJETIVOS.length]
+                  const ctx = contexto({ diasSemana, duracaoMin, nivel, enfases, objetivos, sexo, limitacoes }, { fase, semanaReadaptacao: semana })
                   const plano = gerarPlano(ctx)
                   total++
-                  for (const pr of problemas(ctx, plano)) falhas.push(`[${diasSemana}d ${duracaoMin}min ${nivel} ${enfase} ${sexo} ${limitacoes.join('+') || 'sem lim'} ${fase}${semana}] ${pr}`)
+                  const rotulo = `${diasSemana}d ${duracaoMin}min ${nivel} ${enfases.join('+') || 'equilibrado'} ${objetivos.join('+')} ${sexo} ${limitacoes.join('+') || 'sem lim'} ${fase}${semana}`
+                  for (const pr of problemas(ctx, plano)) falhas.push(`[${rotulo}] ${pr}`)
                 }
-    expect(total).toBe(5 * 5 * 3 * 4 * 2 * 3 * 3)
+    expect(total).toBe(5 * 19 * 3 * 8 * 2 * 3 * 3)
     expect(falhas.slice(0, 20)).toEqual([])
-  })
+  }, 120_000)
 
   it('é determinístico (mesmas entradas, mesmo plano)', () => {
-    const ctx = contexto({ diasSemana: 5, duracaoMin: 75, enfase: 'gluteos', sexo: 'feminino', limitacoes: ['ombro'] })
+    const ctx = contexto({ diasSemana: 5, duracaoMin: 75, enfases: ['gluteos'], sexo: 'feminino', limitacoes: ['ombro'] })
     expect(gerarPlano(ctx)).toEqual(gerarPlano(ctx))
   })
 })
@@ -110,29 +124,48 @@ describe('motor: todas as combinações (§11)', () => {
 describe('divisão (§6.2)', () => {
   const nomes = (p: PlanoGerado) => p.dias.map((d) => d.nome)
   it('2 dias: full body A/B', () => {
-    expect(nomes(gerarPlano(contexto({ diasSemana: 2 })))).toEqual(['Full body A', 'Full body B'])
+    expect(nomes(gerarPlano(contexto({ diasSemana: 2 })))).toEqual(['Treino A · Full body', 'Treino B · Full body'])
   })
   it('3 dias: full body A/B/C para iniciante e retornando; PPL para intermediário', () => {
-    expect(nomes(gerarPlano(contexto({ diasSemana: 3, nivel: 'iniciante' })))).toEqual(['Full body A', 'Full body B', 'Full body C'])
-    expect(nomes(gerarPlano(contexto({ diasSemana: 3, nivel: 'retornando' })))).toEqual(['Full body A', 'Full body B', 'Full body C'])
-    expect(nomes(gerarPlano(contexto({ diasSemana: 3, nivel: 'intermediario' })))).toEqual(['Push', 'Pull', 'Legs'])
+    const fb3 = ['Treino A · Full body', 'Treino B · Full body', 'Treino C · Full body']
+    expect(nomes(gerarPlano(contexto({ diasSemana: 3, nivel: 'iniciante' })))).toEqual(fb3)
+    expect(nomes(gerarPlano(contexto({ diasSemana: 3, nivel: 'retornando' })))).toEqual(fb3)
+    expect(nomes(gerarPlano(contexto({ diasSemana: 3, nivel: 'intermediario' })))).toEqual(['Treino A · Push', 'Treino B · Pull', 'Treino C · Legs'])
   })
-  it('4 dias: Superior/Inferior; com ênfase inferior ou glúteos vira Inferior/Superior/Inferior/Full body', () => {
-    expect(nomes(gerarPlano(contexto({ diasSemana: 4 })))).toEqual(['Superior A', 'Inferior A', 'Superior B', 'Inferior B'])
-    for (const enfase of ['inferior', 'gluteos'] as const) {
-      expect(nomes(gerarPlano(contexto({ diasSemana: 4, enfase })))).toEqual(['Inferior A', 'Superior', 'Inferior B', 'Full body A'])
+  it('4 dias: Superior/Inferior; com ênfase só de inferiores vira Inferior/Superior/Inferior/Full body (C2)', () => {
+    const supInf = ['Treino A · Superior', 'Treino B · Inferior', 'Treino C · Superior', 'Treino D · Inferior']
+    const infSup = ['Treino A · Inferior', 'Treino B · Superior', 'Treino C · Inferior', 'Treino D · Full body']
+    expect(nomes(gerarPlano(contexto({ diasSemana: 4 })))).toEqual(supInf)
+    for (const enfases of [['inferior'], ['gluteos'], ['inferior', 'gluteos'], ['inferior', 'superior', 'gluteos']] as Enfase[][]) {
+      expect(nomes(gerarPlano(contexto({ diasSemana: 4, enfases }))), enfases.join('+')).toEqual(infSup)
+    }
+    for (const enfases of [['superior'], ['superior', 'gluteos'], ['superior', 'inferior']] as Enfase[][]) {
+      expect(nomes(gerarPlano(contexto({ diasSemana: 4, enfases }))), enfases.join('+')).toEqual(supInf)
     }
   })
   it('5 dias: Superior/Inferior/Push/Pull/Legs; 6 dias: PPL × 2', () => {
-    expect(nomes(gerarPlano(contexto({ diasSemana: 5 })))).toEqual(['Superior', 'Inferior', 'Push', 'Pull', 'Legs'])
-    expect(nomes(gerarPlano(contexto({ diasSemana: 6 })))).toEqual(['Push A', 'Pull A', 'Legs A', 'Push B', 'Pull B', 'Legs B'])
+    expect(nomes(gerarPlano(contexto({ diasSemana: 5 })))).toEqual(['Treino A · Superior', 'Treino B · Inferior', 'Treino C · Push', 'Treino D · Pull', 'Treino E · Legs'])
+    expect(nomes(gerarPlano(contexto({ diasSemana: 6 })))).toEqual([
+      'Treino A · Push',
+      'Treino B · Pull',
+      'Treino C · Legs',
+      'Treino D · Push',
+      'Treino E · Pull',
+      'Treino F · Legs',
+    ])
   })
-  it('readaptação: full body, no máximo 4 dias (§6.1)', () => {
+  it('readaptação: full body, no máximo 4 dias (§6.1); dias repetidos mantêm a letra', () => {
     for (const diasSemana of DIAS) {
       const p = gerarPlano(contexto({ diasSemana, nivel: 'iniciante' }, { fase: 'readaptacao' }))
       expect(p.dias.length).toBe(Math.min(diasSemana, 4))
       expect(p.dias.every((d) => d.tipo === 'fullbody')).toBe(true)
     }
+    expect(nomes(gerarPlano(contexto({ diasSemana: 5, nivel: 'iniciante' }, { fase: 'readaptacao' })))).toEqual([
+      'Treino A · Full body',
+      'Treino B · Full body',
+      'Treino A · Full body',
+      'Treino B · Full body',
+    ])
   })
   it('48 h entre o mesmo grupo nas divisões que separam grupos (§6.3)', () => {
     const porcao = (id: string) => {
@@ -157,20 +190,32 @@ describe('divisão (§6.2)', () => {
 describe('volume semanal (§6.3, §6.6)', () => {
   it('com tempo suficiente, todos os grupos atingem o alvo', () => {
     for (const diasSemana of [4, 5, 6] as const) {
-      for (const enfase of ENFASES) {
-        const p = gerarPlano(contexto({ diasSemana, duracaoMin: 90, enfase }))
-        for (const [g, alvo] of Object.entries(p.alvos)) expect(p.volume[g as keyof typeof p.volume], `${diasSemana}d ${enfase} ${g}`).toBeGreaterThanOrEqual(alvo)
+      for (const enfases of ENFASES) {
+        const p = gerarPlano(contexto({ diasSemana, duracaoMin: 90, enfases }))
+        for (const [g, alvo] of Object.entries(p.alvos)) expect(p.volume[g as keyof typeof p.volume], `${diasSemana}d ${enfases.join('+')} ${g}`).toBeGreaterThanOrEqual(alvo)
         expect(p.avisos).toEqual([])
       }
     }
   })
   it('grupos grandes começam com 8 séries; grupo com ênfase recebe +30 a 40%', () => {
-    const eq = gerarPlano(contexto({ enfase: 'equilibrado' }))
-    const gl = gerarPlano(contexto({ enfase: 'gluteos' }))
+    const eq = gerarPlano(contexto({ enfases: [] }))
+    const gl = gerarPlano(contexto({ enfases: ['gluteos'] }))
     expect(eq.alvos.peito).toBe(8)
     expect(gl.alvos.gluteos / eq.alvos.gluteos).toBeGreaterThanOrEqual(1.3)
     expect(gl.alvos.gluteos / eq.alvos.gluteos).toBeLessThanOrEqual(1.4)
     expect(gl.alvos.peito).toBe(8)
+  })
+  it('C2: várias ênfases somam grupos; superior + inferior se anulam; glúteos continua valendo', () => {
+    expect(gruposDaEnfase([])).toEqual([])
+    expect(gruposDaEnfase(['superior', 'gluteos']).sort()).toEqual(['biceps', 'costas', 'gluteos', 'ombros', 'peito', 'triceps'])
+    expect(gruposDaEnfase(['superior', 'inferior'])).toEqual([])
+    expect(gruposDaEnfase(['superior', 'inferior', 'gluteos'])).toEqual(['gluteos'])
+    expect(gruposDaEnfase(['inferior', 'gluteos']).sort()).toEqual(gruposDaEnfase(['inferior']).sort())
+    const supGlu = gerarPlano(contexto({ enfases: ['superior', 'gluteos'] }))
+    expect(supGlu.alvos.peito).toBe(11)
+    expect(supGlu.alvos.gluteos).toBe(11)
+    expect(supGlu.alvos.quadriceps).toBe(8)
+    expect(gerarPlano(contexto({ enfases: ['superior', 'inferior'] })).alvos).toEqual(gerarPlano(contexto({ enfases: [] })).alvos)
   })
   it('aumento gradual: nível de volume maior gera mais séries, até 16 (A3)', () => {
     const p = gerarPlano(contexto({ duracaoMin: 90 }, { nivelVolume: { peito: 12 } }))
@@ -182,8 +227,8 @@ describe('volume semanal (§6.3, §6.6)', () => {
     const f = gerarPlano(contexto({ sexo: 'feminino' }, { nivelVolume: { peito: 10 } }))
     expect(f.alvos.peito).toBe(11)
     expect(m.alvos.peito).toBe(10)
-    expect(descansoSegundos('hipertrofia', 'composto', 'feminino', 'normal')).toBe(130)
-    expect(descansoSegundos('hipertrofia', 'composto', 'masculino', 'normal')).toBe(150)
+    expect(descansoSegundos(['hipertrofia'], 'composto', 'feminino', 'normal')).toBe(130)
+    expect(descansoSegundos(['hipertrofia'], 'composto', 'masculino', 'normal')).toBe(150)
   })
   it('sem tempo para o mínimo, o app avisa em vez de passar da duração (A2)', () => {
     const p = gerarPlano(contexto({ diasSemana: 2, duracaoMin: 30 }))
@@ -194,12 +239,24 @@ describe('volume semanal (§6.3, §6.6)', () => {
 
 describe('descanso e faixas (§6.5, §6.1)', () => {
   it('descanso padrão por objetivo (meio da faixa)', () => {
-    expect(descansoSegundos('hipertrofia', 'isolado', 'masculino', 'normal')).toBe(75)
-    expect(descansoSegundos('emagrecimento', 'composto', 'masculino', 'normal')).toBe(75)
-    expect(descansoSegundos('emagrecimento', 'isolado', 'masculino', 'normal')).toBe(55)
-    expect(descansoSegundos('saude', 'composto', 'masculino', 'normal')).toBe(90)
-    expect(descansoSegundos('saude', 'isolado', 'masculino', 'normal')).toBe(60)
-    expect(descansoSegundos('hipertrofia', 'composto', 'masculino', 'readaptacao')).toBe(90)
+    expect(descansoSegundos(['hipertrofia'], 'isolado', 'masculino', 'normal')).toBe(75)
+    expect(descansoSegundos(['emagrecimento'], 'composto', 'masculino', 'normal')).toBe(75)
+    expect(descansoSegundos(['emagrecimento'], 'isolado', 'masculino', 'normal')).toBe(55)
+    expect(descansoSegundos(['saude'], 'composto', 'masculino', 'normal')).toBe(90)
+    expect(descansoSegundos(['saude'], 'isolado', 'masculino', 'normal')).toBe(60)
+    expect(descansoSegundos(['hipertrofia'], 'composto', 'masculino', 'readaptacao')).toBe(90)
+  })
+  it('C1: vários objetivos usam a média dos descansos', () => {
+    // hipertrofia 150 s + emagrecimento 75 s → 112,5 → 115 s (arredonda de 5 em 5)
+    expect(descansoSegundos(['hipertrofia', 'emagrecimento'], 'composto', 'masculino', 'normal')).toBe(115)
+    // (150 + 75 + 90) / 3 = 105
+    expect(descansoSegundos(['hipertrofia', 'emagrecimento', 'saude'], 'composto', 'masculino', 'normal')).toBe(105)
+    // feminino: 112,5 × 0,85 = 95,6 → 95
+    expect(descansoSegundos(['hipertrofia', 'emagrecimento'], 'composto', 'feminino', 'normal')).toBe(95)
+    // a ordem não importa
+    expect(descansoSegundos(['emagrecimento', 'hipertrofia'], 'isolado', 'masculino', 'normal')).toBe(descansoSegundos(['hipertrofia', 'emagrecimento'], 'isolado', 'masculino', 'normal'))
+    // readaptação continua com o descanso de saúde geral
+    expect(descansoSegundos(['hipertrofia', 'emagrecimento'], 'composto', 'masculino', 'readaptacao')).toBe(90)
   })
   it('readaptação: 2 séries na primeira semana e 3 depois, faixa 12-15', () => {
     const s0 = gerarPlano(contexto({ nivel: 'iniciante', duracaoMin: 60 }, { fase: 'readaptacao', semanaReadaptacao: 0 }))

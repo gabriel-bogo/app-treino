@@ -13,8 +13,8 @@ const perfil: Perfil = {
   alturaCm: 165,
   pesoInicialKg: 62.5,
   nivel: 'iniciante',
-  objetivo: 'saude',
-  enfase: 'equilibrado',
+  objetivos: ['saude'],
+  enfases: [],
   diasSemana: 3,
   duracaoMin: 60,
   limitacoes: [],
@@ -149,5 +149,28 @@ describe('lembrete de backup (§8: mais de 14 dias)', () => {
   it('nunca fez backup: conta a partir do primeiro uso (B12)', () => {
     expect(precisaLembrarBackup({ primeiroUsoEm: '2026-03-10T12:00:00' }, agora)).toBe(false)
     expect(precisaLembrarBackup({ primeiroUsoEm: '2026-03-01T12:00:00' }, agora)).toBe(true)
+  })
+
+  it('importa backup da versão anterior (perfil com objetivo e ênfase únicos)', async () => {
+    const banco = bancoNovo()
+    const { objetivos: _o, enfases: _e, ...resto } = perfil
+    const antigo = {
+      app: 'app-treino',
+      schemaVersion: 1,
+      exportadoEm: '2026-02-05T10:00:00.000Z',
+      versaoApp: '0.1.0',
+      tabelas: { perfil: [{ ...resto, objetivo: 'emagrecimento', enfase: 'equilibrado', duracaoMin: 75 }] },
+    }
+    const v = validarBackup(JSON.stringify(antigo))
+    expect(v.ok).toBe(true)
+    if (!v.ok) return
+    await restaurarBackup(banco, v.backup)
+    const p = (await banco.perfil.get('perfil')) as unknown as Record<string, unknown>
+    expect(p.objetivos).toEqual(['emagrecimento'])
+    expect(p.enfases).toEqual([])
+    expect(p.duracaoMin).toBe(75)
+    expect('objetivo' in p).toBe(false)
+    expect('enfase' in p).toBe(false)
+    expect(VERSAO_SCHEMA).toBe(2)
   })
 })

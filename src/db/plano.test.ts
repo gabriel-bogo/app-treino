@@ -13,8 +13,8 @@ const perfil: Perfil = {
   alturaCm: 175,
   pesoInicialKg: 75,
   nivel: 'intermediario',
-  objetivo: 'hipertrofia',
-  enfase: 'equilibrado',
+  objetivos: ['hipertrofia'],
+  enfases: [],
   diasSemana: 4,
   duracaoMin: 60,
   limitacoes: [],
@@ -116,6 +116,34 @@ describe('plano ativo', () => {
     expect(plano.fase).toBe('normal')
     expect(plano.mensagemFase).toMatch(/Readaptação concluída/)
     expect(plano.divisao).toBe('Full body A / B / C')
+  })
+
+  it('C6: antes do primeiro treino, a fase acompanha o nível do perfil', async () => {
+    await db.perfil.put({ ...perfil, nivel: 'iniciante', diasSemana: 5 })
+    await garantirPlano()
+    expect((await db.plano.get('atual'))!.fase).toBe('readaptacao')
+    expect(await db.diasPlano.count()).toBe(4)
+    // na revisão do plano, a pessoa muda para intermediário
+    await db.perfil.put({ ...perfil, nivel: 'intermediario', diasSemana: 5 })
+    await garantirPlano()
+    const plano = (await db.plano.get('atual'))!
+    expect(plano.fase).toBe('normal')
+    expect(plano.divisao).toBe('Superior / Inferior / Push / Pull / Legs')
+    expect(await db.diasPlano.count()).toBe(5)
+    // depois do primeiro treino, mudar o nível não volta para a readaptação
+    await db.sessoes.put({
+      id: 's1',
+      diaId: '0',
+      nomeDia: 'Treino A · Superior',
+      fase: 'normal',
+      inicio: new Date().toISOString(),
+      status: 'concluida',
+      estado: { itens: [], atualUid: null, aquecimentoGeral: 'feito', timer: null },
+      substituicoes: [],
+    })
+    await db.perfil.put({ ...perfil, nivel: 'iniciante', diasSemana: 5 })
+    await garantirPlano()
+    expect((await db.plano.get('atual'))!.fase).toBe('normal')
   })
 
   it('revisa o volume a cada 3 semanas conforme a progressão (A3)', async () => {

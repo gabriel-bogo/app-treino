@@ -7,7 +7,7 @@ async function comecar(page: Page) {
 }
 
 test('registrar séries com 1 toque cada: check inicia o timer de descanso (§3, §11)', async ({ page }) => {
-  await fazerOnboarding(page, { nivel: 'Intermediário', dias: '4', duracao: '45 min' })
+  await fazerOnboarding(page, { nivel: 'Intermediário', dias: '4', duracao: 45 })
   await comecar(page)
   await expect(page.getByText(/0 de \d séries/).first()).toBeVisible()
   await page.getByRole('button', { name: 'Marcar série 1 como feita' }).click()
@@ -20,7 +20,7 @@ test('registrar séries com 1 toque cada: check inicia o timer de descanso (§3,
 })
 
 test('fechar o app no meio do treino e reabrir retoma exatamente do mesmo ponto (§11)', async ({ page }) => {
-  await fazerOnboarding(page, { nivel: 'Intermediário', dias: '4', duracao: '45 min' })
+  await fazerOnboarding(page, { nivel: 'Intermediário', dias: '4', duracao: 45 })
   await comecar(page)
   // muda a carga da 1ª série e marca duas séries
   const carga = page.getByRole('textbox', { name: 'carga da série 1' })
@@ -49,8 +49,8 @@ test('fechar o app no meio do treino e reabrir retoma exatamente do mesmo ponto 
 })
 
 test('finalizar grava o treino, mostra o resumo e avança para o próximo da sequência', async ({ page }) => {
-  await fazerOnboarding(page, { nivel: 'Intermediário', dias: '4', duracao: '45 min' })
-  await expect(page.getByText('Superior A', { exact: true })).toBeVisible()
+  await fazerOnboarding(page, { nivel: 'Intermediário', dias: '4', duracao: 45 })
+  await expect(page.getByText('Treino A · Superior', { exact: true })).toBeVisible()
   await comecar(page)
   // marca todas as séries de todos os exercícios (preenche carga onde estiver vazia)
   for (let i = 0; i < 60; i++) {
@@ -68,11 +68,11 @@ test('finalizar grava o treino, mostra o resumo e avança para o próximo da seq
   await expect(page.getByText('Treino concluído')).toBeVisible()
   await expect(page.getByText(/Carga inicial registrada|Meta confirmada|Primeiro registro/).first()).toBeVisible()
   await page.getByRole('button', { name: 'Voltar ao início' }).click()
-  await expect(page.getByText('Inferior A', { exact: true })).toBeVisible()
+  await expect(page.getByText('Treino B · Inferior', { exact: true })).toBeVisible()
 })
 
 test('fora da ordem: deixar pra depois e tocar em outro exercício', async ({ page }) => {
-  await fazerOnboarding(page, { nivel: 'Intermediário', dias: '4', duracao: '60 min' })
+  await fazerOnboarding(page, { nivel: 'Intermediário', dias: '4', duracao: 60 })
   await comecar(page)
   const primeiro = await page.getByTestId('nome-exercicio').textContent()
   await page.getByRole('button', { name: 'Deixar pra depois' }).click()

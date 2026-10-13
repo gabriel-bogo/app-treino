@@ -44,6 +44,22 @@ A especificação (`docs/app-treino-spec.md`) deixava alguns pontos em aberto ou
 | B19 | Traduções e "erros comuns" escritos para o app; recomenda-se revisão por profissional. |
 | B20 | A especificação fica no repositório em `docs/`. |
 
+## C. Ajustes pedidos depois da primeira versão
+
+Mudanças de regra aprovadas depois de usar o app. Onde elas contradizem a especificação, vale o que está aqui.
+
+| Código | Ponto | Decisão |
+|---|---|---|
+| C1 | Objetivo | Pode marcar mais de um. O descanso é a média dos descansos de cada objetivo marcado (§6.5), arredondada de 5 em 5 s. Ex: hipertrofia + emagrecimento = 1:55 nos compostos. Emagrecimento marcado com IMC baixo continua gerando o alerta da §10. |
+| C2 | Ênfase | Sai a opção "Equilibrado": nada marcado = equilibrado. Dá para marcar várias (inferiores, superiores, glúteos). Superiores + inferiores juntos se anulam (glúteos, se marcado também, continua valendo). Inferiores + glúteos = inferiores. Com 4 dias, vira Inferior / Superior / Inferior / Full body quando a ênfase que sobra é só de membros inferiores. |
+| C3 | Duração do treino | Barra deslizante de 30 a 120 min, de 5 em 5 (padrão 60). Abaixo de 30 não cabem aquecimento e 3 exercícios. Acima de 120 o teto de volume semanal (16 séries por grupo) não deixa preencher o tempo. O teste do motor cobre todas as durações da faixa. |
+| C4 | Ordem dos exercícios | Agrupada por músculo, como numa ficha de academia (substitui a ordem geral da §6.4): aquecimento de ombro primeiro, músculos grandes antes dos pequenos (com ênfase primeiro), composto antes de isolado dentro de cada músculo, core no fim. |
+| C5 | Proposta do plano | Ao terminar o onboarding, o app mostra o programa ("Treino A · Superior", "Treino B · Inferior"…, com seções por músculo) para aprovar, trocar exercício ou mudar as escolhas. A troca vale para todos os treinos em que o exercício aparece; trocar de novo substitui a troca anterior e voltar ao original desfaz. Na readaptação, a tela explica a fase e mostra como fica o plano depois. A aba Plano usa o mesmo formato. |
+| C6 | Fase × perfil | Antes do primeiro treino, a fase (readaptação ou normal) acompanha o perfil. Ex: mudar o nível de "iniciante" para "intermediário" na revisão do plano tira a readaptação. Depois do primeiro treino, não muda mais por causa do nível. |
+| C7 | IMC no onboarding | A mensagem do IMC vem antes das opções de objetivo. Fora da faixa adequada, aparece num bloco vermelho com a classificação em maiúsculas e negrito. O objetivo recomendado fica em negrito, com a etiqueta "Recomendado": sobrepeso e obesidade → emagrecimento; abaixo do peso → hipertrofia e saúde geral; peso adequado → nenhum. |
+
+O banco local passou para a versão 2. Quem já tinha o app instalado tem o perfil convertido automaticamente: objetivo vira lista de um item, "Equilibrado" vira nenhuma ênfase e a duração é mantida. Backups da versão 1 continuam podendo ser importados.
+
 ## Interpretações feitas durante a implementação
 
 - **Nível "retornando"** recebe exercícios de nível iniciante e intermediário (só "iniciante" fica restrito aos de nível iniciante).

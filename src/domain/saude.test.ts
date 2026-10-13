@@ -9,7 +9,9 @@ import {
   exigeLiberacaoMedica,
   faixaPesoAdequado,
   mediaMovel7,
-  mensagensObjetivo,
+  mensagensClassificacao,
+  alertasObjetivo,
+  objetivosRecomendados,
   pesoTendencia,
   registrosDePeso,
   resumoVariacao,
@@ -135,8 +137,10 @@ describe('coerência com o objetivo (§10)', () => {
     const av = avaliarPeso({ ...base, pesoKg: 52 })
     expect(av.classe).toBe('abaixo')
     expect(emagrecimentoDesaconselhado(av)).toBe(true)
-    const msgs = mensagensObjetivo(av, 'emagrecimento')
+    const msgs = alertasObjetivo(av, ['emagrecimento', 'hipertrofia'])
     expect(msgs.some((m) => m.tipo === 'perigo' && /médico ou nutricionista/.test(m.texto))).toBe(true)
+    expect(alertasObjetivo(av, ['hipertrofia'])).toEqual([])
+    expect(objetivosRecomendados(av)).toEqual(['hipertrofia', 'saude'])
   })
 
   it('IMC até 19,9 também desaconselha emagrecimento', () => {
@@ -149,22 +153,38 @@ describe('coerência com o objetivo (§10)', () => {
   it('sobrepeso: emagrecimento como sugestão', () => {
     const av = avaliarPeso({ ...base, pesoKg: 78 })
     expect(av.classe).toBe('sobrepeso')
-    expect(mensagensObjetivo(av, undefined)[0].texto).toMatch(/Emagrecimento pode ser um bom objetivo/)
+    const [m] = mensagensClassificacao(av)
+    expect(m.texto).toMatch(/Emagrecimento pode ser um bom objetivo/)
+    expect(objetivosRecomendados(av)).toEqual(['emagrecimento'])
+  })
+
+  it('C7: fora da faixa adequada, mensagem em vermelho com a classificação em maiúsculas', () => {
+    const av = avaliarPeso({ ...base, pesoKg: 94 }) // IMC 32,5
+    expect(av.classe).toBe('obesidade1')
+    const [m] = mensagensClassificacao(av)
+    expect(m.tipo).toBe('perigo')
+    expect(m.texto).toBe('Pelo IMC (32,5), sua classificação é OBESIDADE GRAU I. Emagrecimento pode ser um bom objetivo para você.')
+    expect(m.destaque).toBe('OBESIDADE GRAU I')
+    // peso adequado: só informativo, sem recomendação
+    const ok = avaliarPeso({ ...base, pesoKg: 65 })
+    expect(mensagensClassificacao(ok)[0].tipo).toBe('info')
+    expect(objetivosRecomendados(ok)).toEqual([])
   })
 
   it('obesidade II ou III: liberação médica e readaptação', () => {
     const av = avaliarPeso({ ...base, pesoKg: 105 })
     expect(av.classe).toBe('obesidade2')
     expect(exigeLiberacaoMedica(av.classe)).toBe(true)
-    expect(mensagensObjetivo(av, 'hipertrofia').some((m) => /liberação médica/.test(m.texto))).toBe(true)
+    expect(mensagensClassificacao(av).some((m) => /liberação médica/.test(m.texto))).toBe(true)
     expect(exigeLiberacaoMedica('obesidade1')).toBe(false)
   })
 
   it('menor de 18: só mostra o valor e recomenda avaliação', () => {
     const av = avaliarPeso({ ...base, nascimento: '2010-01-01', pesoKg: 60 })
     expect(av.classe).toBe('nao_classificado')
-    const msgs = mensagensObjetivo(av, 'emagrecimento')
+    const msgs = [...mensagensClassificacao(av), ...alertasObjetivo(av, ['emagrecimento'])]
     expect(msgs).toHaveLength(1)
     expect(msgs[0].texto).toMatch(/avaliação/)
+    expect(objetivosRecomendados(av)).toEqual([])
   })
 })
