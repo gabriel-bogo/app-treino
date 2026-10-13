@@ -1,0 +1,4168 @@
+[
+ {
+  "id": "supino-reto-barra",
+  "nome": "Supino reto com barra",
+  "nomeOriginal": "Barbell Bench Press - Medium Grip",
+  "grupo": "peito",
+  "gruposSecundarios": [
+   "triceps"
+  ],
+  "categoria": "push",
+  "equipamento": "barra",
+  "tipo": "composto",
+  "padrao": "empurrar_horizontal",
+  "nivel": "iniciante",
+  "tipoCarga": "porLado",
+  "unilateral": false,
+  "incrementoCarga": 1,
+  "contraindicacoes": [
+   {
+    "limitacao": "ombro",
+    "nivel": "leve"
+   },
+   {
+    "limitacao": "punho",
+    "nivel": "leve"
+   }
+  ],
+  "substitutos": [
+   "supino-reto-halter",
+   "supino-inclinado-barra",
+   "supino-inclinado-halter",
+   "supino-maquina"
+  ],
+  "imagens": [
+   "supino-reto-barra/0.webp",
+   "supino-reto-barra/1.webp"
+  ],
+  "passos": [
+   "Deite no banco reto com os olhos abaixo da barra e os pés firmes no chão.",
+   "Segure a barra com as mãos um pouco mais abertas que os ombros e tire-a do suporte com os braços estendidos.",
+   "Desça a barra com controle até encostar de leve no meio do peito, cotovelos a uns 45° do tronco.",
+   "Empurre a barra de volta até estender os braços."
+  ],
+  "errosComuns": [
+   "Quicar a barra no peito ou tirar o quadril do banco.",
+   "Abrir os cotovelos a 90° do tronco, o que sobrecarrega o ombro."
+  ],
+  "prioridade": 1
+ },
+ {
+  "id": "supino-reto-halter",
+  "nome": "Supino reto com halteres",
+  "nomeOriginal": "Dumbbell Bench Press",
+  "grupo": "peito",
+  "gruposSecundarios": [
+   "triceps"
+  ],
+  "categoria": "push",
+  "equipamento": "halter",
+  "tipo": "composto",
+  "padrao": "empurrar_horizontal",
+  "nivel": "iniciante",
+  "tipoCarga": "porHalter",
+  "unilateral": false,
+  "incrementoCarga": 2,
+  "contraindicacoes": [],
+  "substitutos": [
+   "supino-reto-barra",
+   "supino-inclinado-barra",
+   "supino-inclinado-halter",
+   "supino-maquina"
+  ],
+  "imagens": [
+   "supino-reto-halter/0.webp",
+   "supino-reto-halter/1.webp"
+  ],
+  "passos": [
+   "Sente na ponta do banco com os halteres apoiados nas coxas e deite levando-os junto ao peito.",
+   "Comece com os halteres na linha do peito, palmas voltadas para os pés.",
+   "Empurre os halteres para cima até quase se encostarem, estendendo os braços.",
+   "Desça devagar até sentir o peito alongar."
+  ],
+  "errosComuns": [
+   "Descer rápido demais e perder o controle no fundo.",
+   "Bater um halter no outro em cima."
+  ],
+  "prioridade": 2,
+  "amigavelOmbro": true
+ },
+ {
+  "id": "supino-inclinado-barra",
+  "nome": "Supino inclinado com barra",
+  "nomeOriginal": "Barbell Incline Bench Press - Medium Grip",
+  "grupo": "peito",
+  "gruposSecundarios": [
+   "triceps"
+  ],
+  "categoria": "push",
+  "equipamento": "barra",
+  "tipo": "composto",
+  "padrao": "empurrar_horizontal",
+  "nivel": "iniciante",
+  "tipoCarga": "porLado",
+  "unilateral": false,
+  "incrementoCarga": 1,
+  "contraindicacoes": [],
+  "substitutos": [
+   "supino-reto-barra",
+   "supino-reto-halter",
+   "supino-inclinado-halter",
+   "supino-maquina"
+  ],
+  "imagens": [
+   "supino-inclinado-barra/0.webp",
+   "supino-inclinado-barra/1.webp"
+  ],
+  "passos": [
+   "Ajuste o banco entre 30° e 45° e deite com os pés firmes no chão.",
+   "Segure a barra um pouco mais aberta que os ombros e tire-a do suporte.",
+   "Desça até a parte de cima do peito, logo abaixo da clavícula.",
+   "Empurre de volta até estender os braços."
+  ],
+  "errosComuns": [
+   "Inclinar demais o banco e transformar o exercício em desenvolvimento.",
+   "Tirar o quadril do banco."
+  ],
+  "prioridade": 3
+ },
+ {
+  "id": "supino-inclinado-halter",
+  "nome": "Supino inclinado com halteres",
+  "nomeOriginal": "Incline Dumbbell Press",
+  "grupo": "peito",
+  "gruposSecundarios": [
+   "triceps"
+  ],
+  "categoria": "push",
+  "equipamento": "halter",
+  "tipo": "composto",
+  "padrao": "empurrar_horizontal",
+  "nivel": "iniciante",
+  "tipoCarga": "porHalter",
+  "unilateral": false,
+  "incrementoCarga": 2,
+  "contraindicacoes": [],
+  "substitutos": [
+   "supino-reto-barra",
+   "supino-reto-halter",
+   "supino-inclinado-barra",
+   "supino-maquina"
+  ],
+  "imagens": [
+   "supino-inclinado-halter/0.webp",
+   "supino-inclinado-halter/1.webp"
+  ],
+  "passos": [
+   "Ajuste o banco entre 30° e 45°, sente e leve os halteres até a altura do peito.",
+   "Deite com os halteres ao lado da parte de cima do peito.",
+   "Empurre para cima até estender os braços, aproximando os halteres.",
+   "Desça devagar até sentir o peito alongar."
+  ],
+  "errosComuns": [
+   "Descer os halteres muito para fora, forçando o ombro.",
+   "Encurtar o movimento com carga alta."
+  ],
+  "prioridade": 4,
+  "amigavelOmbro": true
+ },
+ {
+  "id": "supino-maquina",
+  "nome": "Supino na máquina (chest press)",
+  "nomeOriginal": "Leverage Chest Press",
+  "grupo": "peito",
+  "gruposSecundarios": [
+   "triceps"
+  ],
+  "categoria": "push",
+  "equipamento": "maquina",
+  "tipo": "composto",
+  "padrao": "empurrar_horizontal",
+  "nivel": "iniciante",
+  "tipoCarga": "total",
+  "unilateral": false,
+  "incrementoCarga": 2,
+  "contraindicacoes": [],
+  "substitutos": [
+   "supino-reto-barra",
+   "supino-reto-halter",
+   "supino-inclinado-barra",
+   "supino-inclinado-halter"
+  ],
+  "imagens": [
+   "supino-maquina/0.webp",
+   "supino-maquina/1.webp"
+  ],
+  "passos": [
+   "Ajuste o banco para que as pegadas fiquem na altura do meio do peito.",
+   "Sente com as costas apoiadas e as escápulas encaixadas para trás.",
+   "Empurre as pegadas para frente até estender os braços.",
+   "Volte devagar sem deixar o peso encostar no apoio."
+  ],
+  "errosComuns": [
+   "Banco alto ou baixo demais, com a pegada fora da linha do peito.",
+   "Tirar as costas do encosto para empurrar."
+  ],
+  "prioridade": 5
+ },
+ {
+  "id": "supino-halter-neutro",
+  "nome": "Supino com halteres pegada neutra",
+  "nomeOriginal": "Dumbbell Bench Press with Neutral Grip",
+  "grupo": "peito",
+  "gruposSecundarios": [
+   "triceps"
+  ],
+  "categoria": "push",
+  "equipamento": "halter",
+  "tipo": "composto",
+  "padrao": "empurrar_horizontal",
+  "nivel": "iniciante",
+  "tipoCarga": "porHalter",
+  "unilateral": false,
+  "incrementoCarga": 2,
+  "contraindicacoes": [],
+  "substitutos": [
+   "supino-reto-barra",
+   "supino-reto-halter",
+   "supino-inclinado-barra",
+   "supino-inclinado-halter"
+  ],
+  "imagens": [
+   "supino-halter-neutro/0.webp",
+   "supino-halter-neutro/1.webp"
+  ],
+  "passos": [
+   "Deite no banco reto com um halter em cada mão, palmas viradas uma para a outra.",
+   "Comece com os halteres ao lado do peito, cotovelos próximos ao tronco.",
+   "Empurre para cima até estender os braços, mantendo as palmas viradas uma para a outra.",
+   "Desça devagar até a linha do peito."
+  ],
+  "errosComuns": [
+   "Deixar os cotovelos abrirem para os lados.",
+   "Arquear demais a lombar."
+  ],
+  "prioridade": 6,
+  "amigavelOmbro": true
+ },
+ {
+  "id": "supino-inclinado-maquina",
+  "nome": "Supino inclinado na máquina",
+  "nomeOriginal": "Leverage Incline Chest Press",
+  "grupo": "peito",
+  "gruposSecundarios": [
+   "triceps"
+  ],
+  "categoria": "push",
+  "equipamento": "maquina",
+  "tipo": "composto",
+  "padrao": "empurrar_horizontal",
+  "nivel": "iniciante",
+  "tipoCarga": "total",
+  "unilateral": false,
+  "incrementoCarga": 2,
+  "contraindicacoes": [],
+  "substitutos": [
+   "supino-reto-barra",
+   "supino-reto-halter",
+   "supino-inclinado-barra",
+   "supino-inclinado-halter"
+  ],
+  "imagens": [
+   "supino-inclinado-maquina/0.webp",
+   "supino-inclinado-maquina/1.webp"
+  ],
+  "passos": [
+   "Ajuste o banco para que as pegadas fiquem na altura da parte de cima do peito.",
+   "Sente com as costas apoiadas e os pés firmes.",
+   "Empurre as pegadas para cima e para frente até estender os braços.",
+   "Volte devagar mantendo tensão no peito."
+  ],
+  "errosComuns": [
+   "Encolher os ombros perto das orelhas.",
+   "Soltar o peso de uma vez na volta."
+  ],
+  "prioridade": 7
+ },
+ {
+  "id": "flexao",
+  "nome": "Flexão de braço",
+  "nomeOriginal": "Pushups",
+  "grupo": "peito",
+  "gruposSecundarios": [
+   "triceps"
+  ],
+  "categoria": "push",
+  "equipamento": "peso_corporal",
+  "tipo": "composto",
+  "padrao": "empurrar_horizontal",
+  "nivel": "iniciante",
+  "tipoCarga": "pesoCorpo",
+  "unilateral": false,
+  "incrementoCarga": 2,
+  "contraindicacoes": [
+   {
+    "limitacao": "punho",
+    "nivel": "leve"
+   }
+  ],
+  "substitutos": [
+   "supino-reto-barra",
+   "supino-reto-halter",
+   "supino-inclinado-barra",
+   "supino-inclinado-halter"
+  ],
+  "imagens": [
+   "flexao/0.webp",
+   "flexao/1.webp"
+  ],
+  "passos": [
+   "Apoie as mãos no chão um pouco mais abertas que os ombros e estenda as pernas, na ponta dos pés.",
+   "Mantenha o corpo em linha reta da cabeça aos calcanhares, abdômen firme.",
+   "Dobre os cotovelos e desça o peito até perto do chão.",
+   "Empurre o chão e volte estendendo os braços."
+  ],
+  "errosComuns": [
+   "Deixar o quadril cair ou empinar.",
+   "Fazer meia repetição, sem descer o peito."
+  ],
+  "prioridade": 8,
+  "tetoReps": 20,
+  "variacaoMaisDificil": "flexao-pes-elevados",
+  "versaoAssistida": [
+   "flexao-inclinada"
+  ]
+ },
+ {
+  "id": "crucifixo-halter",
+  "nome": "Crucifixo com halteres",
+  "nomeOriginal": "Dumbbell Flyes",
+  "grupo": "peito",
+  "gruposSecundarios": [],
+  "categoria": "push",
+  "equipamento": "halter",
+  "tipo": "isolado",
+  "padrao": "isolado_bracos",
+  "nivel": "iniciante",
+  "tipoCarga": "porHalter",
+  "unilateral": false,
+  "incrementoCarga": 2,
+  "contraindicacoes": [],
+  "substitutos": [
+   "voador",
+   "crossover",
+   "crucifixo-inclinado",
+   "supino-reto-barra"
+  ],
+  "imagens": [
+   "crucifixo-halter/0.webp",
+   "crucifixo-halter/1.webp"
+  ],
+  "passos": [
+   "Deite no banco reto com os halteres acima do peito, palmas viradas uma para a outra.",
+   "Mantenha os cotovelos levemente dobrados durante todo o movimento.",
+   "Abra os braços em arco, descendo os halteres até a linha do peito.",
+   "Feche os braços pelo mesmo arco, contraindo o peito."
+  ],
+  "errosComuns": [
+   "Esticar totalmente os cotovelos, sobrecarregando a articulação.",
+   "Descer além da linha do ombro."
+  ],
+  "prioridade": 9
+ },
+ {
+  "id": "voador",
+  "nome": "Voador (peck deck)",
+  "nomeOriginal": "Butterfly",
+  "grupo": "peito",
+  "gruposSecundarios": [],
+  "categoria": "push",
+  "equipamento": "maquina",
+  "tipo": "isolado",
+  "padrao": "isolado_bracos",
+  "nivel": "iniciante",
+  "tipoCarga": "total",
+  "unilateral": false,
+  "incrementoCarga": 2,
+  "contraindicacoes": [],
+  "substitutos": [
+   "crucifixo-halter",
+   "crossover",
+   "crucifixo-inclinado",
+   "supino-reto-barra"
+  ],
+  "imagens": [
+   "voador/0.webp",
+   "voador/1.webp"
+  ],
+  "passos": [
+   "Ajuste o banco para que as pegadas fiquem na altura do peito.",
+   "Sente com as costas apoiadas e segure as pegadas com os cotovelos levemente dobrados.",
+   "Feche os braços à frente do peito, contraindo o peitoral.",
+   "Abra devagar até sentir o peito alongar, sem passar da linha do ombro."
+  ],
+  "errosComuns": [
+   "Deixar o peso puxar os braços para trás demais.",
+   "Usar o impulso do tronco."
+  ],
+  "prioridade": 10
+ },
+ {
+  "id": "crossover",
+  "nome": "Crossover (polia alta)",
+  "nomeOriginal": "Cable Crossover",
+  "grupo": "peito",
+  "gruposSecundarios": [],
+  "categoria": "push",
+  "equipamento": "cabo",
+  "tipo": "isolado",
+  "padrao": "isolado_bracos",
+  "nivel": "iniciante",
+  "tipoCarga": "total",
+  "unilateral": false,
+  "incrementoCarga": 2,
+  "contraindicacoes": [],
+  "substitutos": [
+   "crucifixo-halter",
+   "voador",
+   "crucifixo-inclinado",
+   "supino-reto-barra"
+  ],
+  "imagens": [
+   "crossover/0.webp",
+   "crossover/1.webp"
+  ],
+  "passos": [
+   "Ajuste as polias no alto e segure uma pegada em cada mão.",
+   "Dê um passo à frente e incline levemente o tronco, cotovelos levemente dobrados.",
+   "Traga as mãos em arco até se encontrarem à frente do corpo.",
+   "Volte devagar até sentir o peito alongar."
+  ],
+  "errosComuns": [
+   "Dobrar e esticar os cotovelos, virando um exercício de tríceps.",
+   "Puxar com o corpo em vez de usar o peito."
+  ],
+  "prioridade": 11
+ },
+ {
+  "id": "flexao-inclinada",
+  "nome": "Flexão inclinada (mãos no banco)",
+  "nomeOriginal": "Incline Push-Up",
+  "grupo": "peito",
+  "gruposSecundarios": [
+   "triceps"
+  ],
+  "categoria": "push",
+  "equipamento": "peso_corporal",
+  "tipo": "composto",
+  "padrao": "empurrar_horizontal",
+  "nivel": "iniciante",
+  "tipoCarga": "pesoCorpo",
+  "unilateral": false,
+  "incrementoCarga": 2,
+  "contraindicacoes": [],
+  "substitutos": [
+   "supino-reto-barra",
+   "supino-reto-halter",
+   "supino-inclinado-barra",
+   "supino-inclinado-halter"
+  ],
+  "imagens": [
+   "flexao-inclinada/0.webp",
+   "flexao-inclinada/1.webp"
+  ],
+  "passos": [
+   "Apoie as mãos na borda de um banco firme, um pouco mais abertas que os ombros.",
+   "Estenda as pernas para trás e mantenha o corpo reto.",
+   "Dobre os cotovelos e leve o peito até a borda do banco.",
+   "Empurre de volta até estender os braços."
+  ],
+  "errosComuns": [
+   "Usar um apoio que escorrega.",
+   "Deixar o quadril cair."
+  ],
+  "prioridade": 12,
+  "tetoReps": 20,
+  "variacaoMaisDificil": "flexao"
+ },
+ {
+  "id": "flexao-pes-elevados",
+  "nome": "Flexão com pés elevados",
+  "nomeOriginal": "Push-Ups With Feet Elevated",
+  "grupo": "peito",
+  "gruposSecundarios": [
+   "triceps"
+  ],
+  "categoria": "push",
+  "equipamento": "peso_corporal",
+  "tipo": "composto",
+  "padrao": "empurrar_horizontal",
+  "nivel": "intermediario",
+  "tipoCarga": "pesoCorpo",
+  "unilateral": false,
+  "incrementoCarga": 2,
+  "contraindicacoes": [
+   {
+    "limitacao": "punho",
+    "nivel": "leve"
+   }
+  ],
+  "substitutos": [
+   "supino-reto-barra",
+   "supino-reto-halter",
+   "supino-inclinado-barra",
+   "supino-inclinado-halter"
+  ],
+  "imagens": [
+   "flexao-pes-elevados/0.webp",
+   "flexao-pes-elevados/1.webp"
+  ],
+  "passos": [
+   "Apoie os pés num banco e as mãos no chão, um pouco mais abertas que os ombros.",
+   "Mantenha o corpo reto e o abdômen firme.",
+   "Desça o peito até perto do chão dobrando os cotovelos.",
+   "Empurre de volta até estender os braços."
+  ],
+  "errosComuns": [
+   "Deixar o quadril cair.",
+   "Abrir demais os cotovelos."
+  ],
+  "prioridade": 13,
+  "tetoReps": 20
+ },
+ {
+  "id": "crucifixo-inclinado",
+  "nome": "Crucifixo inclinado com halteres",
+  "nomeOriginal": "Incline Dumbbell Flyes",
+  "grupo": "peito",
+  "gruposSecundarios": [],
+  "categoria": "push",
+  "equipamento": "halter",
+  "tipo": "isolado",
+  "padrao": "isolado_bracos",
+  "nivel": "iniciante",
+  "tipoCarga": "porHalter",
+  "unilateral": false,
+  "incrementoCarga": 2,
+  "contraindicacoes": [],
+  "substitutos": [
+   "crucifixo-halter",
+   "voador",
+   "crossover",
+   "supino-reto-barra"
+  ],
+  "imagens": [
+   "crucifixo-inclinado/0.webp",
+   "crucifixo-inclinado/1.webp"
+  ],
+  "passos": [
+   "Ajuste o banco a uns 30° e deite com os halteres acima do peito.",
+   "Mantenha os cotovelos levemente dobrados.",
+   "Abra os braços em arco até a linha do peito.",
+   "Volte pelo mesmo arco contraindo a parte de cima do peito."
+  ],
+  "errosComuns": [
+   "Usar carga alta e transformar o movimento em supino.",
+   "Descer além da linha do ombro."
+  ],
+  "prioridade": 14
+ },
+ {
+  "id": "puxada-frontal",
+  "nome": "Puxada frontal",
+  "nomeOriginal": "Wide-Grip Lat Pulldown",
+  "grupo": "costas",
+  "gruposSecundarios": [
+   "biceps"
+  ],
+  "categoria": "pull",
+  "equipamento": "cabo",
+  "tipo": "composto",
+  "padrao": "puxar_vertical",
+  "nivel": "iniciante",
+  "tipoCarga": "total",
+  "unilateral": false,
+  "incrementoCarga": 2,
+  "contraindicacoes": [],
+  "substitutos": [
+   "puxada-supinada",
+   "puxada-fechada",
+   "barra-fixa",
+   "barra-fixa-supinada"
+  ],
+  "imagens": [
+   "puxada-frontal/0.webp",
+   "puxada-frontal/1.webp"
+  ],
+  "passos": [
+   "Ajuste o apoio das coxas e segure a barra com as mãos bem mais abertas que os ombros.",
+   "Sente, incline levemente o tronco para trás e estufe o peito.",
+   "Puxe a barra até a parte de cima do peito, levando os cotovelos para baixo e para trás.",
+   "Volte devagar até estender os braços."
+  ],
+  "errosComuns": [
+   "Jogar o tronco para trás para puxar.",
+   "Puxar a barra atrás da nuca."
+  ],
+  "prioridade": 1
+ },
+ {
+  "id": "remada-baixa",
+  "nome": "Remada baixa (polia)",
+  "nomeOriginal": "Seated Cable Rows",
+  "grupo": "costas",
+  "gruposSecundarios": [
+   "biceps"
+  ],
+  "categoria": "pull",
+  "equipamento": "cabo",
+  "tipo": "composto",
+  "padrao": "puxar_horizontal",
+  "nivel": "iniciante",
+  "tipoCarga": "total",
+  "unilateral": false,
+  "incrementoCarga": 2,
+  "contraindicacoes": [],
+  "substitutos": [
+   "serrote",
+   "remada-curvada-barra",
+   "remada-maquina",
+   "remada-cavalinho"
+  ],
+  "imagens": [
+   "remada-baixa/0.webp",
+   "remada-baixa/1.webp"
+  ],
+  "passos": [
+   "Sente com os pés apoiados e os joelhos levemente dobrados, segurando o triângulo.",
+   "Mantenha o tronco reto, quase vertical.",
+   "Puxe a pegada até a barriga, levando os cotovelos para trás e juntando as escápulas.",
+   "Volte devagar estendendo os braços, sem curvar as costas."
+  ],
+  "errosComuns": [
+   "Balançar o tronco para frente e para trás.",
+   "Curvar a lombar na volta."
+  ],
+  "prioridade": 2
+ },
+ {
+  "id": "serrote",
+  "nome": "Remada unilateral com halter (serrote)",
+  "nomeOriginal": "One-Arm Dumbbell Row",
+  "grupo": "costas",
+  "gruposSecundarios": [
+   "biceps"
+  ],
+  "categoria": "pull",
+  "equipamento": "halter",
+  "tipo": "composto",
+  "padrao": "puxar_horizontal",
+  "nivel": "iniciante",
+  "tipoCarga": "porHalter",
+  "unilateral": true,
+  "incrementoCarga": 2,
+  "contraindicacoes": [],
+  "substitutos": [
+   "remada-baixa",
+   "remada-curvada-barra",
+   "remada-maquina",
+   "remada-cavalinho"
+  ],
+  "imagens": [
+   "serrote/0.webp",
+   "serrote/1.webp"
+  ],
+  "passos": [
+   "Apoie um joelho e a mão do mesmo lado no banco, costas retas.",
+   "Segure o halter com a outra mão, braço estendido.",
+   "Puxe o halter até a lateral da cintura, cotovelo junto ao corpo.",
+   "Desça devagar até estender o braço. Faça as repetições e troque de lado."
+  ],
+  "errosComuns": [
+   "Girar o tronco para levantar o peso.",
+   "Puxar com o bíceps em vez das costas."
+  ],
+  "prioridade": 3
+ },
+ {
+  "id": "remada-curvada-barra",
+  "nome": "Remada curvada com barra",
+  "nomeOriginal": "Bent Over Barbell Row",
+  "grupo": "costas",
+  "gruposSecundarios": [
+   "biceps"
+  ],
+  "categoria": "pull",
+  "equipamento": "barra",
+  "tipo": "composto",
+  "padrao": "puxar_horizontal",
+  "nivel": "iniciante",
+  "tipoCarga": "porLado",
+  "unilateral": false,
+  "incrementoCarga": 1,
+  "contraindicacoes": [
+   {
+    "limitacao": "lombar",
+    "nivel": "leve"
+   }
+  ],
+  "substitutos": [
+   "remada-baixa",
+   "serrote",
+   "remada-maquina",
+   "remada-cavalinho"
+  ],
+  "imagens": [
+   "remada-curvada-barra/0.webp",
+   "remada-curvada-barra/1.webp"
+  ],
+  "passos": [
+   "Em pé, segure a barra com as mãos na largura dos ombros, palmas para baixo.",
+   "Dobre levemente os joelhos e incline o tronco para frente com as costas retas.",
+   "Puxe a barra até a altura do umbigo, cotovelos junto ao corpo.",
+   "Desça devagar até estender os braços."
+  ],
+  "errosComuns": [
+   "Arredondar as costas.",
+   "Levantar o tronco a cada repetição para ajudar."
+  ],
+  "prioridade": 4
+ },
+ {
+  "id": "puxada-supinada",
+  "nome": "Puxada supinada",
+  "nomeOriginal": "Underhand Cable Pulldowns",
+  "grupo": "costas",
+  "gruposSecundarios": [
+   "biceps"
+  ],
+  "categoria": "pull",
+  "equipamento": "cabo",
+  "tipo": "composto",
+  "padrao": "puxar_vertical",
+  "nivel": "iniciante",
+  "tipoCarga": "total",
+  "unilateral": false,
+  "incrementoCarga": 2,
+  "contraindicacoes": [],
+  "substitutos": [
+   "puxada-frontal",
+   "puxada-fechada",
+   "barra-fixa",
+   "barra-fixa-supinada"
+  ],
+  "imagens": [
+   "puxada-supinada/0.webp",
+   "puxada-supinada/1.webp"
+  ],
+  "passos": [
+   "Segure a barra com as palmas viradas para você, mãos na largura dos ombros.",
+   "Sente com as coxas presas no apoio e o peito estufado.",
+   "Puxe a barra até a parte de cima do peito, cotovelos junto ao corpo.",
+   "Volte devagar até estender os braços."
+  ],
+  "errosComuns": [
+   "Balançar o tronco.",
+   "Não estender os braços na volta."
+  ],
+  "prioridade": 5
+ },
+ {
+  "id": "remada-maquina",
+  "nome": "Remada na máquina",
+  "nomeOriginal": "Leverage Iso Row",
+  "grupo": "costas",
+  "gruposSecundarios": [
+   "biceps"
+  ],
+  "categoria": "pull",
+  "equipamento": "maquina",
+  "tipo": "composto",
+  "padrao": "puxar_horizontal",
+  "nivel": "iniciante",
+  "tipoCarga": "total",
+  "unilateral": false,
+  "incrementoCarga": 2,
+  "contraindicacoes": [],
+  "substitutos": [
+   "remada-baixa",
+   "serrote",
+   "remada-curvada-barra",
+   "remada-cavalinho"
+  ],
+  "imagens": [
+   "remada-maquina/0.webp",
+   "remada-maquina/1.webp"
+  ],
+  "passos": [
+   "Ajuste o banco para que as pegadas fiquem na altura do peito e apoie o peito no encosto.",
+   "Segure as pegadas com os braços estendidos.",
+   "Puxe as pegadas em direção ao corpo, levando os cotovelos para trás.",
+   "Volte devagar sem deixar o peso encostar."
+  ],
+  "errosComuns": [
+   "Tirar o peito do apoio.",
+   "Encolher os ombros."
+  ],
+  "prioridade": 6
+ },
+ {
+  "id": "remada-cavalinho",
+  "nome": "Remada cavalinho",
+  "nomeOriginal": "T-Bar Row with Handle",
+  "grupo": "costas",
+  "gruposSecundarios": [
+   "biceps"
+  ],
+  "categoria": "pull",
+  "equipamento": "barra",
+  "tipo": "composto",
+  "padrao": "puxar_horizontal",
+  "nivel": "iniciante",
+  "tipoCarga": "total",
+  "unilateral": false,
+  "incrementoCarga": 2,
+  "contraindicacoes": [
+   {
+    "limitacao": "lombar",
+    "nivel": "leve"
+   }
+  ],
+  "substitutos": [
+   "remada-baixa",
+   "serrote",
+   "remada-curvada-barra",
+   "remada-maquina"
+  ],
+  "imagens": [
+   "remada-cavalinho/0.webp",
+   "remada-cavalinho/1.webp"
+  ],
+  "passos": [
+   "Fique com uma perna de cada lado da barra, joelhos levemente dobrados.",
+   "Incline o tronco para frente com as costas retas e segure a pegada.",
+   "Puxe a pegada em direção ao abdômen juntando as escápulas.",
+   "Desça devagar até estender os braços."
+  ],
+  "errosComuns": [
+   "Arredondar a lombar.",
+   "Dar trancos para subir o peso."
+  ],
+  "prioridade": 7
+ },
+ {
+  "id": "puxada-fechada",
+  "nome": "Puxada frontal pegada fechada",
+  "nomeOriginal": "Close-Grip Front Lat Pulldown",
+  "grupo": "costas",
+  "gruposSecundarios": [
+   "biceps"
+  ],
+  "categoria": "pull",
+  "equipamento": "cabo",
+  "tipo": "composto",
+  "padrao": "puxar_vertical",
+  "nivel": "iniciante",
+  "tipoCarga": "total",
+  "unilateral": false,
+  "incrementoCarga": 2,
+  "contraindicacoes": [],
+  "substitutos": [
+   "puxada-frontal",
+   "puxada-supinada",
+   "barra-fixa",
+   "barra-fixa-supinada"
+  ],
+  "imagens": [
+   "puxada-fechada/0.webp",
+   "puxada-fechada/1.webp"
+  ],
+  "passos": [
+   "Segure a barra com as mãos na largura dos ombros, palmas para frente.",
+   "Sente, incline levemente o tronco para trás e estufe o peito.",
+   "Puxe a barra até o peito levando os cotovelos para baixo.",
+   "Volte devagar até estender os braços."
+  ],
+  "errosComuns": [
+   "Puxar com os braços e esquecer as costas.",
+   "Jogar o corpo para trás."
+  ],
+  "prioridade": 8
+ },
+ {
+  "id": "remada-apoiada",
+  "nome": "Remada com halteres no banco inclinado",
+  "nomeOriginal": "Dumbbell Incline Row",
+  "grupo": "costas",
+  "gruposSecundarios": [
+   "biceps"
+  ],
+  "categoria": "pull",
+  "equipamento": "halter",
+  "tipo": "composto",
+  "padrao": "puxar_horizontal",
+  "nivel": "iniciante",
+  "tipoCarga": "porHalter",
+  "unilateral": false,
+  "incrementoCarga": 2,
+  "contraindicacoes": [],
+  "substitutos": [
+   "remada-baixa",
+   "serrote",
+   "remada-curvada-barra",
+   "remada-maquina"
+  ],
+  "imagens": [
+   "remada-apoiada/0.webp",
+   "remada-apoiada/1.webp"
+  ],
+  "passos": [
+   "Ajuste o banco a uns 30° e deite de bruços, com o peito apoiado.",
+   "Segure um halter em cada mão, braços estendidos para baixo.",
+   "Puxe os halteres levando os cotovelos para trás e juntando as escápulas.",
+   "Desça devagar até estender os braços."
+  ],
+  "errosComuns": [
+   "Tirar o peito do banco.",
+   "Encolher os ombros em direção às orelhas."
+  ],
+  "prioridade": 9
+ },
+ {
+  "id": "remada-curvada-halter",
+  "nome": "Remada curvada com halteres",
+  "nomeOriginal": "Bent Over Two-Dumbbell Row",
+  "grupo": "costas",
+  "gruposSecundarios": [
+   "biceps"
+  ],
+  "categoria": "pull",
+  "equipamento": "halter",
+  "tipo": "composto",
+  "padrao": "puxar_horizontal",
+  "nivel": "iniciante",
+  "tipoCarga": "porHalter",
+  "unilateral": false,
+  "incrementoCarga": 2,
+  "contraindicacoes": [
+   {
+    "limitacao": "lombar",
+    "nivel": "leve"
+   }
+  ],
+  "substitutos": [
+   "remada-baixa",
+   "serrote",
+   "remada-curvada-barra",
+   "remada-maquina"
+  ],
+  "imagens": [
+   "remada-curvada-halter/0.webp",
+   "remada-curvada-halter/1.webp"
+  ],
+  "passos": [
+   "Segure um halter em cada mão, dobre levemente os joelhos e incline o tronco com as costas retas.",
+   "Deixe os braços estendidos abaixo dos ombros.",
+   "Puxe os halteres até a lateral da cintura, juntando as escápulas.",
+   "Desça devagar."
+  ],
+  "errosComuns": [
+   "Arredondar as costas.",
+   "Usar impulso do tronco."
+  ],
+  "prioridade": 10
+ },
+ {
+  "id": "barra-fixa",
+  "nome": "Barra fixa",
+  "nomeOriginal": "Pullups",
+  "grupo": "costas",
+  "gruposSecundarios": [
+   "biceps"
+  ],
+  "categoria": "pull",
+  "equipamento": "peso_corporal",
+  "tipo": "composto",
+  "padrao": "puxar_vertical",
+  "nivel": "intermediario",
+  "tipoCarga": "pesoCorpo",
+  "unilateral": false,
+  "incrementoCarga": 2,
+  "contraindicacoes": [],
+  "substitutos": [
+   "puxada-frontal",
+   "puxada-supinada",
+   "puxada-fechada",
+   "barra-fixa-supinada"
+  ],
+  "imagens": [
+   "barra-fixa/0.webp",
+   "barra-fixa/1.webp"
+  ],
+  "passos": [
+   "Segure a barra com as palmas viradas para frente, mãos um pouco mais abertas que os ombros.",
+   "Fique pendurado com os braços estendidos e o abdômen firme.",
+   "Puxe o corpo até o queixo passar a barra, levando os cotovelos para baixo.",
+   "Desça devagar até estender os braços de novo."
+  ],
+  "errosComuns": [
+   "Balançar as pernas para ganhar impulso.",
+   "Não descer até o fim."
+  ],
+  "prioridade": 11,
+  "tetoReps": 12,
+  "versaoAssistida": [
+   "barra-graviton",
+   "barra-elastico"
+  ]
+ },
+ {
+  "id": "barra-fixa-supinada",
+  "nome": "Barra fixa supinada",
+  "nomeOriginal": "Chin-Up",
+  "grupo": "costas",
+  "gruposSecundarios": [
+   "biceps"
+  ],
+  "categoria": "pull",
+  "equipamento": "peso_corporal",
+  "tipo": "composto",
+  "padrao": "puxar_vertical",
+  "nivel": "intermediario",
+  "tipoCarga": "pesoCorpo",
+  "unilateral": false,
+  "incrementoCarga": 2,
+  "contraindicacoes": [],
+  "substitutos": [
+   "puxada-frontal",
+   "puxada-supinada",
+   "puxada-fechada",
+   "barra-fixa"
+  ],
+  "imagens": [
+   "barra-fixa-supinada/0.webp",
+   "barra-fixa-supinada/1.webp"
+  ],
+  "passos": [
+   "Segure a barra com as palmas viradas para você, mãos na largura dos ombros.",
+   "Fique pendurado com os braços estendidos.",
+   "Puxe o corpo até o queixo passar a barra.",
+   "Desça devagar até estender os braços."
+  ],
+  "errosComuns": [
+   "Usar impulso.",
+   "Fazer só a parte de cima do movimento."
+  ],
+  "prioridade": 12,
+  "tetoReps": 12,
+  "versaoAssistida": [
+   "barra-graviton",
+   "barra-elastico"
+  ]
+ },
+ {
+  "id": "barra-graviton",
+  "nome": "Barra fixa no graviton (assistida)",
+  "nomeOriginal": "Barra fixa no graviton (assistida)",
+  "grupo": "costas",
+  "gruposSecundarios": [
+   "biceps"
+  ],
+  "categoria": "pull",
+  "equipamento": "maquina",
+  "tipo": "composto",
+  "padrao": "puxar_vertical",
+  "nivel": "iniciante",
+  "tipoCarga": "total",
+  "unilateral": false,
+  "incrementoCarga": 2,
+  "contraindicacoes": [],
+  "substitutos": [
+   "puxada-frontal",
+   "puxada-supinada",
+   "puxada-fechada",
+   "barra-fixa"
+  ],
+  "imagens": [],
+  "passos": [
+   "Escolha o peso de ajuda: quanto mais peso, mais fácil.",
+   "Ajoelhe (ou pise) na plataforma e segure as pegadas de cima.",
+   "Puxe o corpo até o queixo passar das pegadas.",
+   "Desça devagar até estender os braços."
+  ],
+  "errosComuns": [
+   "Descer rápido demais.",
+   "Ficar sempre com o mesmo peso de ajuda: o objetivo é ir diminuindo."
+  ],
+  "prioridade": 13,
+  "variacaoMaisDificil": "barra-fixa",
+  "assistido": true
+ },
+ {
+  "id": "barra-elastico",
+  "nome": "Barra fixa com elástico",
+  "nomeOriginal": "Band Assisted Pull-Up",
+  "grupo": "costas",
+  "gruposSecundarios": [
+   "biceps"
+  ],
+  "categoria": "pull",
+  "equipamento": "elastico",
+  "tipo": "composto",
+  "padrao": "puxar_vertical",
+  "nivel": "iniciante",
+  "tipoCarga": "pesoCorpo",
+  "unilateral": false,
+  "incrementoCarga": 2,
+  "contraindicacoes": [],
+  "substitutos": [
+   "puxada-frontal",
+   "puxada-supinada",
+   "puxada-fechada",
+   "barra-fixa"
+  ],
+  "imagens": [
+   "barra-elastico/0.webp",
+   "barra-elastico/1.webp"
+  ],
+  "passos": [
+   "Prenda um elástico na barra e apoie um pé ou joelho nele.",
+   "Segure a barra um pouco mais aberta que os ombros.",
+   "Puxe o corpo até o queixo passar a barra.",
+   "Desça devagar até estender os braços."
+  ],
+  "errosComuns": [
+   "Deixar o elástico jogar o corpo para cima no impulso.",
+   "Não descer até o fim."
+  ],
+  "prioridade": 14,
+  "tetoReps": 12,
+  "variacaoMaisDificil": "barra-fixa"
+ },
+ {
+  "id": "pulldown-braco-estendido",
+  "nome": "Pulldown com braços estendidos",
+  "nomeOriginal": "Straight-Arm Pulldown",
+  "grupo": "costas",
+  "gruposSecundarios": [],
+  "categoria": "pull",
+  "equipamento": "cabo",
+  "tipo": "isolado",
+  "padrao": "isolado_bracos",
+  "nivel": "iniciante",
+  "tipoCarga": "total",
+  "unilateral": false,
+  "incrementoCarga": 2,
+  "contraindicacoes": [],
+  "substitutos": [
+   "puxada-frontal",
+   "remada-baixa",
+   "serrote",
+   "remada-curvada-barra"
+  ],
+  "imagens": [
+   "pulldown-braco-estendido/0.webp",
+   "pulldown-braco-estendido/1.webp"
+  ],
+  "passos": [
+   "Fique em pé de frente para a polia alta e segure a barra com os braços estendidos.",
+   "Incline levemente o tronco à frente, cotovelos quase retos.",
+   "Leve a barra em arco até as coxas usando as costas.",
+   "Volte devagar até a altura dos olhos."
+  ],
+  "errosComuns": [
+   "Dobrar os cotovelos e virar um tríceps.",
+   "Balançar o tronco."
+  ],
+  "prioridade": 15
+ },
+ {
+  "id": "puxada-nuca",
+  "nome": "Puxada por trás da nuca",
+  "nomeOriginal": "Wide-Grip Pulldown Behind The Neck",
+  "grupo": "costas",
+  "gruposSecundarios": [
+   "biceps"
+  ],
+  "categoria": "pull",
+  "equipamento": "cabo",
+  "tipo": "composto",
+  "padrao": "puxar_vertical",
+  "nivel": "intermediario",
+  "tipoCarga": "total",
+  "unilateral": false,
+  "incrementoCarga": 2,
+  "contraindicacoes": [
+   {
+    "limitacao": "ombro",
+    "nivel": "forte"
+   }
+  ],
+  "substitutos": [
+   "puxada-frontal",
+   "puxada-supinada",
+   "puxada-fechada",
+   "barra-fixa"
+  ],
+  "imagens": [
+   "puxada-nuca/0.webp",
+   "puxada-nuca/1.webp"
+  ],
+  "passos": [
+   "Segure a barra bem aberta e sente com as coxas presas no apoio.",
+   "Incline levemente a cabeça para frente.",
+   "Puxe a barra até a altura da nuca, cotovelos para baixo.",
+   "Volte devagar até estender os braços."
+  ],
+  "errosComuns": [
+   "Forçar a cabeça e o pescoço para frente.",
+   "Usar carga alta: o movimento coloca o ombro numa posição de risco."
+  ],
+  "prioridade": 30
+ },
+ {
+  "id": "desenvolvimento-halter",
+  "nome": "Desenvolvimento com halteres",
+  "nomeOriginal": "Seated Dumbbell Press",
+  "grupo": "ombros",
+  "gruposSecundarios": [
+   "triceps"
+  ],
+  "categoria": "push",
+  "equipamento": "halter",
+  "tipo": "composto",
+  "padrao": "empurrar_vertical",
+  "nivel": "iniciante",
+  "tipoCarga": "porHalter",
+  "unilateral": false,
+  "incrementoCarga": 2,
+  "contraindicacoes": [],
+  "substitutos": [
+   "desenvolvimento-maquina",
+   "desenvolvimento-barra",
+   "desenvolvimento-neutro",
+   "desenvolvimento-arnold"
+  ],
+  "imagens": [
+   "desenvolvimento-halter/0.webp",
+   "desenvolvimento-halter/1.webp"
+  ],
+  "passos": [
+   "Sente num banco com encosto vertical, um halter em cada mão na altura dos ombros.",
+   "Palmas viradas para frente, cotovelos um pouco à frente do corpo.",
+   "Empurre os halteres para cima até quase estender os braços.",
+   "Desça devagar até a altura das orelhas."
+  ],
+  "errosComuns": [
+   "Arquear demais a lombar.",
+   "Descer pouco e fazer só meia repetição."
+  ],
+  "prioridade": 1,
+  "amigavelOmbro": true
+ },
+ {
+  "id": "desenvolvimento-maquina",
+  "nome": "Desenvolvimento na máquina",
+  "nomeOriginal": "Machine Shoulder (Military) Press",
+  "grupo": "ombros",
+  "gruposSecundarios": [
+   "triceps"
+  ],
+  "categoria": "push",
+  "equipamento": "maquina",
+  "tipo": "composto",
+  "padrao": "empurrar_vertical",
+  "nivel": "iniciante",
+  "tipoCarga": "total",
+  "unilateral": false,
+  "incrementoCarga": 2,
+  "contraindicacoes": [],
+  "substitutos": [
+   "desenvolvimento-halter",
+   "desenvolvimento-barra",
+   "desenvolvimento-neutro",
+   "desenvolvimento-arnold"
+  ],
+  "imagens": [
+   "desenvolvimento-maquina/0.webp",
+   "desenvolvimento-maquina/1.webp"
+  ],
+  "passos": [
+   "Ajuste o banco para as pegadas ficarem na altura dos ombros.",
+   "Sente com as costas apoiadas e segure as pegadas.",
+   "Empurre para cima até quase estender os braços.",
+   "Desça devagar até a altura dos ombros."
+  ],
+  "errosComuns": [
+   "Tirar as costas do encosto.",
+   "Travar os cotovelos com força em cima."
+  ],
+  "prioridade": 2
+ },
+ {
+  "id": "desenvolvimento-barra",
+  "nome": "Desenvolvimento com barra (em pé)",
+  "nomeOriginal": "Standing Military Press",
+  "grupo": "ombros",
+  "gruposSecundarios": [
+   "triceps"
+  ],
+  "categoria": "push",
+  "equipamento": "barra",
+  "tipo": "composto",
+  "padrao": "empurrar_vertical",
+  "nivel": "iniciante",
+  "tipoCarga": "porLado",
+  "unilateral": false,
+  "incrementoCarga": 1,
+  "contraindicacoes": [
+   {
+    "limitacao": "ombro",
+    "nivel": "leve"
+   },
+   {
+    "limitacao": "lombar",
+    "nivel": "leve"
+   }
+  ],
+  "substitutos": [
+   "desenvolvimento-halter",
+   "desenvolvimento-maquina",
+   "desenvolvimento-neutro",
+   "desenvolvimento-arnold"
+  ],
+  "imagens": [
+   "desenvolvimento-barra/0.webp",
+   "desenvolvimento-barra/1.webp"
+  ],
+  "passos": [
+   "Segure a barra na altura dos ombros, mãos um pouco mais abertas que eles.",
+   "Em pé, pés na largura do quadril, abdômen e glúteos firmes.",
+   "Empurre a barra para cima, passando o rosto, até estender os braços.",
+   "Desça devagar até a parte de cima do peito."
+  ],
+  "errosComuns": [
+   "Inclinar o tronco para trás e forçar a lombar.",
+   "Empurrar a barra muito à frente do corpo."
+  ],
+  "prioridade": 3
+ },
+ {
+  "id": "desenvolvimento-neutro",
+  "nome": "Desenvolvimento com halteres pegada neutra",
+  "nomeOriginal": "Standing Palms-In Dumbbell Press",
+  "grupo": "ombros",
+  "gruposSecundarios": [
+   "triceps"
+  ],
+  "categoria": "push",
+  "equipamento": "halter",
+  "tipo": "composto",
+  "padrao": "empurrar_vertical",
+  "nivel": "iniciante",
+  "tipoCarga": "porHalter",
+  "unilateral": false,
+  "incrementoCarga": 2,
+  "contraindicacoes": [],
+  "substitutos": [
+   "desenvolvimento-halter",
+   "desenvolvimento-maquina",
+   "desenvolvimento-barra",
+   "desenvolvimento-arnold"
+  ],
+  "imagens": [
+   "desenvolvimento-neutro/0.webp",
+   "desenvolvimento-neutro/1.webp"
+  ],
+  "passos": [
+   "Segure os halteres na altura dos ombros com as palmas viradas uma para a outra.",
+   "Mantenha os cotovelos à frente do corpo.",
+   "Empurre para cima até quase estender os braços.",
+   "Desça devagar até a altura dos ombros."
+  ],
+  "errosComuns": [
+   "Abrir os cotovelos para os lados.",
+   "Arquear a lombar."
+  ],
+  "prioridade": 4,
+  "amigavelOmbro": true
+ },
+ {
+  "id": "desenvolvimento-arnold",
+  "nome": "Desenvolvimento Arnold",
+  "nomeOriginal": "Arnold Dumbbell Press",
+  "grupo": "ombros",
+  "gruposSecundarios": [
+   "triceps"
+  ],
+  "categoria": "push",
+  "equipamento": "halter",
+  "tipo": "composto",
+  "padrao": "empurrar_vertical",
+  "nivel": "intermediario",
+  "tipoCarga": "porHalter",
+  "unilateral": false,
+  "incrementoCarga": 2,
+  "contraindicacoes": [],
+  "substitutos": [
+   "desenvolvimento-halter",
+   "desenvolvimento-maquina",
+   "desenvolvimento-barra",
+   "desenvolvimento-neutro"
+  ],
+  "imagens": [
+   "desenvolvimento-arnold/0.webp",
+   "desenvolvimento-arnold/1.webp"
+  ],
+  "passos": [
+   "Sente com os halteres à frente dos ombros, palmas viradas para você.",
+   "Empurre para cima girando os punhos até as palmas ficarem viradas para frente.",
+   "Estenda os braços em cima sem travar.",
+   "Desça fazendo o giro ao contrário."
+  ],
+  "errosComuns": [
+   "Girar rápido demais, sem controle.",
+   "Arquear a lombar."
+  ],
+  "prioridade": 5
+ },
+ {
+  "id": "elevacao-lateral",
+  "nome": "Elevação lateral com halteres",
+  "nomeOriginal": "Side Lateral Raise",
+  "grupo": "ombros",
+  "gruposSecundarios": [],
+  "categoria": "push",
+  "equipamento": "halter",
+  "tipo": "isolado",
+  "padrao": "isolado_bracos",
+  "nivel": "iniciante",
+  "tipoCarga": "porHalter",
+  "unilateral": false,
+  "incrementoCarga": 2,
+  "contraindicacoes": [],
+  "substitutos": [
+   "voador-invertido",
+   "elevacao-lateral-cabo",
+   "crucifixo-inverso",
+   "elevacao-frontal"
+  ],
+  "imagens": [
+   "elevacao-lateral/0.webp",
+   "elevacao-lateral/1.webp"
+  ],
+  "passos": [
+   "Em pé, segure um halter em cada mão ao lado do corpo.",
+   "Dobre levemente os cotovelos e incline o tronco um pouco à frente.",
+   "Eleve os braços pelas laterais até a altura dos ombros.",
+   "Desça devagar."
+  ],
+  "errosComuns": [
+   "Subir acima da linha dos ombros encolhendo o trapézio.",
+   "Balançar o corpo para levantar o peso."
+  ],
+  "prioridade": 6
+ },
+ {
+  "id": "voador-invertido",
+  "nome": "Voador invertido (máquina)",
+  "nomeOriginal": "Reverse Machine Flyes",
+  "grupo": "ombros",
+  "gruposSecundarios": [],
+  "categoria": "pull",
+  "equipamento": "maquina",
+  "tipo": "isolado",
+  "padrao": "isolado_bracos",
+  "nivel": "iniciante",
+  "tipoCarga": "total",
+  "unilateral": false,
+  "incrementoCarga": 2,
+  "contraindicacoes": [],
+  "substitutos": [
+   "elevacao-lateral",
+   "elevacao-lateral-cabo",
+   "crucifixo-inverso",
+   "elevacao-frontal"
+  ],
+  "imagens": [
+   "voador-invertido/0.webp",
+   "voador-invertido/1.webp"
+  ],
+  "passos": [
+   "Sente de frente para o encosto, com o peito apoiado.",
+   "Segure as pegadas com os braços estendidos à frente.",
+   "Abra os braços para trás em arco, juntando as escápulas.",
+   "Volte devagar."
+  ],
+  "errosComuns": [
+   "Usar carga alta e encolher os ombros.",
+   "Dobrar demais os cotovelos."
+  ],
+  "prioridade": 7
+ },
+ {
+  "id": "elevacao-lateral-cabo",
+  "nome": "Elevação lateral na polia",
+  "nomeOriginal": "Standing Low-Pulley Deltoid Raise",
+  "grupo": "ombros",
+  "gruposSecundarios": [],
+  "categoria": "push",
+  "equipamento": "cabo",
+  "tipo": "isolado",
+  "padrao": "isolado_bracos",
+  "nivel": "iniciante",
+  "tipoCarga": "total",
+  "unilateral": true,
+  "incrementoCarga": 2,
+  "contraindicacoes": [],
+  "substitutos": [
+   "elevacao-lateral",
+   "voador-invertido",
+   "crucifixo-inverso",
+   "elevacao-frontal"
+  ],
+  "imagens": [
+   "elevacao-lateral-cabo/0.webp",
+   "elevacao-lateral-cabo/1.webp"
+  ],
+  "passos": [
+   "Fique de lado para a polia baixa e segure a pegada com a mão mais distante.",
+   "Com o cotovelo levemente dobrado, eleve o braço pela lateral até a altura do ombro.",
+   "Desça devagar até a frente do quadril.",
+   "Faça todas as repetições e troque de lado."
+  ],
+  "errosComuns": [
+   "Inclinar o corpo para longe da polia para ajudar.",
+   "Subir acima do ombro."
+  ],
+  "prioridade": 8
+ },
+ {
+  "id": "crucifixo-inverso",
+  "nome": "Crucifixo inverso com halteres",
+  "nomeOriginal": "Reverse Flyes",
+  "grupo": "ombros",
+  "gruposSecundarios": [],
+  "categoria": "pull",
+  "equipamento": "halter",
+  "tipo": "isolado",
+  "padrao": "isolado_bracos",
+  "nivel": "iniciante",
+  "tipoCarga": "porHalter",
+  "unilateral": false,
+  "incrementoCarga": 2,
+  "contraindicacoes": [],
+  "substitutos": [
+   "elevacao-lateral",
+   "voador-invertido",
+   "elevacao-lateral-cabo",
+   "elevacao-frontal"
+  ],
+  "imagens": [
+   "crucifixo-inverso/0.webp",
+   "crucifixo-inverso/1.webp"
+  ],
+  "passos": [
+   "Incline o tronco à frente com as costas retas (ou deite de bruços num banco inclinado).",
+   "Deixe os halteres pendurados abaixo dos ombros, cotovelos levemente dobrados.",
+   "Abra os braços para os lados até a linha dos ombros.",
+   "Desça devagar."
+  ],
+  "errosComuns": [
+   "Levantar o tronco para ajudar.",
+   "Usar carga alta e perder a postura."
+  ],
+  "prioridade": 9
+ },
+ {
+  "id": "face-pull",
+  "nome": "Face pull",
+  "nomeOriginal": "Face Pull",
+  "grupo": "ombros",
+  "gruposSecundarios": [],
+  "categoria": "pull",
+  "equipamento": "cabo",
+  "tipo": "isolado",
+  "padrao": "puxar_horizontal",
+  "nivel": "iniciante",
+  "tipoCarga": "total",
+  "unilateral": false,
+  "incrementoCarga": 2,
+  "contraindicacoes": [],
+  "substitutos": [
+   "elevacao-lateral",
+   "voador-invertido",
+   "elevacao-lateral-cabo",
+   "crucifixo-inverso"
+  ],
+  "imagens": [
+   "face-pull/0.webp",
+   "face-pull/1.webp"
+  ],
+  "passos": [
+   "Ajuste a polia na altura do rosto e use a corda.",
+   "Segure a corda com as palmas viradas para baixo e dê um passo para trás.",
+   "Puxe a corda em direção ao rosto, abrindo as mãos e levando os cotovelos para trás e para cima.",
+   "Volte devagar até estender os braços."
+  ],
+  "errosComuns": [
+   "Usar carga alta e puxar com o corpo.",
+   "Deixar os cotovelos caírem abaixo dos ombros."
+  ],
+  "prioridade": 10,
+  "amigavelOmbro": true
+ },
+ {
+  "id": "elevacao-frontal",
+  "nome": "Elevação frontal com halteres",
+  "nomeOriginal": "Front Dumbbell Raise",
+  "grupo": "ombros",
+  "gruposSecundarios": [],
+  "categoria": "push",
+  "equipamento": "halter",
+  "tipo": "isolado",
+  "padrao": "isolado_bracos",
+  "nivel": "iniciante",
+  "tipoCarga": "porHalter",
+  "unilateral": false,
+  "incrementoCarga": 2,
+  "contraindicacoes": [],
+  "substitutos": [
+   "elevacao-lateral",
+   "voador-invertido",
+   "elevacao-lateral-cabo",
+   "crucifixo-inverso"
+  ],
+  "imagens": [
+   "elevacao-frontal/0.webp",
+   "elevacao-frontal/1.webp"
+  ],
+  "passos": [
+   "Em pé, segure os halteres à frente das coxas.",
+   "Com os cotovelos levemente dobrados, eleve os braços à frente até a altura dos ombros.",
+   "Desça devagar.",
+   "Se preferir, alterne um braço de cada vez."
+  ],
+  "errosComuns": [
+   "Jogar o tronco para trás.",
+   "Subir acima da linha dos olhos."
+  ],
+  "prioridade": 11
+ },
+ {
+  "id": "remada-alta",
+  "nome": "Remada alta",
+  "nomeOriginal": "Upright Barbell Row",
+  "grupo": "ombros",
+  "gruposSecundarios": [],
+  "categoria": "push",
+  "equipamento": "barra",
+  "tipo": "composto",
+  "padrao": "puxar_vertical",
+  "nivel": "iniciante",
+  "tipoCarga": "total",
+  "unilateral": false,
+  "incrementoCarga": 2,
+  "contraindicacoes": [
+   {
+    "limitacao": "ombro",
+    "nivel": "forte"
+   }
+  ],
+  "substitutos": [
+   "desenvolvimento-halter",
+   "desenvolvimento-maquina",
+   "desenvolvimento-barra",
+   "desenvolvimento-neutro"
+  ],
+  "imagens": [
+   "remada-alta/0.webp",
+   "remada-alta/1.webp"
+  ],
+  "passos": [
+   "Segure a barra à frente das coxas com as mãos na largura dos ombros.",
+   "Puxe a barra para cima, rente ao corpo, levando os cotovelos para o alto.",
+   "Suba até a altura do peito.",
+   "Desça devagar."
+  ],
+  "errosComuns": [
+   "Subir a barra acima do peito, comprimindo o ombro.",
+   "Usar pegada muito fechada."
+  ],
+  "prioridade": 30
+ },
+ {
+  "id": "desenvolvimento-nuca",
+  "nome": "Desenvolvimento por trás da nuca",
+  "nomeOriginal": "Standing Barbell Press Behind Neck",
+  "grupo": "ombros",
+  "gruposSecundarios": [
+   "triceps"
+  ],
+  "categoria": "push",
+  "equipamento": "barra",
+  "tipo": "composto",
+  "padrao": "empurrar_vertical",
+  "nivel": "intermediario",
+  "tipoCarga": "porLado",
+  "unilateral": false,
+  "incrementoCarga": 1,
+  "contraindicacoes": [
+   {
+    "limitacao": "ombro",
+    "nivel": "forte"
+   }
+  ],
+  "substitutos": [
+   "desenvolvimento-halter",
+   "desenvolvimento-maquina",
+   "desenvolvimento-barra",
+   "desenvolvimento-neutro"
+  ],
+  "imagens": [
+   "desenvolvimento-nuca/0.webp",
+   "desenvolvimento-nuca/1.webp"
+  ],
+  "passos": [
+   "Apoie a barra atrás da nuca, mãos bem abertas.",
+   "Mantenha o abdômen firme.",
+   "Empurre a barra para cima até estender os braços.",
+   "Desça devagar até a altura das orelhas."
+  ],
+  "errosComuns": [
+   "Descer a barra demais atrás da cabeça.",
+   "Usar carga alta: o movimento coloca o ombro numa posição de risco."
+  ],
+  "prioridade": 31
+ },
+ {
+  "id": "rotacao-externa-elastico",
+  "nome": "Rotação externa com elástico",
+  "nomeOriginal": "External Rotation with Band",
+  "grupo": "ombros",
+  "gruposSecundarios": [],
+  "categoria": "pull",
+  "equipamento": "elastico",
+  "tipo": "isolado",
+  "padrao": "isolado_bracos",
+  "nivel": "iniciante",
+  "tipoCarga": "pesoCorpo",
+  "unilateral": true,
+  "incrementoCarga": 2,
+  "contraindicacoes": [],
+  "substitutos": [],
+  "imagens": [
+   "rotacao-externa-elastico/0.webp",
+   "rotacao-externa-elastico/1.webp"
+  ],
+  "passos": [
+   "Prenda o elástico na altura da cintura e fique de lado para ele.",
+   "Segure com a mão mais distante, cotovelo dobrado a 90° e colado ao corpo (uma toalha enrolada ajuda).",
+   "Gire o antebraço para fora, mantendo o cotovelo no lugar.",
+   "Volte devagar. Faça as repetições e troque de lado."
+  ],
+  "errosComuns": [
+   "Afastar o cotovelo do corpo.",
+   "Usar elástico forte demais: é um aquecimento leve."
+  ],
+  "prioridade": 40,
+  "tetoReps": 15,
+  "soAquecimento": true
+ },
+ {
+  "id": "rotacao-externa-cabo",
+  "nome": "Rotação externa na polia",
+  "nomeOriginal": "External Rotation with Cable",
+  "grupo": "ombros",
+  "gruposSecundarios": [],
+  "categoria": "pull",
+  "equipamento": "cabo",
+  "tipo": "isolado",
+  "padrao": "isolado_bracos",
+  "nivel": "iniciante",
+  "tipoCarga": "total",
+  "unilateral": true,
+  "incrementoCarga": 2,
+  "contraindicacoes": [],
+  "substitutos": [],
+  "imagens": [
+   "rotacao-externa-cabo/0.webp",
+   "rotacao-externa-cabo/1.webp"
+  ],
+  "passos": [
+   "Ajuste a polia na altura da cintura e fique de lado para ela.",
+   "Segure a pegada com a mão mais distante, cotovelo dobrado a 90° e colado ao corpo.",
+   "Gire o antebraço para fora, sem mexer o cotovelo.",
+   "Volte devagar. Faça as repetições e troque de lado."
+  ],
+  "errosComuns": [
+   "Afastar o cotovelo do corpo.",
+   "Usar carga alta: é um aquecimento leve."
+  ],
+  "prioridade": 41,
+  "soAquecimento": true
+ },
+ {
+  "id": "agachamento-livre",
+  "nome": "Agachamento livre com barra",
+  "nomeOriginal": "Barbell Squat",
+  "grupo": "quadriceps",
+  "gruposSecundarios": [
+   "gluteos"
+  ],
+  "categoria": "legs",
+  "equipamento": "barra",
+  "tipo": "composto",
+  "padrao": "agachar",
+  "nivel": "iniciante",
+  "tipoCarga": "porLado",
+  "unilateral": false,
+  "incrementoCarga": 2,
+  "contraindicacoes": [
+   {
+    "limitacao": "joelho",
+    "nivel": "leve"
+   },
+   {
+    "limitacao": "lombar",
+    "nivel": "leve"
+   }
+  ],
+  "substitutos": [
+   "leg-press",
+   "hack",
+   "agachamento-smith",
+   "bulgaro"
+  ],
+  "imagens": [
+   "agachamento-livre/0.webp",
+   "agachamento-livre/1.webp"
+  ],
+  "passos": [
+   "Apoie a barra no alto das costas (não no pescoço) e tire-a do suporte.",
+   "Pés na largura dos ombros, pontas levemente para fora.",
+   "Desça empurrando o quadril para trás e dobrando os joelhos, peito aberto, até as coxas ficarem paralelas ao chão (ou até onde mantiver a postura).",
+   "Suba empurrando o chão com o pé inteiro."
+  ],
+  "errosComuns": [
+   "Deixar os joelhos caírem para dentro.",
+   "Arredondar a lombar no fundo."
+  ],
+  "prioridade": 1
+ },
+ {
+  "id": "leg-press",
+  "nome": "Leg press 45°",
+  "nomeOriginal": "Leg Press",
+  "grupo": "quadriceps",
+  "gruposSecundarios": [
+   "gluteos"
+  ],
+  "categoria": "legs",
+  "equipamento": "maquina",
+  "tipo": "composto",
+  "padrao": "agachar",
+  "nivel": "iniciante",
+  "tipoCarga": "total",
+  "unilateral": false,
+  "incrementoCarga": 4,
+  "contraindicacoes": [],
+  "substitutos": [
+   "agachamento-livre",
+   "hack",
+   "agachamento-smith",
+   "bulgaro"
+  ],
+  "imagens": [
+   "leg-press/0.webp",
+   "leg-press/1.webp"
+  ],
+  "passos": [
+   "Sente com as costas e o quadril bem apoiados no encosto.",
+   "Pés na plataforma na largura dos ombros.",
+   "Destrave e desça dobrando os joelhos até uns 90°, sem tirar o quadril do banco.",
+   "Empurre de volta sem travar os joelhos em cima."
+  ],
+  "errosComuns": [
+   "Descer tanto que o quadril sai do encosto.",
+   "Travar os joelhos esticados no final."
+  ],
+  "prioridade": 2
+ },
+ {
+  "id": "hack",
+  "nome": "Agachamento no hack",
+  "nomeOriginal": "Hack Squat",
+  "grupo": "quadriceps",
+  "gruposSecundarios": [
+   "gluteos"
+  ],
+  "categoria": "legs",
+  "equipamento": "maquina",
+  "tipo": "composto",
+  "padrao": "agachar",
+  "nivel": "iniciante",
+  "tipoCarga": "total",
+  "unilateral": false,
+  "incrementoCarga": 4,
+  "contraindicacoes": [
+   {
+    "limitacao": "joelho",
+    "nivel": "leve"
+   }
+  ],
+  "substitutos": [
+   "agachamento-livre",
+   "leg-press",
+   "agachamento-smith",
+   "bulgaro"
+  ],
+  "imagens": [
+   "hack/0.webp",
+   "hack/1.webp"
+  ],
+  "passos": [
+   "Apoie as costas e os ombros nas almofadas, pés na plataforma na largura dos ombros.",
+   "Destrave a máquina.",
+   "Desça dobrando os joelhos até as coxas ficarem paralelas à plataforma.",
+   "Empurre de volta sem travar os joelhos."
+  ],
+  "errosComuns": [
+   "Tirar os calcanhares da plataforma.",
+   "Deixar os joelhos caírem para dentro."
+  ],
+  "prioridade": 3
+ },
+ {
+  "id": "agachamento-smith",
+  "nome": "Agachamento no Smith",
+  "nomeOriginal": "Smith Machine Squat",
+  "grupo": "quadriceps",
+  "gruposSecundarios": [
+   "gluteos"
+  ],
+  "categoria": "legs",
+  "equipamento": "maquina",
+  "tipo": "composto",
+  "padrao": "agachar",
+  "nivel": "iniciante",
+  "tipoCarga": "porLado",
+  "unilateral": false,
+  "incrementoCarga": 2,
+  "contraindicacoes": [
+   {
+    "limitacao": "joelho",
+    "nivel": "leve"
+   }
+  ],
+  "substitutos": [
+   "agachamento-livre",
+   "leg-press",
+   "hack",
+   "bulgaro"
+  ],
+  "imagens": [
+   "agachamento-smith/0.webp",
+   "agachamento-smith/1.webp"
+  ],
+  "passos": [
+   "Posicione a barra no alto das costas e os pés um pouco à frente da barra.",
+   "Destrave a barra girando os punhos.",
+   "Desça dobrando joelhos e quadril até as coxas ficarem paralelas ao chão.",
+   "Suba empurrando o chão e trave a barra no final da série."
+  ],
+  "errosComuns": [
+   "Pés muito para trás, forçando os joelhos.",
+   "Arredondar a lombar."
+  ],
+  "prioridade": 4
+ },
+ {
+  "id": "cadeira-extensora",
+  "nome": "Cadeira extensora",
+  "nomeOriginal": "Leg Extensions",
+  "grupo": "quadriceps",
+  "gruposSecundarios": [],
+  "categoria": "legs",
+  "equipamento": "maquina",
+  "tipo": "isolado",
+  "padrao": "isolado_pernas",
+  "nivel": "iniciante",
+  "tipoCarga": "total",
+  "unilateral": false,
+  "incrementoCarga": 4,
+  "contraindicacoes": [
+   {
+    "limitacao": "joelho",
+    "nivel": "leve"
+   }
+  ],
+  "substitutos": [
+   "agachamento-livre",
+   "leg-press",
+   "hack",
+   "agachamento-smith"
+  ],
+  "imagens": [
+   "cadeira-extensora/0.webp",
+   "cadeira-extensora/1.webp"
+  ],
+  "passos": [
+   "Ajuste o encosto para o joelho ficar alinhado com o eixo da máquina e o rolo sobre o peito do pé.",
+   "Segure as alças laterais.",
+   "Estenda os joelhos até as pernas ficarem retas.",
+   "Desça devagar."
+  ],
+  "errosComuns": [
+   "Dar trancos para subir o peso.",
+   "Descer rápido demais."
+  ],
+  "prioridade": 5
+ },
+ {
+  "id": "bulgaro",
+  "nome": "Agachamento búlgaro",
+  "nomeOriginal": "Split Squat with Dumbbells",
+  "grupo": "quadriceps",
+  "gruposSecundarios": [
+   "gluteos"
+  ],
+  "categoria": "legs",
+  "equipamento": "halter",
+  "tipo": "composto",
+  "padrao": "agachar",
+  "nivel": "iniciante",
+  "tipoCarga": "porHalter",
+  "unilateral": true,
+  "incrementoCarga": 2,
+  "contraindicacoes": [
+   {
+    "limitacao": "joelho",
+    "nivel": "leve"
+   }
+  ],
+  "substitutos": [
+   "agachamento-livre",
+   "leg-press",
+   "hack",
+   "agachamento-smith"
+  ],
+  "imagens": [
+   "bulgaro/0.webp",
+   "bulgaro/1.webp"
+  ],
+  "passos": [
+   "Apoie o peito do pé de trás num banco e dê um passo à frente com a outra perna.",
+   "Segure um halter em cada mão ao lado do corpo.",
+   "Desça dobrando o joelho da frente até a coxa ficar quase paralela ao chão.",
+   "Suba empurrando com o calcanhar da frente. Faça as repetições e troque de perna."
+  ],
+  "errosComuns": [
+   "Pé da frente perto demais do banco.",
+   "Inclinar demais o tronco e perder o equilíbrio."
+  ],
+  "prioridade": 6
+ },
+ {
+  "id": "avanco",
+  "nome": "Avanço com halteres",
+  "nomeOriginal": "Dumbbell Lunges",
+  "grupo": "quadriceps",
+  "gruposSecundarios": [
+   "gluteos"
+  ],
+  "categoria": "legs",
+  "equipamento": "halter",
+  "tipo": "composto",
+  "padrao": "agachar",
+  "nivel": "iniciante",
+  "tipoCarga": "porHalter",
+  "unilateral": true,
+  "incrementoCarga": 2,
+  "contraindicacoes": [
+   {
+    "limitacao": "joelho",
+    "nivel": "leve"
+   }
+  ],
+  "substitutos": [
+   "agachamento-livre",
+   "leg-press",
+   "hack",
+   "agachamento-smith"
+  ],
+  "imagens": [
+   "avanco/0.webp",
+   "avanco/1.webp"
+  ],
+  "passos": [
+   "Em pé, segure um halter em cada mão ao lado do corpo.",
+   "Dê um passo largo à frente e desça até o joelho de trás quase encostar no chão.",
+   "Empurre com o calcanhar da frente para voltar à posição inicial.",
+   "Faça as repetições de um lado e depois do outro."
+  ],
+  "errosComuns": [
+   "Joelho da frente caindo para dentro.",
+   "Passo curto demais, jogando o joelho muito à frente."
+  ],
+  "prioridade": 7
+ },
+ {
+  "id": "agachamento-halteres",
+  "nome": "Agachamento com halteres",
+  "nomeOriginal": "Dumbbell Squat",
+  "grupo": "quadriceps",
+  "gruposSecundarios": [
+   "gluteos"
+  ],
+  "categoria": "legs",
+  "equipamento": "halter",
+  "tipo": "composto",
+  "padrao": "agachar",
+  "nivel": "iniciante",
+  "tipoCarga": "porHalter",
+  "unilateral": false,
+  "incrementoCarga": 2,
+  "contraindicacoes": [],
+  "substitutos": [
+   "agachamento-livre",
+   "leg-press",
+   "hack",
+   "agachamento-smith"
+  ],
+  "imagens": [
+   "agachamento-halteres/0.webp",
+   "agachamento-halteres/1.webp"
+  ],
+  "passos": [
+   "Em pé, segure um halter em cada mão ao lado do corpo.",
+   "Pés na largura dos ombros, pontas levemente para fora.",
+   "Desça empurrando o quadril para trás até as coxas ficarem paralelas ao chão.",
+   "Suba empurrando o chão."
+  ],
+  "errosComuns": [
+   "Curvar as costas para frente.",
+   "Tirar os calcanhares do chão."
+  ],
+  "prioridade": 8
+ },
+ {
+  "id": "agachamento-sumo",
+  "nome": "Agachamento sumô com halter",
+  "nomeOriginal": "Plie Dumbbell Squat",
+  "grupo": "quadriceps",
+  "gruposSecundarios": [
+   "gluteos"
+  ],
+  "categoria": "legs",
+  "equipamento": "halter",
+  "tipo": "composto",
+  "padrao": "agachar",
+  "nivel": "iniciante",
+  "tipoCarga": "porHalter",
+  "unilateral": false,
+  "incrementoCarga": 2,
+  "contraindicacoes": [
+   {
+    "limitacao": "joelho",
+    "nivel": "leve"
+   }
+  ],
+  "substitutos": [
+   "agachamento-livre",
+   "leg-press",
+   "hack",
+   "agachamento-smith"
+  ],
+  "imagens": [
+   "agachamento-sumo/0.webp",
+   "agachamento-sumo/1.webp"
+  ],
+  "passos": [
+   "Afaste bem os pés, pontas viradas para fora, e segure um halter com as duas mãos à frente do corpo.",
+   "Mantenha o tronco reto.",
+   "Desça dobrando os joelhos na direção das pontas dos pés até as coxas ficarem paralelas ao chão.",
+   "Suba empurrando com os calcanhares."
+  ],
+  "errosComuns": [
+   "Joelhos caindo para dentro.",
+   "Inclinar o tronco à frente."
+  ],
+  "prioridade": 9
+ },
+ {
+  "id": "subida-banco",
+  "nome": "Subida no banco com halteres",
+  "nomeOriginal": "Dumbbell Step Ups",
+  "grupo": "quadriceps",
+  "gruposSecundarios": [
+   "gluteos"
+  ],
+  "categoria": "legs",
+  "equipamento": "halter",
+  "tipo": "composto",
+  "padrao": "agachar",
+  "nivel": "intermediario",
+  "tipoCarga": "porHalter",
+  "unilateral": true,
+  "incrementoCarga": 2,
+  "contraindicacoes": [
+   {
+    "limitacao": "joelho",
+    "nivel": "leve"
+   }
+  ],
+  "substitutos": [
+   "agachamento-livre",
+   "leg-press",
+   "hack",
+   "agachamento-smith"
+  ],
+  "imagens": [
+   "subida-banco/0.webp",
+   "subida-banco/1.webp"
+  ],
+  "passos": [
+   "Segure um halter em cada mão, de frente para um banco firme.",
+   "Apoie o pé inteiro em cima do banco.",
+   "Suba empurrando com a perna de cima até ficar em pé no banco.",
+   "Desça devagar com a mesma perna e repita. Depois troque de lado."
+  ],
+  "errosComuns": [
+   "Dar impulso com a perna de baixo.",
+   "Usar um banco alto demais."
+  ],
+  "prioridade": 10
+ },
+ {
+  "id": "agachamento-corpo",
+  "nome": "Agachamento livre (peso do corpo)",
+  "nomeOriginal": "Bodyweight Squat",
+  "grupo": "quadriceps",
+  "gruposSecundarios": [
+   "gluteos"
+  ],
+  "categoria": "legs",
+  "equipamento": "peso_corporal",
+  "tipo": "composto",
+  "padrao": "agachar",
+  "nivel": "iniciante",
+  "tipoCarga": "pesoCorpo",
+  "unilateral": false,
+  "incrementoCarga": 2,
+  "contraindicacoes": [],
+  "substitutos": [
+   "agachamento-livre",
+   "leg-press",
+   "hack",
+   "agachamento-smith"
+  ],
+  "imagens": [
+   "agachamento-corpo/0.webp",
+   "agachamento-corpo/1.webp"
+  ],
+  "passos": [
+   "Em pé, pés na largura dos ombros, braços à frente para equilibrar.",
+   "Desça empurrando o quadril para trás e dobrando os joelhos.",
+   "Vá até as coxas ficarem paralelas ao chão, mantendo o peito aberto.",
+   "Suba empurrando o chão."
+  ],
+  "errosComuns": [
+   "Tirar os calcanhares do chão.",
+   "Deixar os joelhos caírem para dentro."
+  ],
+  "prioridade": 11,
+  "tetoReps": 12
+ },
+ {
+  "id": "stiff-halteres",
+  "nome": "Stiff com halteres",
+  "nomeOriginal": "Stiff-Legged Dumbbell Deadlift",
+  "grupo": "posteriores",
+  "gruposSecundarios": [
+   "gluteos"
+  ],
+  "categoria": "legs",
+  "equipamento": "halter",
+  "tipo": "composto",
+  "padrao": "dobrar_quadril",
+  "nivel": "iniciante",
+  "tipoCarga": "porHalter",
+  "unilateral": false,
+  "incrementoCarga": 2,
+  "contraindicacoes": [
+   {
+    "limitacao": "lombar",
+    "nivel": "leve"
+   }
+  ],
+  "substitutos": [
+   "stiff-barra",
+   "terra-romeno",
+   "hiperextensao",
+   "levantamento-terra"
+  ],
+  "imagens": [
+   "stiff-halteres/0.webp",
+   "stiff-halteres/1.webp"
+  ],
+  "passos": [
+   "Em pé, segure um halter em cada mão à frente das coxas.",
+   "Joelhos levemente dobrados e fixos durante todo o movimento.",
+   "Desça os halteres rente às pernas empurrando o quadril para trás, costas retas.",
+   "Suba contraindo glúteos e posteriores."
+  ],
+  "errosComuns": [
+   "Arredondar a lombar.",
+   "Afastar os halteres das pernas."
+  ],
+  "prioridade": 1
+ },
+ {
+  "id": "stiff-barra",
+  "nome": "Stiff com barra",
+  "nomeOriginal": "Stiff-Legged Barbell Deadlift",
+  "grupo": "posteriores",
+  "gruposSecundarios": [
+   "gluteos"
+  ],
+  "categoria": "legs",
+  "equipamento": "barra",
+  "tipo": "composto",
+  "padrao": "dobrar_quadril",
+  "nivel": "intermediario",
+  "tipoCarga": "porLado",
+  "unilateral": false,
+  "incrementoCarga": 2,
+  "contraindicacoes": [
+   {
+    "limitacao": "lombar",
+    "nivel": "leve"
+   }
+  ],
+  "substitutos": [
+   "stiff-halteres",
+   "terra-romeno",
+   "hiperextensao",
+   "levantamento-terra"
+  ],
+  "imagens": [
+   "stiff-barra/0.webp",
+   "stiff-barra/1.webp"
+  ],
+  "passos": [
+   "Em pé, segure a barra à frente das coxas, mãos na largura dos ombros.",
+   "Joelhos levemente dobrados e fixos durante todo o movimento.",
+   "Desça a barra rente às pernas empurrando o quadril para trás, com as costas retas, até sentir alongar atrás da coxa.",
+   "Suba contraindo glúteos e posteriores."
+  ],
+  "errosComuns": [
+   "Arredondar as costas para descer mais.",
+   "Dobrar os joelhos como num agachamento."
+  ],
+  "prioridade": 2
+ },
+ {
+  "id": "mesa-flexora",
+  "nome": "Mesa flexora",
+  "nomeOriginal": "Lying Leg Curls",
+  "grupo": "posteriores",
+  "gruposSecundarios": [],
+  "categoria": "legs",
+  "equipamento": "maquina",
+  "tipo": "isolado",
+  "padrao": "isolado_pernas",
+  "nivel": "iniciante",
+  "tipoCarga": "total",
+  "unilateral": false,
+  "incrementoCarga": 4,
+  "contraindicacoes": [],
+  "substitutos": [
+   "cadeira-flexora",
+   "flexora-em-pe",
+   "stiff-halteres",
+   "stiff-barra"
+  ],
+  "imagens": [
+   "mesa-flexora/0.webp",
+   "mesa-flexora/1.webp"
+  ],
+  "passos": [
+   "Deite de bruços com os joelhos logo após a borda do banco e o rolo acima dos calcanhares.",
+   "Segure as pegadas.",
+   "Dobre os joelhos trazendo o rolo em direção aos glúteos.",
+   "Desça devagar."
+  ],
+  "errosComuns": [
+   "Tirar o quadril do banco.",
+   "Descer o peso de uma vez."
+  ],
+  "prioridade": 3
+ },
+ {
+  "id": "cadeira-flexora",
+  "nome": "Cadeira flexora",
+  "nomeOriginal": "Seated Leg Curl",
+  "grupo": "posteriores",
+  "gruposSecundarios": [],
+  "categoria": "legs",
+  "equipamento": "maquina",
+  "tipo": "isolado",
+  "padrao": "isolado_pernas",
+  "nivel": "iniciante",
+  "tipoCarga": "total",
+  "unilateral": false,
+  "incrementoCarga": 4,
+  "contraindicacoes": [],
+  "substitutos": [
+   "mesa-flexora",
+   "flexora-em-pe",
+   "stiff-halteres",
+   "stiff-barra"
+  ],
+  "imagens": [
+   "cadeira-flexora/0.webp",
+   "cadeira-flexora/1.webp"
+  ],
+  "passos": [
+   "Ajuste o encosto para o joelho ficar alinhado com o eixo da máquina, rolo atrás dos calcanhares.",
+   "Prenda as coxas com o apoio de cima.",
+   "Dobre os joelhos levando o rolo para baixo e para trás.",
+   "Volte devagar."
+  ],
+  "errosComuns": [
+   "Coxas soltas, subindo do banco.",
+   "Movimento curto com carga alta."
+  ],
+  "prioridade": 4
+ },
+ {
+  "id": "terra-romeno",
+  "nome": "Levantamento terra romeno",
+  "nomeOriginal": "Romanian Deadlift",
+  "grupo": "posteriores",
+  "gruposSecundarios": [
+   "gluteos"
+  ],
+  "categoria": "legs",
+  "equipamento": "barra",
+  "tipo": "composto",
+  "padrao": "dobrar_quadril",
+  "nivel": "intermediario",
+  "tipoCarga": "porLado",
+  "unilateral": false,
+  "incrementoCarga": 2,
+  "contraindicacoes": [
+   {
+    "limitacao": "lombar",
+    "nivel": "leve"
+   }
+  ],
+  "substitutos": [
+   "stiff-halteres",
+   "stiff-barra",
+   "hiperextensao",
+   "levantamento-terra"
+  ],
+  "imagens": [
+   "terra-romeno/0.webp",
+   "terra-romeno/1.webp"
+  ],
+  "passos": [
+   "Em pé, segure a barra à frente das coxas, pés na largura do quadril.",
+   "Dobre levemente os joelhos.",
+   "Empurre o quadril para trás descendo a barra rente às pernas até um pouco abaixo dos joelhos, costas retas.",
+   "Volte estendendo o quadril e contraindo os glúteos."
+  ],
+  "errosComuns": [
+   "Arredondar as costas.",
+   "Deixar a barra se afastar do corpo."
+  ],
+  "prioridade": 5
+ },
+ {
+  "id": "flexora-em-pe",
+  "nome": "Flexora em pé (unilateral)",
+  "nomeOriginal": "Standing Leg Curl",
+  "grupo": "posteriores",
+  "gruposSecundarios": [],
+  "categoria": "legs",
+  "equipamento": "maquina",
+  "tipo": "isolado",
+  "padrao": "isolado_pernas",
+  "nivel": "iniciante",
+  "tipoCarga": "total",
+  "unilateral": true,
+  "incrementoCarga": 4,
+  "contraindicacoes": [],
+  "substitutos": [
+   "mesa-flexora",
+   "cadeira-flexora",
+   "stiff-halteres",
+   "stiff-barra"
+  ],
+  "imagens": [
+   "flexora-em-pe/0.webp",
+   "flexora-em-pe/1.webp"
+  ],
+  "passos": [
+   "Apoie o tronco na máquina e encaixe o rolo atrás do calcanhar.",
+   "Dobre o joelho trazendo o calcanhar em direção ao glúteo.",
+   "Desça devagar.",
+   "Faça as repetições e troque de perna."
+  ],
+  "errosComuns": [
+   "Girar o quadril para ajudar.",
+   "Descer rápido."
+  ],
+  "prioridade": 6
+ },
+ {
+  "id": "hiperextensao",
+  "nome": "Hiperextensão no banco romano",
+  "nomeOriginal": "Hyperextensions (Back Extensions)",
+  "grupo": "posteriores",
+  "gruposSecundarios": [
+   "gluteos"
+  ],
+  "categoria": "legs",
+  "equipamento": "peso_corporal",
+  "tipo": "composto",
+  "padrao": "dobrar_quadril",
+  "nivel": "iniciante",
+  "tipoCarga": "pesoCorpo",
+  "unilateral": false,
+  "incrementoCarga": 2,
+  "contraindicacoes": [
+   {
+    "limitacao": "lombar",
+    "nivel": "leve"
+   }
+  ],
+  "substitutos": [
+   "stiff-halteres",
+   "stiff-barra",
+   "terra-romeno",
+   "levantamento-terra"
+  ],
+  "imagens": [
+   "hiperextensao/0.webp",
+   "hiperextensao/1.webp"
+  ],
+  "passos": [
+   "Apoie as coxas na almofada e prenda os tornozelos no apoio.",
+   "Cruze os braços à frente do peito.",
+   "Desça o tronco dobrando no quadril, costas retas.",
+   "Suba até o corpo ficar alinhado, sem passar dessa linha."
+  ],
+  "errosComuns": [
+   "Subir além da linha do corpo, forçando a lombar.",
+   "Fazer o movimento rápido, com impulso."
+  ],
+  "prioridade": 7,
+  "tetoReps": 12
+ },
+ {
+  "id": "levantamento-terra",
+  "nome": "Levantamento terra",
+  "nomeOriginal": "Barbell Deadlift",
+  "grupo": "posteriores",
+  "gruposSecundarios": [
+   "gluteos"
+  ],
+  "categoria": "legs",
+  "equipamento": "barra",
+  "tipo": "composto",
+  "padrao": "dobrar_quadril",
+  "nivel": "intermediario",
+  "tipoCarga": "porLado",
+  "unilateral": false,
+  "incrementoCarga": 2,
+  "contraindicacoes": [
+   {
+    "limitacao": "lombar",
+    "nivel": "forte"
+   }
+  ],
+  "substitutos": [
+   "stiff-halteres",
+   "stiff-barra",
+   "terra-romeno",
+   "hiperextensao"
+  ],
+  "imagens": [
+   "levantamento-terra/0.webp",
+   "levantamento-terra/1.webp"
+  ],
+  "passos": [
+   "Pés na largura do quadril com a barra sobre o meio dos pés.",
+   "Agache e segure a barra logo fora das pernas, costas retas e peito aberto.",
+   "Levante empurrando o chão com as pernas, com a barra rente ao corpo, até ficar em pé.",
+   "Desça controlando pelo mesmo caminho."
+  ],
+  "errosComuns": [
+   "Arredondar a lombar ao puxar.",
+   "Subir o quadril antes do peito no começo do movimento."
+  ],
+  "prioridade": 8
+ },
+ {
+  "id": "good-morning",
+  "nome": "Good morning",
+  "nomeOriginal": "Good Morning",
+  "grupo": "posteriores",
+  "gruposSecundarios": [
+   "gluteos"
+  ],
+  "categoria": "legs",
+  "equipamento": "barra",
+  "tipo": "composto",
+  "padrao": "dobrar_quadril",
+  "nivel": "intermediario",
+  "tipoCarga": "porLado",
+  "unilateral": false,
+  "incrementoCarga": 2,
+  "contraindicacoes": [
+   {
+    "limitacao": "lombar",
+    "nivel": "forte"
+   }
+  ],
+  "substitutos": [
+   "stiff-halteres",
+   "stiff-barra",
+   "terra-romeno",
+   "hiperextensao"
+  ],
+  "imagens": [
+   "good-morning/0.webp",
+   "good-morning/1.webp"
+  ],
+  "passos": [
+   "Apoie a barra no alto das costas, pés na largura do quadril.",
+   "Dobre levemente os joelhos.",
+   "Incline o tronco à frente empurrando o quadril para trás, costas retas, até quase paralelo ao chão.",
+   "Volte estendendo o quadril."
+  ],
+  "errosComuns": [
+   "Arredondar as costas.",
+   "Usar carga alta: o exercício exige muito da lombar."
+  ],
+  "prioridade": 20
+ },
+ {
+  "id": "elevacao-pelvica",
+  "nome": "Elevação pélvica com barra",
+  "nomeOriginal": "Barbell Hip Thrust",
+  "grupo": "gluteos",
+  "gruposSecundarios": [
+   "posteriores"
+  ],
+  "categoria": "legs",
+  "equipamento": "barra",
+  "tipo": "composto",
+  "padrao": "dobrar_quadril",
+  "nivel": "iniciante",
+  "tipoCarga": "porLado",
+  "unilateral": false,
+  "incrementoCarga": 2,
+  "contraindicacoes": [],
+  "substitutos": [
+   "ponte-barra",
+   "pull-through",
+   "ponte",
+   "ponte-unilateral"
+  ],
+  "imagens": [
+   "elevacao-pelvica/0.webp",
+   "elevacao-pelvica/1.webp"
+  ],
+  "passos": [
+   "Sente no chão com a parte de cima das costas apoiada num banco e a barra (com proteção) sobre o quadril.",
+   "Pés firmes no chão na largura do quadril, joelhos dobrados.",
+   "Empurre o quadril para cima até o tronco ficar alinhado com as coxas, contraindo os glúteos.",
+   "Desça devagar."
+  ],
+  "errosComuns": [
+   "Arquear a lombar em vez de subir com o quadril.",
+   "Pés longe demais, puxando com os posteriores."
+  ],
+  "prioridade": 1
+ },
+ {
+  "id": "abdutora",
+  "nome": "Cadeira abdutora",
+  "nomeOriginal": "Thigh Abductor",
+  "grupo": "gluteos",
+  "gruposSecundarios": [],
+  "categoria": "legs",
+  "equipamento": "maquina",
+  "tipo": "isolado",
+  "padrao": "isolado_pernas",
+  "nivel": "iniciante",
+  "tipoCarga": "total",
+  "unilateral": false,
+  "incrementoCarga": 4,
+  "contraindicacoes": [],
+  "substitutos": [
+   "gluteo-polia",
+   "gluteo-quatro-apoios",
+   "elevacao-pelvica",
+   "ponte-barra"
+  ],
+  "imagens": [
+   "abdutora/0.webp",
+   "abdutora/1.webp"
+  ],
+  "passos": [
+   "Sente com as costas apoiadas e as almofadas por fora dos joelhos.",
+   "Segure as pegadas laterais.",
+   "Abra as pernas o máximo que conseguir com controle.",
+   "Volte devagar sem deixar o peso encostar."
+  ],
+  "errosComuns": [
+   "Jogar o tronco para frente e para trás.",
+   "Voltar soltando o peso."
+  ],
+  "prioridade": 2
+ },
+ {
+  "id": "ponte-barra",
+  "nome": "Ponte de glúteo com barra",
+  "nomeOriginal": "Barbell Glute Bridge",
+  "grupo": "gluteos",
+  "gruposSecundarios": [
+   "posteriores"
+  ],
+  "categoria": "legs",
+  "equipamento": "barra",
+  "tipo": "composto",
+  "padrao": "dobrar_quadril",
+  "nivel": "iniciante",
+  "tipoCarga": "porLado",
+  "unilateral": false,
+  "incrementoCarga": 2,
+  "contraindicacoes": [],
+  "substitutos": [
+   "elevacao-pelvica",
+   "pull-through",
+   "ponte",
+   "ponte-unilateral"
+  ],
+  "imagens": [
+   "ponte-barra/0.webp",
+   "ponte-barra/1.webp"
+  ],
+  "passos": [
+   "Deite de costas no chão com os joelhos dobrados e a barra (com proteção) sobre o quadril.",
+   "Pés firmes no chão na largura do quadril.",
+   "Empurre o quadril para cima contraindo os glúteos.",
+   "Desça devagar até quase encostar no chão."
+  ],
+  "errosComuns": [
+   "Empurrar com as pontas dos pés em vez dos calcanhares.",
+   "Arquear a lombar no alto."
+  ],
+  "prioridade": 3
+ },
+ {
+  "id": "gluteo-polia",
+  "nome": "Glúteo na polia (coice)",
+  "nomeOriginal": "One-Legged Cable Kickback",
+  "grupo": "gluteos",
+  "gruposSecundarios": [],
+  "categoria": "legs",
+  "equipamento": "cabo",
+  "tipo": "isolado",
+  "padrao": "isolado_pernas",
+  "nivel": "iniciante",
+  "tipoCarga": "total",
+  "unilateral": true,
+  "incrementoCarga": 4,
+  "contraindicacoes": [],
+  "substitutos": [
+   "abdutora",
+   "gluteo-quatro-apoios",
+   "elevacao-pelvica",
+   "ponte-barra"
+  ],
+  "imagens": [
+   "gluteo-polia/0.webp",
+   "gluteo-polia/1.webp"
+  ],
+  "passos": [
+   "Prenda a caneleira na polia baixa e no tornozelo.",
+   "Fique de frente para a máquina segurando no apoio, tronco levemente inclinado.",
+   "Leve a perna para trás e para cima contraindo o glúteo, sem arquear a lombar.",
+   "Volte devagar. Faça as repetições e troque de perna."
+  ],
+  "errosComuns": [
+   "Arquear as costas para subir mais a perna.",
+   "Balançar a perna com impulso."
+  ],
+  "prioridade": 4
+ },
+ {
+  "id": "pull-through",
+  "nome": "Pull-through na polia",
+  "nomeOriginal": "Pull Through",
+  "grupo": "gluteos",
+  "gruposSecundarios": [
+   "posteriores"
+  ],
+  "categoria": "legs",
+  "equipamento": "cabo",
+  "tipo": "composto",
+  "padrao": "dobrar_quadril",
+  "nivel": "iniciante",
+  "tipoCarga": "total",
+  "unilateral": false,
+  "incrementoCarga": 4,
+  "contraindicacoes": [],
+  "substitutos": [
+   "elevacao-pelvica",
+   "ponte-barra",
+   "ponte",
+   "ponte-unilateral"
+  ],
+  "imagens": [
+   "pull-through/0.webp",
+   "pull-through/1.webp"
+  ],
+  "passos": [
+   "De costas para a polia baixa, segure a corda entre as pernas.",
+   "Dê alguns passos à frente, pés um pouco mais abertos que o quadril.",
+   "Empurre o quadril para trás deixando a corda passar entre as pernas, costas retas.",
+   "Volte estendendo o quadril e contraindo os glúteos."
+  ],
+  "errosComuns": [
+   "Puxar com os braços.",
+   "Agachar em vez de dobrar no quadril."
+  ],
+  "prioridade": 5
+ },
+ {
+  "id": "ponte",
+  "nome": "Ponte de glúteo (peso do corpo)",
+  "nomeOriginal": "Butt Lift (Bridge)",
+  "grupo": "gluteos",
+  "gruposSecundarios": [
+   "posteriores"
+  ],
+  "categoria": "legs",
+  "equipamento": "peso_corporal",
+  "tipo": "composto",
+  "padrao": "dobrar_quadril",
+  "nivel": "iniciante",
+  "tipoCarga": "pesoCorpo",
+  "unilateral": false,
+  "incrementoCarga": 2,
+  "contraindicacoes": [],
+  "substitutos": [
+   "elevacao-pelvica",
+   "ponte-barra",
+   "pull-through",
+   "ponte-unilateral"
+  ],
+  "imagens": [
+   "ponte/0.webp",
+   "ponte/1.webp"
+  ],
+  "passos": [
+   "Deite de costas, joelhos dobrados e pés no chão na largura dos ombros.",
+   "Braços ao lado do corpo.",
+   "Suba o quadril empurrando com os calcanhares, contraindo os glúteos.",
+   "Desça devagar."
+  ],
+  "errosComuns": [
+   "Arquear a lombar.",
+   "Fazer rápido, sem contrair no alto."
+  ],
+  "prioridade": 6,
+  "tetoReps": 12,
+  "variacaoMaisDificil": "ponte-unilateral"
+ },
+ {
+  "id": "ponte-unilateral",
+  "nome": "Ponte de glúteo unilateral",
+  "nomeOriginal": "Single Leg Glute Bridge",
+  "grupo": "gluteos",
+  "gruposSecundarios": [
+   "posteriores"
+  ],
+  "categoria": "legs",
+  "equipamento": "peso_corporal",
+  "tipo": "composto",
+  "padrao": "dobrar_quadril",
+  "nivel": "iniciante",
+  "tipoCarga": "pesoCorpo",
+  "unilateral": true,
+  "incrementoCarga": 2,
+  "contraindicacoes": [],
+  "substitutos": [
+   "elevacao-pelvica",
+   "ponte-barra",
+   "pull-through",
+   "ponte"
+  ],
+  "imagens": [
+   "ponte-unilateral/0.webp",
+   "ponte-unilateral/1.webp"
+  ],
+  "passos": [
+   "Deite de costas com um joelho dobrado e o pé no chão; estenda a outra perna.",
+   "Suba o quadril empurrando com o calcanhar do pé apoiado.",
+   "Mantenha o quadril nivelado, sem cair para um lado.",
+   "Desça devagar. Faça as repetições e troque de perna."
+  ],
+  "errosComuns": [
+   "Deixar o quadril girar.",
+   "Empurrar com a ponta do pé."
+  ],
+  "prioridade": 7,
+  "tetoReps": 12
+ },
+ {
+  "id": "gluteo-quatro-apoios",
+  "nome": "Glúteo quatro apoios",
+  "nomeOriginal": "Glute Kickback",
+  "grupo": "gluteos",
+  "gruposSecundarios": [],
+  "categoria": "legs",
+  "equipamento": "peso_corporal",
+  "tipo": "isolado",
+  "padrao": "isolado_pernas",
+  "nivel": "iniciante",
+  "tipoCarga": "pesoCorpo",
+  "unilateral": true,
+  "incrementoCarga": 2,
+  "contraindicacoes": [],
+  "substitutos": [
+   "abdutora",
+   "gluteo-polia",
+   "elevacao-pelvica",
+   "ponte-barra"
+  ],
+  "imagens": [
+   "gluteo-quatro-apoios/0.webp",
+   "gluteo-quatro-apoios/1.webp"
+  ],
+  "passos": [
+   "Fique de quatro apoios, mãos abaixo dos ombros e joelhos abaixo do quadril.",
+   "Mantendo o joelho dobrado a 90°, eleve uma perna até a coxa ficar alinhada com as costas.",
+   "Contraia o glúteo no alto e desça devagar.",
+   "Faça as repetições e troque de perna."
+  ],
+  "errosComuns": [
+   "Arquear a lombar.",
+   "Girar o quadril para o lado."
+  ],
+  "prioridade": 8,
+  "tetoReps": 12
+ },
+ {
+  "id": "panturrilha-em-pe",
+  "nome": "Panturrilha em pé (máquina)",
+  "nomeOriginal": "Standing Calf Raises",
+  "grupo": "panturrilha",
+  "gruposSecundarios": [],
+  "categoria": "legs",
+  "equipamento": "maquina",
+  "tipo": "isolado",
+  "padrao": "panturrilha",
+  "nivel": "iniciante",
+  "tipoCarga": "total",
+  "unilateral": false,
+  "incrementoCarga": 4,
+  "contraindicacoes": [],
+  "substitutos": [
+   "panturrilha-sentado",
+   "panturrilha-leg-press",
+   "panturrilha-halter",
+   "panturrilha-smith"
+  ],
+  "imagens": [
+   "panturrilha-em-pe/0.webp",
+   "panturrilha-em-pe/1.webp"
+  ],
+  "passos": [
+   "Encaixe os ombros nas almofadas e apoie a ponta dos pés na plataforma.",
+   "Deixe os calcanhares descerem até sentir alongar.",
+   "Suba na ponta dos pés o máximo que conseguir.",
+   "Desça devagar."
+  ],
+  "errosComuns": [
+   "Dobrar os joelhos para ajudar.",
+   "Fazer o movimento curto e rápido."
+  ],
+  "prioridade": 1
+ },
+ {
+  "id": "panturrilha-sentado",
+  "nome": "Panturrilha sentado",
+  "nomeOriginal": "Seated Calf Raise",
+  "grupo": "panturrilha",
+  "gruposSecundarios": [],
+  "categoria": "legs",
+  "equipamento": "maquina",
+  "tipo": "isolado",
+  "padrao": "panturrilha",
+  "nivel": "iniciante",
+  "tipoCarga": "total",
+  "unilateral": false,
+  "incrementoCarga": 4,
+  "contraindicacoes": [],
+  "substitutos": [
+   "panturrilha-em-pe",
+   "panturrilha-leg-press",
+   "panturrilha-halter",
+   "panturrilha-smith"
+  ],
+  "imagens": [
+   "panturrilha-sentado/0.webp",
+   "panturrilha-sentado/1.webp"
+  ],
+  "passos": [
+   "Sente e apoie a ponta dos pés na plataforma, com a almofada sobre as coxas.",
+   "Destrave a máquina.",
+   "Desça os calcanhares até alongar e suba na ponta dos pés.",
+   "Desça devagar."
+  ],
+  "errosComuns": [
+   "Quicar no fundo.",
+   "Amplitude curta."
+  ],
+  "prioridade": 2
+ },
+ {
+  "id": "panturrilha-leg-press",
+  "nome": "Panturrilha no leg press",
+  "nomeOriginal": "Calf Press On The Leg Press Machine",
+  "grupo": "panturrilha",
+  "gruposSecundarios": [],
+  "categoria": "legs",
+  "equipamento": "maquina",
+  "tipo": "isolado",
+  "padrao": "panturrilha",
+  "nivel": "iniciante",
+  "tipoCarga": "total",
+  "unilateral": false,
+  "incrementoCarga": 4,
+  "contraindicacoes": [],
+  "substitutos": [
+   "panturrilha-em-pe",
+   "panturrilha-sentado",
+   "panturrilha-halter",
+   "panturrilha-smith"
+  ],
+  "imagens": [
+   "panturrilha-leg-press/0.webp",
+   "panturrilha-leg-press/1.webp"
+  ],
+  "passos": [
+   "Sente no leg press e apoie só a ponta dos pés na borda de baixo da plataforma.",
+   "Estenda as pernas sem travar os joelhos.",
+   "Empurre a plataforma com a ponta dos pés.",
+   "Volte devagar até alongar a panturrilha."
+  ],
+  "errosComuns": [
+   "Deixar o pé escorregar da plataforma.",
+   "Dobrar os joelhos durante o movimento."
+  ],
+  "prioridade": 3
+ },
+ {
+  "id": "panturrilha-halter",
+  "nome": "Panturrilha em pé com halter",
+  "nomeOriginal": "Standing Dumbbell Calf Raise",
+  "grupo": "panturrilha",
+  "gruposSecundarios": [],
+  "categoria": "legs",
+  "equipamento": "halter",
+  "tipo": "isolado",
+  "padrao": "panturrilha",
+  "nivel": "iniciante",
+  "tipoCarga": "porHalter",
+  "unilateral": false,
+  "incrementoCarga": 2,
+  "contraindicacoes": [],
+  "substitutos": [
+   "panturrilha-em-pe",
+   "panturrilha-sentado",
+   "panturrilha-leg-press",
+   "panturrilha-smith"
+  ],
+  "imagens": [
+   "panturrilha-halter/0.webp",
+   "panturrilha-halter/1.webp"
+  ],
+  "passos": [
+   "Segure um halter numa mão e apoie a ponta dos pés num step; segure em algo firme com a outra mão.",
+   "Deixe os calcanhares descerem até alongar.",
+   "Suba na ponta dos pés o máximo que conseguir.",
+   "Desça devagar."
+  ],
+  "errosComuns": [
+   "Quicar no fundo.",
+   "Dobrar os joelhos."
+  ],
+  "prioridade": 4
+ },
+ {
+  "id": "panturrilha-smith",
+  "nome": "Panturrilha no Smith",
+  "nomeOriginal": "Smith Machine Calf Raise",
+  "grupo": "panturrilha",
+  "gruposSecundarios": [],
+  "categoria": "legs",
+  "equipamento": "maquina",
+  "tipo": "isolado",
+  "padrao": "panturrilha",
+  "nivel": "iniciante",
+  "tipoCarga": "porLado",
+  "unilateral": false,
+  "incrementoCarga": 2,
+  "contraindicacoes": [],
+  "substitutos": [
+   "panturrilha-em-pe",
+   "panturrilha-sentado",
+   "panturrilha-leg-press",
+   "panturrilha-halter"
+  ],
+  "imagens": [
+   "panturrilha-smith/0.webp",
+   "panturrilha-smith/1.webp"
+  ],
+  "passos": [
+   "Coloque um step sob a barra e apoie a ponta dos pés nele.",
+   "Posicione a barra no alto das costas e destrave.",
+   "Suba na ponta dos pés o máximo que conseguir.",
+   "Desça devagar até alongar."
+  ],
+  "errosComuns": [
+   "Dobrar os joelhos.",
+   "Perder o equilíbrio no step."
+  ],
+  "prioridade": 5
+ },
+ {
+  "id": "rosca-direta",
+  "nome": "Rosca direta com barra",
+  "nomeOriginal": "Barbell Curl",
+  "grupo": "biceps",
+  "gruposSecundarios": [],
+  "categoria": "pull",
+  "equipamento": "barra",
+  "tipo": "isolado",
+  "padrao": "isolado_bracos",
+  "nivel": "iniciante",
+  "tipoCarga": "total",
+  "unilateral": false,
+  "incrementoCarga": 2,
+  "contraindicacoes": [
+   {
+    "limitacao": "punho",
+    "nivel": "leve"
+   }
+  ],
+  "substitutos": [
+   "rosca-alternada",
+   "rosca-w",
+   "rosca-martelo",
+   "rosca-polia"
+  ],
+  "imagens": [
+   "rosca-direta/0.webp",
+   "rosca-direta/1.webp"
+  ],
+  "passos": [
+   "Em pé, segure a barra com as palmas viradas para frente, mãos na largura dos ombros.",
+   "Cotovelos colados ao corpo.",
+   "Dobre os cotovelos levando a barra até a altura do peito.",
+   "Desça devagar até estender os braços."
+  ],
+  "errosComuns": [
+   "Balançar o tronco para subir o peso.",
+   "Levar os cotovelos para frente."
+  ],
+  "prioridade": 1
+ },
+ {
+  "id": "rosca-alternada",
+  "nome": "Rosca alternada com halteres",
+  "nomeOriginal": "Dumbbell Alternate Bicep Curl",
+  "grupo": "biceps",
+  "gruposSecundarios": [],
+  "categoria": "pull",
+  "equipamento": "halter",
+  "tipo": "isolado",
+  "padrao": "isolado_bracos",
+  "nivel": "iniciante",
+  "tipoCarga": "porHalter",
+  "unilateral": true,
+  "incrementoCarga": 2,
+  "contraindicacoes": [],
+  "substitutos": [
+   "rosca-direta",
+   "rosca-w",
+   "rosca-martelo",
+   "rosca-polia"
+  ],
+  "imagens": [
+   "rosca-alternada/0.webp",
+   "rosca-alternada/1.webp"
+  ],
+  "passos": [
+   "Em pé, segure um halter em cada mão ao lado do corpo, palmas viradas para dentro.",
+   "Suba um halter girando o punho até a palma ficar virada para você.",
+   "Desça devagar e repita com o outro braço.",
+   "Mantenha os cotovelos sempre colados ao corpo."
+  ],
+  "errosComuns": [
+   "Balançar o corpo.",
+   "Descer rápido."
+  ],
+  "prioridade": 2
+ },
+ {
+  "id": "rosca-w",
+  "nome": "Rosca com barra W",
+  "nomeOriginal": "EZ-Bar Curl",
+  "grupo": "biceps",
+  "gruposSecundarios": [],
+  "categoria": "pull",
+  "equipamento": "barra",
+  "tipo": "isolado",
+  "padrao": "isolado_bracos",
+  "nivel": "iniciante",
+  "tipoCarga": "total",
+  "unilateral": false,
+  "incrementoCarga": 2,
+  "contraindicacoes": [],
+  "substitutos": [
+   "rosca-direta",
+   "rosca-alternada",
+   "rosca-martelo",
+   "rosca-polia"
+  ],
+  "imagens": [
+   "rosca-w/0.webp",
+   "rosca-w/1.webp"
+  ],
+  "passos": [
+   "Segure a barra W nas partes inclinadas, palmas para frente.",
+   "Cotovelos colados ao corpo.",
+   "Suba a barra até a altura do peito.",
+   "Desça devagar."
+  ],
+  "errosComuns": [
+   "Usar impulso.",
+   "Não estender os braços no fim."
+  ],
+  "prioridade": 3
+ },
+ {
+  "id": "rosca-martelo",
+  "nome": "Rosca martelo",
+  "nomeOriginal": "Hammer Curls",
+  "grupo": "biceps",
+  "gruposSecundarios": [],
+  "categoria": "pull",
+  "equipamento": "halter",
+  "tipo": "isolado",
+  "padrao": "isolado_bracos",
+  "nivel": "iniciante",
+  "tipoCarga": "porHalter",
+  "unilateral": false,
+  "incrementoCarga": 2,
+  "contraindicacoes": [],
+  "substitutos": [
+   "rosca-direta",
+   "rosca-alternada",
+   "rosca-w",
+   "rosca-polia"
+  ],
+  "imagens": [
+   "rosca-martelo/0.webp",
+   "rosca-martelo/1.webp"
+  ],
+  "passos": [
+   "Em pé, segure os halteres ao lado do corpo com as palmas viradas uma para a outra.",
+   "Cotovelos colados ao corpo.",
+   "Suba os halteres mantendo as palmas viradas para dentro.",
+   "Desça devagar."
+  ],
+  "errosComuns": [
+   "Usar impulso do tronco.",
+   "Afastar os cotovelos do corpo."
+  ],
+  "prioridade": 4
+ },
+ {
+  "id": "rosca-polia",
+  "nome": "Rosca na polia",
+  "nomeOriginal": "Standing Biceps Cable Curl",
+  "grupo": "biceps",
+  "gruposSecundarios": [],
+  "categoria": "pull",
+  "equipamento": "cabo",
+  "tipo": "isolado",
+  "padrao": "isolado_bracos",
+  "nivel": "iniciante",
+  "tipoCarga": "total",
+  "unilateral": false,
+  "incrementoCarga": 2,
+  "contraindicacoes": [],
+  "substitutos": [
+   "rosca-direta",
+   "rosca-alternada",
+   "rosca-w",
+   "rosca-martelo"
+  ],
+  "imagens": [
+   "rosca-polia/0.webp",
+   "rosca-polia/1.webp"
+  ],
+  "passos": [
+   "Fique de frente para a polia baixa e segure a barra com as palmas para cima.",
+   "Cotovelos colados ao corpo.",
+   "Suba a barra até a altura do peito.",
+   "Desça devagar."
+  ],
+  "errosComuns": [
+   "Inclinar o corpo para trás.",
+   "Levar os cotovelos para frente."
+  ],
+  "prioridade": 5
+ },
+ {
+  "id": "rosca-scott",
+  "nome": "Rosca Scott",
+  "nomeOriginal": "Preacher Curl",
+  "grupo": "biceps",
+  "gruposSecundarios": [],
+  "categoria": "pull",
+  "equipamento": "barra",
+  "tipo": "isolado",
+  "padrao": "isolado_bracos",
+  "nivel": "iniciante",
+  "tipoCarga": "total",
+  "unilateral": false,
+  "incrementoCarga": 2,
+  "contraindicacoes": [],
+  "substitutos": [
+   "rosca-direta",
+   "rosca-alternada",
+   "rosca-w",
+   "rosca-martelo"
+  ],
+  "imagens": [
+   "rosca-scott/0.webp",
+   "rosca-scott/1.webp"
+  ],
+  "passos": [
+   "Sente no banco Scott com a parte de trás dos braços apoiada na almofada.",
+   "Segure a barra com as palmas para cima.",
+   "Suba a barra dobrando os cotovelos.",
+   "Desça devagar até quase estender os braços."
+  ],
+  "errosComuns": [
+   "Tirar os braços da almofada.",
+   "Esticar o cotovelo de uma vez no fundo."
+  ],
+  "prioridade": 6
+ },
+ {
+  "id": "rosca-concentrada",
+  "nome": "Rosca concentrada",
+  "nomeOriginal": "Concentration Curls",
+  "grupo": "biceps",
+  "gruposSecundarios": [],
+  "categoria": "pull",
+  "equipamento": "halter",
+  "tipo": "isolado",
+  "padrao": "isolado_bracos",
+  "nivel": "iniciante",
+  "tipoCarga": "porHalter",
+  "unilateral": true,
+  "incrementoCarga": 2,
+  "contraindicacoes": [],
+  "substitutos": [
+   "rosca-direta",
+   "rosca-alternada",
+   "rosca-w",
+   "rosca-martelo"
+  ],
+  "imagens": [
+   "rosca-concentrada/0.webp",
+   "rosca-concentrada/1.webp"
+  ],
+  "passos": [
+   "Sente com as pernas afastadas e apoie o cotovelo na parte de dentro da coxa.",
+   "Segure o halter com o braço estendido.",
+   "Suba o halter em direção ao ombro.",
+   "Desça devagar. Faça as repetições e troque de braço."
+  ],
+  "errosComuns": [
+   "Mover o ombro para ajudar.",
+   "Descer rápido."
+  ],
+  "prioridade": 7
+ },
+ {
+  "id": "rosca-inclinada",
+  "nome": "Rosca inclinada com halteres",
+  "nomeOriginal": "Incline Dumbbell Curl",
+  "grupo": "biceps",
+  "gruposSecundarios": [],
+  "categoria": "pull",
+  "equipamento": "halter",
+  "tipo": "isolado",
+  "padrao": "isolado_bracos",
+  "nivel": "iniciante",
+  "tipoCarga": "porHalter",
+  "unilateral": false,
+  "incrementoCarga": 2,
+  "contraindicacoes": [],
+  "substitutos": [
+   "rosca-direta",
+   "rosca-alternada",
+   "rosca-w",
+   "rosca-martelo"
+  ],
+  "imagens": [
+   "rosca-inclinada/0.webp",
+   "rosca-inclinada/1.webp"
+  ],
+  "passos": [
+   "Sente num banco inclinado a uns 45°, braços pendurados com os halteres.",
+   "Palmas viradas para frente.",
+   "Suba os halteres sem mover os cotovelos.",
+   "Desça devagar até estender os braços."
+  ],
+  "errosComuns": [
+   "Tirar as costas do banco.",
+   "Levar os cotovelos para frente."
+  ],
+  "prioridade": 8
+ },
+ {
+  "id": "triceps-pulley",
+  "nome": "Tríceps na polia (barra)",
+  "nomeOriginal": "Triceps Pushdown",
+  "grupo": "triceps",
+  "gruposSecundarios": [],
+  "categoria": "push",
+  "equipamento": "cabo",
+  "tipo": "isolado",
+  "padrao": "isolado_bracos",
+  "nivel": "iniciante",
+  "tipoCarga": "total",
+  "unilateral": false,
+  "incrementoCarga": 2,
+  "contraindicacoes": [],
+  "substitutos": [
+   "triceps-corda",
+   "triceps-testa",
+   "triceps-frances",
+   "triceps-corda-alto"
+  ],
+  "imagens": [
+   "triceps-pulley/0.webp",
+   "triceps-pulley/1.webp"
+  ],
+  "passos": [
+   "De frente para a polia alta, segure a barra com as palmas para baixo.",
+   "Cotovelos colados ao corpo, antebraços paralelos ao chão.",
+   "Empurre a barra para baixo até estender os braços.",
+   "Volte devagar até os antebraços ficarem paralelos ao chão."
+  ],
+  "errosComuns": [
+   "Afastar os cotovelos do corpo.",
+   "Inclinar o tronco sobre a barra."
+  ],
+  "prioridade": 1
+ },
+ {
+  "id": "triceps-corda",
+  "nome": "Tríceps na polia com corda",
+  "nomeOriginal": "Triceps Pushdown - Rope Attachment",
+  "grupo": "triceps",
+  "gruposSecundarios": [],
+  "categoria": "push",
+  "equipamento": "cabo",
+  "tipo": "isolado",
+  "padrao": "isolado_bracos",
+  "nivel": "iniciante",
+  "tipoCarga": "total",
+  "unilateral": false,
+  "incrementoCarga": 2,
+  "contraindicacoes": [],
+  "substitutos": [
+   "triceps-pulley",
+   "triceps-testa",
+   "triceps-frances",
+   "triceps-corda-alto"
+  ],
+  "imagens": [
+   "triceps-corda/0.webp",
+   "triceps-corda/1.webp"
+  ],
+  "passos": [
+   "Segure a corda na polia alta com as palmas viradas uma para a outra.",
+   "Cotovelos colados ao corpo.",
+   "Empurre a corda para baixo e abra as mãos no final.",
+   "Volte devagar."
+  ],
+  "errosComuns": [
+   "Mexer os ombros para ajudar.",
+   "Levar os cotovelos para frente."
+  ],
+  "prioridade": 2
+ },
+ {
+  "id": "supino-fechado",
+  "nome": "Supino fechado",
+  "nomeOriginal": "Close-Grip Barbell Bench Press",
+  "grupo": "triceps",
+  "gruposSecundarios": [
+   "peito"
+  ],
+  "categoria": "push",
+  "equipamento": "barra",
+  "tipo": "composto",
+  "padrao": "empurrar_horizontal",
+  "nivel": "iniciante",
+  "tipoCarga": "porLado",
+  "unilateral": false,
+  "incrementoCarga": 1,
+  "contraindicacoes": [
+   {
+    "limitacao": "punho",
+    "nivel": "leve"
+   }
+  ],
+  "substitutos": [
+   "mergulho-maquina",
+   "mergulho-banco",
+   "mergulho-paralela",
+   "triceps-pulley"
+  ],
+  "imagens": [
+   "supino-fechado/0.webp",
+   "supino-fechado/1.webp"
+  ],
+  "passos": [
+   "Deite no banco reto e segure a barra com as mãos na largura dos ombros.",
+   "Tire a barra do suporte com os braços estendidos.",
+   "Desça até a parte de baixo do peito, cotovelos junto ao corpo.",
+   "Empurre de volta estendendo os braços."
+  ],
+  "errosComuns": [
+   "Pegada fechada demais, forçando os punhos.",
+   "Abrir os cotovelos."
+  ],
+  "prioridade": 3
+ },
+ {
+  "id": "triceps-testa",
+  "nome": "Tríceps testa",
+  "nomeOriginal": "EZ-Bar Skullcrusher",
+  "grupo": "triceps",
+  "gruposSecundarios": [],
+  "categoria": "push",
+  "equipamento": "barra",
+  "tipo": "isolado",
+  "padrao": "isolado_bracos",
+  "nivel": "iniciante",
+  "tipoCarga": "total",
+  "unilateral": false,
+  "incrementoCarga": 2,
+  "contraindicacoes": [
+   {
+    "limitacao": "punho",
+    "nivel": "leve"
+   }
+  ],
+  "substitutos": [
+   "triceps-pulley",
+   "triceps-corda",
+   "triceps-frances",
+   "triceps-corda-alto"
+  ],
+  "imagens": [
+   "triceps-testa/0.webp",
+   "triceps-testa/1.webp"
+  ],
+  "passos": [
+   "Deite no banco segurando a barra W acima do peito, braços estendidos.",
+   "Mantenha os cotovelos apontados para o teto.",
+   "Dobre os cotovelos descendo a barra em direção à testa.",
+   "Estenda os braços de volta."
+  ],
+  "errosComuns": [
+   "Abrir os cotovelos para os lados.",
+   "Mover os ombros junto."
+  ],
+  "prioridade": 4
+ },
+ {
+  "id": "triceps-frances",
+  "nome": "Tríceps francês com halter",
+  "nomeOriginal": "Standing Dumbbell Triceps Extension",
+  "grupo": "triceps",
+  "gruposSecundarios": [],
+  "categoria": "push",
+  "equipamento": "halter",
+  "tipo": "isolado",
+  "padrao": "isolado_bracos",
+  "nivel": "iniciante",
+  "tipoCarga": "porHalter",
+  "unilateral": false,
+  "incrementoCarga": 2,
+  "contraindicacoes": [],
+  "substitutos": [
+   "triceps-pulley",
+   "triceps-corda",
+   "triceps-testa",
+   "triceps-corda-alto"
+  ],
+  "imagens": [
+   "triceps-frances/0.webp",
+   "triceps-frances/1.webp"
+  ],
+  "passos": [
+   "Sente ou fique em pé segurando um halter com as duas mãos acima da cabeça.",
+   "Mantenha os cotovelos apontados para cima e perto da cabeça.",
+   "Desça o halter atrás da cabeça dobrando os cotovelos.",
+   "Estenda os braços de volta."
+  ],
+  "errosComuns": [
+   "Abrir os cotovelos.",
+   "Arquear a lombar."
+  ],
+  "prioridade": 5
+ },
+ {
+  "id": "triceps-corda-alto",
+  "nome": "Tríceps na polia acima da cabeça",
+  "nomeOriginal": "Cable Rope Overhead Triceps Extension",
+  "grupo": "triceps",
+  "gruposSecundarios": [],
+  "categoria": "push",
+  "equipamento": "cabo",
+  "tipo": "isolado",
+  "padrao": "isolado_bracos",
+  "nivel": "iniciante",
+  "tipoCarga": "total",
+  "unilateral": false,
+  "incrementoCarga": 2,
+  "contraindicacoes": [],
+  "substitutos": [
+   "triceps-pulley",
+   "triceps-corda",
+   "triceps-testa",
+   "triceps-frances"
+  ],
+  "imagens": [
+   "triceps-corda-alto/0.webp",
+   "triceps-corda-alto/1.webp"
+  ],
+  "passos": [
+   "De costas para a polia, segure a corda atrás da cabeça.",
+   "Dê um passo à frente, cotovelos apontados para frente perto da cabeça.",
+   "Estenda os braços à frente e para cima.",
+   "Volte devagar."
+  ],
+  "errosComuns": [
+   "Abrir os cotovelos.",
+   "Usar o tronco para empurrar."
+  ],
+  "prioridade": 6
+ },
+ {
+  "id": "triceps-coice",
+  "nome": "Tríceps coice com halter",
+  "nomeOriginal": "Tricep Dumbbell Kickback",
+  "grupo": "triceps",
+  "gruposSecundarios": [],
+  "categoria": "push",
+  "equipamento": "halter",
+  "tipo": "isolado",
+  "padrao": "isolado_bracos",
+  "nivel": "iniciante",
+  "tipoCarga": "porHalter",
+  "unilateral": true,
+  "incrementoCarga": 2,
+  "contraindicacoes": [],
+  "substitutos": [
+   "triceps-pulley",
+   "triceps-corda",
+   "triceps-testa",
+   "triceps-frances"
+  ],
+  "imagens": [
+   "triceps-coice/0.webp",
+   "triceps-coice/1.webp"
+  ],
+  "passos": [
+   "Apoie um joelho e uma mão no banco, tronco paralelo ao chão.",
+   "Com o outro braço, segure o halter com o cotovelo dobrado e colado ao corpo.",
+   "Estenda o cotovelo levando o halter para trás.",
+   "Volte devagar. Faça as repetições e troque de braço."
+  ],
+  "errosComuns": [
+   "Deixar o cotovelo cair.",
+   "Balançar o braço."
+  ],
+  "prioridade": 7
+ },
+ {
+  "id": "mergulho-maquina",
+  "nome": "Mergulho na máquina",
+  "nomeOriginal": "Dip Machine",
+  "grupo": "triceps",
+  "gruposSecundarios": [
+   "peito"
+  ],
+  "categoria": "push",
+  "equipamento": "maquina",
+  "tipo": "composto",
+  "padrao": "empurrar_vertical",
+  "nivel": "iniciante",
+  "tipoCarga": "total",
+  "unilateral": false,
+  "incrementoCarga": 2,
+  "contraindicacoes": [
+   {
+    "limitacao": "ombro",
+    "nivel": "forte"
+   }
+  ],
+  "substitutos": [
+   "mergulho-banco",
+   "mergulho-paralela",
+   "supino-fechado",
+   "triceps-pulley"
+  ],
+  "imagens": [
+   "mergulho-maquina/0.webp",
+   "mergulho-maquina/1.webp"
+  ],
+  "passos": [
+   "Sente e ajuste o banco para as pegadas ficarem ao lado do corpo.",
+   "Segure as pegadas com os cotovelos dobrados.",
+   "Empurre para baixo até estender os braços.",
+   "Volte devagar até uns 90°."
+  ],
+  "errosComuns": [
+   "Encolher os ombros.",
+   "Voltar além de 90°."
+  ],
+  "prioridade": 8
+ },
+ {
+  "id": "mergulho-banco",
+  "nome": "Mergulho no banco",
+  "nomeOriginal": "Bench Dips",
+  "grupo": "triceps",
+  "gruposSecundarios": [
+   "peito"
+  ],
+  "categoria": "push",
+  "equipamento": "peso_corporal",
+  "tipo": "composto",
+  "padrao": "empurrar_vertical",
+  "nivel": "iniciante",
+  "tipoCarga": "pesoCorpo",
+  "unilateral": false,
+  "incrementoCarga": 2,
+  "contraindicacoes": [
+   {
+    "limitacao": "ombro",
+    "nivel": "forte"
+   },
+   {
+    "limitacao": "punho",
+    "nivel": "leve"
+   }
+  ],
+  "substitutos": [
+   "mergulho-maquina",
+   "mergulho-paralela",
+   "supino-fechado",
+   "triceps-pulley"
+  ],
+  "imagens": [
+   "mergulho-banco/0.webp",
+   "mergulho-banco/1.webp"
+  ],
+  "passos": [
+   "Apoie as mãos na borda de um banco atrás de você, dedos para frente.",
+   "Estenda as pernas à frente (ou dobre os joelhos para facilitar).",
+   "Desça o corpo dobrando os cotovelos até uns 90°.",
+   "Empurre de volta até estender os braços."
+  ],
+  "errosComuns": [
+   "Descer demais, forçando o ombro.",
+   "Afastar o corpo do banco."
+  ],
+  "prioridade": 9,
+  "tetoReps": 12,
+  "variacaoMaisDificil": "mergulho-paralela"
+ },
+ {
+  "id": "mergulho-paralela",
+  "nome": "Mergulho na paralela",
+  "nomeOriginal": "Dips - Triceps Version",
+  "grupo": "triceps",
+  "gruposSecundarios": [
+   "peito"
+  ],
+  "categoria": "push",
+  "equipamento": "peso_corporal",
+  "tipo": "composto",
+  "padrao": "empurrar_vertical",
+  "nivel": "intermediario",
+  "tipoCarga": "pesoCorpo",
+  "unilateral": false,
+  "incrementoCarga": 2,
+  "contraindicacoes": [
+   {
+    "limitacao": "ombro",
+    "nivel": "forte"
+   }
+  ],
+  "substitutos": [
+   "mergulho-maquina",
+   "mergulho-banco",
+   "supino-fechado",
+   "triceps-pulley"
+  ],
+  "imagens": [
+   "mergulho-paralela/0.webp",
+   "mergulho-paralela/1.webp"
+  ],
+  "passos": [
+   "Segure as barras paralelas e suba com os braços estendidos.",
+   "Mantenha o tronco o mais reto possível.",
+   "Desça dobrando os cotovelos até uns 90°.",
+   "Empurre de volta até estender os braços."
+  ],
+  "errosComuns": [
+   "Descer muito fundo, forçando o ombro.",
+   "Balançar as pernas."
+  ],
+  "prioridade": 10,
+  "tetoReps": 12,
+  "versaoAssistida": [
+   "mergulho-banco"
+  ]
+ },
+ {
+  "id": "abdominal",
+  "nome": "Abdominal (crunch)",
+  "nomeOriginal": "Crunches",
+  "grupo": "core",
+  "gruposSecundarios": [],
+  "categoria": "core",
+  "equipamento": "peso_corporal",
+  "tipo": "isolado",
+  "padrao": "core",
+  "nivel": "iniciante",
+  "tipoCarga": "pesoCorpo",
+  "unilateral": false,
+  "incrementoCarga": 2,
+  "contraindicacoes": [],
+  "substitutos": [
+   "abdominal-infra",
+   "abdominal-polia",
+   "dead-bug",
+   "elevacao-pernas"
+  ],
+  "imagens": [
+   "abdominal/0.webp",
+   "abdominal/1.webp"
+  ],
+  "passos": [
+   "Deite de costas com os joelhos dobrados e os pés no chão.",
+   "Mãos ao lado da cabeça, sem puxar o pescoço.",
+   "Suba o tronco tirando as escápulas do chão, contraindo o abdômen.",
+   "Desça devagar."
+  ],
+  "errosComuns": [
+   "Puxar a cabeça com as mãos.",
+   "Subir com impulso."
+  ],
+  "prioridade": 1,
+  "tetoReps": 20
+ },
+ {
+  "id": "abdominal-infra",
+  "nome": "Abdominal infra (reverso)",
+  "nomeOriginal": "Reverse Crunch",
+  "grupo": "core",
+  "gruposSecundarios": [],
+  "categoria": "core",
+  "equipamento": "peso_corporal",
+  "tipo": "isolado",
+  "padrao": "core",
+  "nivel": "iniciante",
+  "tipoCarga": "pesoCorpo",
+  "unilateral": false,
+  "incrementoCarga": 2,
+  "contraindicacoes": [],
+  "substitutos": [
+   "abdominal",
+   "abdominal-polia",
+   "dead-bug",
+   "elevacao-pernas"
+  ],
+  "imagens": [
+   "abdominal-infra/0.webp",
+   "abdominal-infra/1.webp"
+  ],
+  "passos": [
+   "Deite de costas, braços ao lado do corpo e pernas elevadas com os joelhos dobrados.",
+   "Leve os joelhos em direção ao peito tirando o quadril do chão.",
+   "Desça devagar até a posição inicial.",
+   "Mantenha a lombar apoiada no chão."
+  ],
+  "errosComuns": [
+   "Balançar as pernas com impulso.",
+   "Deixar a lombar arquear na descida."
+  ],
+  "prioridade": 2,
+  "tetoReps": 20
+ },
+ {
+  "id": "abdominal-polia",
+  "nome": "Abdominal na polia (ajoelhado)",
+  "nomeOriginal": "Cable Crunch",
+  "grupo": "core",
+  "gruposSecundarios": [],
+  "categoria": "core",
+  "equipamento": "cabo",
+  "tipo": "isolado",
+  "padrao": "core",
+  "nivel": "iniciante",
+  "tipoCarga": "total",
+  "unilateral": false,
+  "incrementoCarga": 2,
+  "contraindicacoes": [],
+  "substitutos": [
+   "abdominal",
+   "abdominal-infra",
+   "dead-bug",
+   "elevacao-pernas"
+  ],
+  "imagens": [
+   "abdominal-polia/0.webp",
+   "abdominal-polia/1.webp"
+  ],
+  "passos": [
+   "Ajoelhe de frente para a polia alta segurando a corda ao lado da cabeça.",
+   "Mantenha o quadril parado.",
+   "Enrole o tronco para baixo levando os cotovelos em direção às coxas.",
+   "Volte devagar."
+  ],
+  "errosComuns": [
+   "Sentar sobre os calcanhares e puxar com o quadril.",
+   "Puxar com os braços."
+  ],
+  "prioridade": 3
+ },
+ {
+  "id": "dead-bug",
+  "nome": "Dead bug",
+  "nomeOriginal": "Dead Bug",
+  "grupo": "core",
+  "gruposSecundarios": [],
+  "categoria": "core",
+  "equipamento": "peso_corporal",
+  "tipo": "isolado",
+  "padrao": "core",
+  "nivel": "iniciante",
+  "tipoCarga": "pesoCorpo",
+  "unilateral": false,
+  "incrementoCarga": 2,
+  "contraindicacoes": [],
+  "substitutos": [
+   "abdominal",
+   "abdominal-infra",
+   "abdominal-polia",
+   "elevacao-pernas"
+  ],
+  "imagens": [
+   "dead-bug/0.webp",
+   "dead-bug/1.webp"
+  ],
+  "passos": [
+   "Deite de costas com os braços estendidos para o teto e os joelhos dobrados a 90° no alto.",
+   "Pressione a lombar no chão.",
+   "Estenda um braço para trás e a perna oposta à frente, sem encostar no chão.",
+   "Volte e troque de lado. Cada lado conta uma repetição."
+  ],
+  "errosComuns": [
+   "Deixar a lombar sair do chão.",
+   "Fazer rápido."
+  ],
+  "prioridade": 4,
+  "tetoReps": 20
+ },
+ {
+  "id": "elevacao-pernas",
+  "nome": "Elevação de pernas no banco",
+  "nomeOriginal": "Flat Bench Lying Leg Raise",
+  "grupo": "core",
+  "gruposSecundarios": [],
+  "categoria": "core",
+  "equipamento": "peso_corporal",
+  "tipo": "isolado",
+  "padrao": "core",
+  "nivel": "iniciante",
+  "tipoCarga": "pesoCorpo",
+  "unilateral": false,
+  "incrementoCarga": 2,
+  "contraindicacoes": [
+   {
+    "limitacao": "lombar",
+    "nivel": "leve"
+   }
+  ],
+  "substitutos": [
+   "abdominal",
+   "abdominal-infra",
+   "abdominal-polia",
+   "dead-bug"
+  ],
+  "imagens": [
+   "elevacao-pernas/0.webp",
+   "elevacao-pernas/1.webp"
+  ],
+  "passos": [
+   "Deite no banco reto segurando nas laterais, pernas estendidas para fora da borda.",
+   "Com as pernas quase retas, eleve-as até formar 90° com o tronco.",
+   "Desça devagar sem encostar os pés no chão.",
+   "Mantenha a lombar apoiada."
+  ],
+  "errosComuns": [
+   "Arquear a lombar na descida.",
+   "Descer rápido."
+  ],
+  "prioridade": 5,
+  "tetoReps": 20
+ },
+ {
+  "id": "abdominal-maquina",
+  "nome": "Abdominal na máquina",
+  "nomeOriginal": "Ab Crunch Machine",
+  "grupo": "core",
+  "gruposSecundarios": [],
+  "categoria": "core",
+  "equipamento": "maquina",
+  "tipo": "isolado",
+  "padrao": "core",
+  "nivel": "iniciante",
+  "tipoCarga": "total",
+  "unilateral": false,
+  "incrementoCarga": 2,
+  "contraindicacoes": [],
+  "substitutos": [
+   "abdominal",
+   "abdominal-infra",
+   "abdominal-polia",
+   "dead-bug"
+  ],
+  "imagens": [
+   "abdominal-maquina/0.webp",
+   "abdominal-maquina/1.webp"
+  ],
+  "passos": [
+   "Sente na máquina, ajuste o banco e segure as pegadas.",
+   "Contraia o abdômen enrolando o tronco para frente.",
+   "Volte devagar sem deixar o peso encostar.",
+   "Mantenha o movimento curto e controlado."
+  ],
+  "errosComuns": [
+   "Puxar com os braços.",
+   "Usar carga alta com impulso."
+  ],
+  "prioridade": 6
+ },
+ {
+  "id": "pallof",
+  "nome": "Pallof press",
+  "nomeOriginal": "Pallof Press",
+  "grupo": "core",
+  "gruposSecundarios": [],
+  "categoria": "core",
+  "equipamento": "cabo",
+  "tipo": "isolado",
+  "padrao": "core",
+  "nivel": "iniciante",
+  "tipoCarga": "total",
+  "unilateral": true,
+  "incrementoCarga": 2,
+  "contraindicacoes": [],
+  "substitutos": [
+   "abdominal",
+   "abdominal-infra",
+   "abdominal-polia",
+   "dead-bug"
+  ],
+  "imagens": [
+   "pallof/0.webp",
+   "pallof/1.webp"
+  ],
+  "passos": [
+   "Ajuste a polia na altura do peito e fique de lado para ela.",
+   "Segure a pegada com as duas mãos junto ao peito, pés na largura do quadril.",
+   "Estenda os braços à frente sem deixar o tronco girar.",
+   "Volte as mãos ao peito. Faça as repetições e troque de lado."
+  ],
+  "errosComuns": [
+   "Deixar o tronco girar em direção à polia.",
+   "Ficar perto demais da máquina, sem tensão no cabo."
+  ],
+  "prioridade": 7
+ },
+ {
+  "id": "abdominal-bicicleta",
+  "nome": "Abdominal bicicleta",
+  "nomeOriginal": "Air Bike",
+  "grupo": "core",
+  "gruposSecundarios": [],
+  "categoria": "core",
+  "equipamento": "peso_corporal",
+  "tipo": "isolado",
+  "padrao": "core",
+  "nivel": "iniciante",
+  "tipoCarga": "pesoCorpo",
+  "unilateral": false,
+  "incrementoCarga": 2,
+  "contraindicacoes": [],
+  "substitutos": [
+   "abdominal",
+   "abdominal-infra",
+   "abdominal-polia",
+   "dead-bug"
+  ],
+  "imagens": [
+   "abdominal-bicicleta/0.webp",
+   "abdominal-bicicleta/1.webp"
+  ],
+  "passos": [
+   "Deite de costas com as mãos ao lado da cabeça e as pernas elevadas, joelhos a 90°.",
+   "Leve um cotovelo em direção ao joelho oposto enquanto estende a outra perna.",
+   "Troque de lado num movimento de pedalada.",
+   "Conte cada lado como uma repetição."
+  ],
+  "errosComuns": [
+   "Puxar o pescoço.",
+   "Fazer rápido demais, sem controle."
+  ],
+  "prioridade": 8,
+  "tetoReps": 20
+ }
+]

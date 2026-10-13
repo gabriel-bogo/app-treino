@@ -57,6 +57,11 @@ export type Grupo =
 /** Em qual tipo de dia o exercício entra (§6.2: Push, Pull, Legs, Core) */
 export type Categoria = 'push' | 'pull' | 'legs' | 'core'
 
+/**
+ * Padrão de movimento (§5). "isolado_bracos" cobre os isolados de membros
+ * superiores em geral (braços, ombros, peito, costas), já que a lista da
+ * especificação não tem categorias separadas para eles.
+ */
 export type Padrao =
   | 'empurrar_horizontal'
   | 'empurrar_vertical'
@@ -68,9 +73,6 @@ export type Padrao =
   | 'isolado_pernas'
   | 'core'
   | 'panturrilha'
-  | 'isolado_ombros'
-  | 'isolado_peito'
-  | 'isolado_costas'
 
 export type TipoExercicio = 'composto' | 'isolado'
 
@@ -124,9 +126,12 @@ export interface Exercicio {
   /** peso do corpo (§6.13) */
   tetoReps?: number
   variacaoMaisDificil?: string
-  versaoAssistida?: string
+  /** versões assistidas, em ordem de preferência */
+  versaoAssistida?: string[]
   /** máquina assistida (graviton): mais carga = mais ajuda; progride reduzindo a carga */
   assistido?: boolean
+  /** usado só no aquecimento específico de ombro (§6.11); o motor não o coloca no plano */
+  soAquecimento?: boolean
 }
 
 /** Ajustes do usuário para um exercício (marcações da biblioteca e §6.14). */

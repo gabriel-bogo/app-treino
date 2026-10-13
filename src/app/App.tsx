@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react'
+import { useEffect, type ReactNode } from 'react'
 import { navegar, useRota } from './rotas'
 import { IconeHistorico, IconeInicio, IconeMais, IconePlano, IconeSaude } from '../components/icones'
 import { Mais } from '../telas/Mais'
@@ -8,6 +8,8 @@ import { Configuracoes } from '../telas/Configuracoes'
 import { EmBreve } from '../telas/EmBreve'
 import { Backup } from '../telas/Backup'
 import { Inicio } from '../telas/Inicio'
+import { Biblioteca } from '../telas/Biblioteca'
+import { ExercicioDetalhe } from '../telas/ExercicioDetalhe'
 
 const ABAS: { caminho: string; rotulo: string; icone: ReactNode }[] = [
   { caminho: '/', rotulo: 'Início', icone: <IconeInicio /> },
@@ -75,7 +77,7 @@ function Conteudo({ partes }: { partes: string[] }) {
     case 'configuracoes':
       return <Configuracoes />
     case 'biblioteca':
-      return <EmBreve titulo="Biblioteca" voltarPara="/mais" />
+      return partes[1] ? <ExercicioDetalhe id={partes[1]} /> : <Biblioteca />
     case 'perfil':
       return <EmBreve titulo="Perfil" voltarPara="/mais" />
     case 'backup':
@@ -86,7 +88,9 @@ function Conteudo({ partes }: { partes: string[] }) {
 }
 
 export function App() {
-  const { partes } = useRota()
+  const { caminho, partes } = useRota()
+  // cada tela nova começa do topo
+  useEffect(() => window.scrollTo(0, 0), [caminho])
   return (
     <div className="min-h-dvh pb-24">
       <Conteudo partes={partes} />

@@ -4,7 +4,7 @@ import { test, expect, type BrowserContext } from '@playwright/test'
 // - "Funciona em modo avião depois de instalado"
 // - "Nenhuma requisição de rede em uso normal"
 
-const ROTAS = ['/', '/#/plano', '/#/historico', '/#/saude', '/#/mais', '/#/sobre', '/#/instalar', '/#/configuracoes']
+const ROTAS = ['/', '/#/plano', '/#/historico', '/#/saude', '/#/mais', '/#/sobre', '/#/instalar', '/#/configuracoes', '/#/biblioteca', '/#/biblioteca/agachamento-livre']
 
 function vigiarRequisicoesExternas(context: BrowserContext, origem: string) {
   const externas: string[] = []
@@ -29,6 +29,11 @@ test('abre e navega sem internet depois da primeira visita', async ({ page, cont
   }
   await page.reload()
   await expect(page.locator('h1').first()).toBeVisible()
+
+  // imagens dos exercícios também vêm do cache (§5: nunca da internet)
+  await page.goto(new URL('/#/biblioteca/leg-press', baseURL).toString())
+  const img = page.locator('img[alt^="Leg press"]').first()
+  await expect.poll(() => img.evaluate((el: HTMLImageElement) => el.complete && el.naturalWidth > 0)).toBe(true)
 })
 
 test('nenhuma requisição para fora do próprio site', async ({ page, context, baseURL }) => {
