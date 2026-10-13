@@ -1,6 +1,7 @@
 import { db, obterConfiguracoes } from './banco'
 import { dataLocal } from '../domain/datas'
 import type { Perfil } from '../domain/tipos'
+import { garantirPlano } from './plano'
 
 export type DadosPerfil = Omit<Perfil, 'id' | 'criadoEm' | 'atualizadoEm'>
 
@@ -14,10 +15,12 @@ export async function salvarPerfilInicial(dados: DadosPerfil, agora: Date = new 
     const existente = await db.registrosCorpo.get(hoje)
     await db.registrosCorpo.put({ ...existente, data: hoje, pesoKg: dados.pesoInicialKg })
   })
+  await garantirPlano(agora)
 }
 
 export async function atualizarPerfil(mudancas: Partial<DadosPerfil>) {
   const atual = await db.perfil.get('perfil')
   if (!atual) return
   await db.perfil.put({ ...atual, ...mudancas, atualizadoEm: new Date().toISOString() })
+  await garantirPlano()
 }

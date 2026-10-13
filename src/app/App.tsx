@@ -13,6 +13,7 @@ import { ExercicioDetalhe } from '../telas/ExercicioDetalhe'
 import { Onboarding } from '../telas/Onboarding'
 import { Perfil } from '../telas/Perfil'
 import { Saude } from '../telas/Saude'
+import { PlanoSemana } from '../telas/PlanoSemana'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '../db/banco'
 
@@ -68,7 +69,9 @@ function Conteudo({ partes }: { partes: string[] }) {
     case undefined:
       return <Inicio />
     case 'plano':
-      return <EmBreve titulo="Plano da semana" />
+      return <PlanoSemana />
+    case 'treino':
+      return <EmBreve titulo="Treino" voltarPara="/" />
     case 'historico':
       return <EmBreve titulo="Histórico" />
     case 'saude':

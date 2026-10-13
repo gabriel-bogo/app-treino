@@ -171,6 +171,8 @@ export interface Plano {
   geradoEm: string
   /** avisos do motor (ex: volume abaixo do recomendado) */
   avisos: string[]
+  /** mensagem de mudança de fase para mostrar na tela inicial (ex: fim da readaptação) */
+  mensagemFase?: string | null
   /** resumo do perfil usado para gerar; se mudar, o plano é refeito (B15) */
   assinatura: string
 }
@@ -181,6 +183,10 @@ export interface DiaPlano {
   /** ex: "Full body A", "Superior B", "Push" */
   nome: string
   tipo: TipoDia
+  /** dias com a mesma variante têm os mesmos exercícios (ex: A/B/A/B) */
+  variante: string
+  /** estimativa pela regra da §6.4 */
+  minutosEstimados: number
 }
 
 export type PapelExercicioPlano = 'trabalho' | 'aquecimento_ombro'
