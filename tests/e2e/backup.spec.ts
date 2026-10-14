@@ -11,7 +11,7 @@ test('exportar backup gera arquivo com o nome e a estrutura certos', async ({ pa
   expect(arquivo.suggestedFilename()).toMatch(/^app-treino-backup-\d{4}-\d{2}-\d{2}\.json$/)
   const conteudo = JSON.parse(await readFile((await arquivo.path())!, 'utf8'))
   expect(conteudo.app).toBe('app-treino')
-  expect(conteudo.schemaVersion).toBe(2)
+  expect(conteudo.schemaVersion).toBe(3)
   expect(conteudo.tabelas.configuracoes).toHaveLength(1)
   await expect(page.getByText(/Último backup:/)).toBeVisible()
 })

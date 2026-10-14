@@ -10,6 +10,8 @@ import {
   OPCOES_OBJETIVO,
   OPCOES_SEXO,
   avisoEnfases,
+  opcoesTreinos,
+  treinosRecomendados,
   textoDuracao,
   type ErrosPerfil,
   type RascunhoPerfil,
@@ -106,8 +108,29 @@ export function CamposTreino({ r, mudar, erros, hoje }: { r: RascunhoPerfil; mud
           <Texto>{aviso}</Texto>
         </Cartao>
       )}
-      <Opcoes rotulo="Dias por semana" valor={r.diasSemana} opcoes={OPCOES_DIAS} aoMudar={(v) => mudar({ diasSemana: v })} colunas={5} />
+      <Opcoes
+        rotulo="Dias por semana"
+        valor={r.diasSemana}
+        opcoes={OPCOES_DIAS}
+        // C10: ao mudar os dias, o número de treinos vai para a sugestão
+        aoMudar={(v) => mudar({ diasSemana: v, treinos: treinosRecomendados(v) })}
+        colunas={5}
+      />
       <Erro texto={erros.diasSemana} />
+      {r.diasSemana && (
+        <>
+          <Opcoes
+            rotulo="Quantos treinos diferentes?"
+            ajuda={`Os treinos se revezam nos dias. Ex: ${r.diasSemana} dias com ${r.treinos ?? treinosRecomendados(r.diasSemana)} treinos = ${sequenciaExemplo(r.diasSemana, r.treinos ?? treinosRecomendados(r.diasSemana))}…`}
+            valor={r.treinos}
+            opcoes={opcoesTreinos(r.diasSemana).map((o) => ({ ...o, rotulo: `${o.valor} treinos`, descricao: o.rotulo }))}
+            recomendado={treinosRecomendados(r.diasSemana)}
+            aoMudar={(v) => mudar({ treinos: v })}
+            colunas={2}
+          />
+          <Erro texto={erros.treinos} />
+        </>
+      )}
       <Deslizante
         rotulo="Duração de cada treino"
         ajuda="Inclui uns 8 minutos de aquecimento."
@@ -121,6 +144,11 @@ export function CamposTreino({ r, mudar, erros, hoje }: { r: RascunhoPerfil; mud
       <Erro texto={erros.duracaoMin} />
     </>
   )
+}
+
+/** 5 dias, 3 treinos → "A, B, C, A, B" */
+function sequenciaExemplo(dias: number, treinos: number): string {
+  return Array.from({ length: dias }, (_, i) => String.fromCharCode(65 + (i % treinos))).join(', ')
 }
 
 export function CamposLimitacoes({ r, mudar }: { r: RascunhoPerfil; mudar: (m: RascunhoPerfil) => void }) {

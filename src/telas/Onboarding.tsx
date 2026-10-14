@@ -55,6 +55,7 @@ export function Onboarding() {
       objetivos: r.objetivos!,
       enfases: r.enfases ?? [],
       diasSemana: r.diasSemana!,
+      treinos: r.treinos!,
       duracaoMin: r.duracaoMin!,
       limitacoes: r.limitacoes ?? [],
       nConfirmacoes: r.nConfirmacoes ?? 2,

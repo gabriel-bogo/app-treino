@@ -16,6 +16,7 @@ const perfil: Perfil = {
   objetivos: ['hipertrofia'],
   enfases: [],
   diasSemana: 4,
+  treinos: 4,
   duracaoMin: 60,
   limitacoes: [],
   nConfirmacoes: 2,
@@ -96,7 +97,7 @@ describe('plano ativo', () => {
       substituicoes: [],
     }
     await db.sessoes.put(sessao)
-    await db.perfil.put({ ...perfil, diasSemana: 2 })
+    await db.perfil.put({ ...perfil, diasSemana: 2, treinos: 2 })
     await garantirPlano(new Date(Date.now() + 1000))
     expect((await db.plano.get('atual'))!.geradoEm).toBe(antes!.geradoEm)
     expect(await db.diasPlano.count()).toBe(4)
@@ -106,7 +107,7 @@ describe('plano ativo', () => {
     expect(semanaDaReadaptacao(0, 3)).toBe(0)
     expect(semanaDaReadaptacao(3, 3)).toBe(1)
     expect(semanaDaReadaptacao(12, 6)).toBe(2) // C9: readaptação na divisão escolhida (6 dias)
-    await db.perfil.put({ ...perfil, nivel: 'iniciante', diasSemana: 3 })
+    await db.perfil.put({ ...perfil, nivel: 'iniciante', diasSemana: 3, treinos: 3 })
     await garantirPlano()
     let plano = (await db.plano.get('atual'))!
     expect(plano.fase).toBe('readaptacao')
@@ -119,12 +120,12 @@ describe('plano ativo', () => {
   })
 
   it('C6: antes do primeiro treino, a fase acompanha o nível do perfil', async () => {
-    await db.perfil.put({ ...perfil, nivel: 'iniciante', diasSemana: 5 })
+    await db.perfil.put({ ...perfil, nivel: 'iniciante', diasSemana: 5, treinos: 5 })
     await garantirPlano()
     expect((await db.plano.get('atual'))!.fase).toBe('readaptacao')
     expect(await db.diasPlano.count()).toBe(5)
     // na revisão do plano, a pessoa muda para intermediário
-    await db.perfil.put({ ...perfil, nivel: 'intermediario', diasSemana: 5 })
+    await db.perfil.put({ ...perfil, nivel: 'intermediario', diasSemana: 5, treinos: 5 })
     await garantirPlano()
     const plano = (await db.plano.get('atual'))!
     expect(plano.fase).toBe('normal')
@@ -141,7 +142,7 @@ describe('plano ativo', () => {
       estado: { itens: [], atualUid: null, aquecimentoGeral: 'feito', timer: null },
       substituicoes: [],
     })
-    await db.perfil.put({ ...perfil, nivel: 'iniciante', diasSemana: 5 })
+    await db.perfil.put({ ...perfil, nivel: 'iniciante', diasSemana: 5, treinos: 5 })
     await garantirPlano()
     expect((await db.plano.get('atual'))!.fase).toBe('normal')
   })

@@ -63,6 +63,15 @@ test('C7: IMC antes do objetivo, em vermelho, com a classificação e o objetivo
   await page.getByRole('button', { name: /^Superiores/ }).click()
   await page.getByRole('button', { name: /^Inferiores/ }).click()
   await expect(page.getByText(/se anulam: o treino fica equilibrado/)).toBeVisible()
+  // C10: número de treinos aparece logo depois dos dias, com sugestão
+  await page.getByRole('radiogroup', { name: 'Dias por semana' }).getByRole('radio', { name: '5', exact: true }).click()
+  const treinos = page.getByRole('radiogroup', { name: 'Quantos treinos diferentes?' })
+  await expect(treinos.getByRole('radio')).toHaveCount(4) // 2 a 5
+  await expect(treinos.getByRole('radio', { name: /^3 treinos/ })).toHaveAttribute('aria-checked', 'true')
+  await expect(treinos.getByRole('radio', { name: /^3 treinos/ })).toContainText('Recomendado')
+  await expect(page.getByText(/A, B, C, A, B…/)).toBeVisible()
+  await treinos.getByRole('radio', { name: /^2 treinos/ }).click()
+  await expect(page.getByText(/A, B, A, B, A…/)).toBeVisible()
   // duração na barra deslizante
   const barra = page.getByRole('slider', { name: /Duração de cada treino/ })
   await expect(barra).toHaveAttribute('min', '30')
@@ -77,9 +86,12 @@ test('C5: depois do onboarding mostra o plano para aprovar, trocar exercício ou
   await expect(page.getByText('Primeiro: 3 semanas de readaptação')).toBeVisible()
   await expect(page.getByText(/os primeiros 15 treinos são mais leves/)).toBeVisible()
   await expect(page.getByText('Foco em superiores (readaptação)', { exact: true })).toBeVisible()
-  for (const nome of ['Treino A · Ombros e tríceps', 'Treino B · Peito, costas e bíceps', 'Treino C · Pernas', 'Treino D · Ombros e tríceps', 'Treino E · Peito, costas e bíceps']) {
+  // C10: 5 dias com a sugestão de 3 treinos → A, B, C revezando
+  for (const nome of ['Treino A · Ombros e tríceps', 'Treino B · Peito, costas e bíceps', 'Treino C · Pernas']) {
     await expect(page.getByText(nome, { exact: true })).toBeVisible()
   }
+  await expect(page.getByText(/^Treino [D-F] · /)).toHaveCount(0)
+  await expect(page.getByText(/Ordem dos treinos: A → B → C\./)).toBeVisible()
   await expect(page.getByText(/Full body/)).toHaveCount(0)
   await expect(page.getByRole('heading', { name: /Abdômen|Glúteos|Panturrilha/ })).toHaveCount(0)
 

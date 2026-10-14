@@ -22,6 +22,7 @@ describe('atualização do banco (v1 → v2)', () => {
     expect(p.enfases).toEqual(['gluteos'])
     expect(p.duracaoMin).toBe(90)
     expect(p.diasSemana).toBe(4)
+    expect(p.treinos).toBe(4) // v3 (C10): sugestão para 4 dias
     expect('objetivo' in p).toBe(false)
     expect('enfase' in p).toBe(false)
     expect(await banco.registrosCorpo.get('2026-01-01')).toEqual({ data: '2026-01-01', pesoKg: 70 })

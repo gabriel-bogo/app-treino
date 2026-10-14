@@ -23,8 +23,9 @@ test('iniciante começa na readaptação com full body', async ({ page }) => {
   await page.goto('/#/plano')
   await expect(page.getByText(/Fase de readaptação: treino 1 de 15/)).toBeVisible()
   // C9: readaptação na divisão escolhida (5 dias), só mais leve
-  await expect(page.getByText(/^Treino [A-E] · /)).toHaveCount(5)
-  await expect(page.getByText(/Ordem dos treinos: A → B → C → D → E/)).toBeVisible()
+  // C10: 5 dias com a sugestão de 3 treinos
+  await expect(page.getByText(/^Treino [A-C] · /)).toHaveCount(3)
+  await expect(page.getByText(/Ordem dos treinos: A → B → C\./)).toBeVisible()
   await expect(page.getByText(/os mesmos treinos passam para 3 a 4 séries de 8 a 12/)).toBeVisible()
 })
 

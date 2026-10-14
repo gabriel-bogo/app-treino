@@ -44,7 +44,7 @@ import {
 } from './regras'
 
 export interface ContextoMotor {
-  perfil: Pick<Perfil, 'sexo' | 'nivel' | 'objetivos' | 'enfases' | 'diasSemana' | 'duracaoMin' | 'limitacoes'>
+  perfil: Pick<Perfil, 'sexo' | 'nivel' | 'objetivos' | 'enfases' | 'diasSemana' | 'treinos' | 'duracaoMin' | 'limitacoes'>
   fase: Fase
   /** 0, 1 ou 2 (semana atual da readaptação) */
   semanaReadaptacao: number
@@ -299,7 +299,13 @@ function preencherVolume(dias: DiaTrabalho[], alvos: Record<Grupo, number>, sel:
     if (deficit < 2) continue
     const total = Math.round(deficit)
     const k = Math.max(1, Math.min(diasG.length, Math.floor(total / 2)))
-    const escolhidos = espalhar(diasG, k)
+    // com menos dias do que treinos possíveis, o grupo vai para os treinos mais vazios
+    // (C10: com treinos revezando, um treino não pode ficar sem nada)
+    const carga = (d: DiaTrabalho) => d.itens.reduce((n, i) => n + i.series, 0)
+    const menosCheios = k < diasG.length && diasG.some((d) => carga(d) !== carga(diasG[0]))
+    const escolhidos = menosCheios
+      ? [...diasG].sort((a, b) => carga(a) - carga(b) || diasG.indexOf(a) - diasG.indexOf(b)).slice(0, k).sort((a, b) => diasG.indexOf(a) - diasG.indexOf(b))
+      : espalhar(diasG, k)
     const porDia = dividir(total, k)
     let faltou = false
     escolhidos.forEach((dia, i) => {
@@ -336,7 +342,7 @@ function cortarAteCaber(ctx: ContextoMotor, dias: DiaTrabalho[], alvos: Record<G
         const cortaveis = trabalho.filter((i) => {
           const perde = i.series > 2 ? dia.ocorrencias : i.series * dia.ocorrencias
           if (i.series <= 2 && trabalho.length <= 1) return false
-          return vol[i.ex.grupo] - perde >= piso(etapa, i.ex.grupo)
+          return vol[i.ex.grupo] - perde >= piso(etapa, i.ex.grupo) - 1e-9 // frequência fracionada (C10)
         })
         if (!cortaveis.length) break
         // Ordem de corte: menos importante primeiro (core < isolado < composto; sem ênfase antes);
@@ -392,6 +398,13 @@ function completarComSobra(ctx: ContextoMotor, dias: DiaTrabalho[], alvos: Recor
         break
       }
       diaLivre.itens.push({ ex, series: 2, papel: 'trabalho' })
+      // o 1º exercício de empurrar com limitação de ombro traz o aquecimento específico junto
+      if (minutos(ctx, diaLivre) > ctx.perfil.duracaoMin) {
+        diaLivre.itens.pop()
+        sel.devolver(ex)
+        fechados.add(diaLivre)
+        break
+      }
     }
   }
 }
@@ -454,7 +467,9 @@ function ordenar(enfases: Perfil['enfases'], itens: Item[]): Item[] {
 
 export function gerarPlano(ctx: ContextoMotor): PlanoGerado {
   const { perfil, fase } = ctx
-  const divisao = definirDivisao({ diasSemana: perfil.diasSemana, nivel: perfil.nivel, enfases: perfil.enfases, fase })
+  // C10: a divisão tem `treinos` treinos diferentes, que se revezam nos dias da semana
+  const divisao = definirDivisao({ diasSemana: perfil.treinos, nivel: perfil.nivel, enfases: perfil.enfases, fase })
+  const vezesPorSemana = perfil.diasSemana / divisao.sequencia.length
   const avisos: string[] = []
 
   // um "dia de trabalho" por variante; variantes repetidas (A/B/A/B) são o mesmo treino
@@ -464,6 +479,7 @@ export function gerarPlano(ctx: ContextoMotor): PlanoGerado {
     if (existente) existente.ocorrencias++
     else porVariante.set(m.variante, { ...m, ocorrencias: 1, temCore: diaTemCore(idx, perfil.enfases), itens: [] })
   })
+  for (const d of porVariante.values()) d.ocorrencias *= vezesPorSemana
   const dias = [...porVariante.values()]
   const sel = new Seletor(ctx)
   const { alvos, semEnfase } = calcularAlvos(ctx)

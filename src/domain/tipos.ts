@@ -29,6 +29,8 @@ export interface Perfil {
   /** vazio = equilibrado (C2) */
   enfases: Enfase[]
   diasSemana: DiasSemana
+  /** C10: quantos treinos diferentes (A, B, C…), de 2 até os dias por semana; eles se revezam nos dias */
+  treinos: DiasSemana
   duracaoMin: DuracaoMin
   /** vazio = "nenhuma" (§6.7: padrão no onboarding) */
   limitacoes: Limitacao[]

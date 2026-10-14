@@ -18,6 +18,7 @@ export function Opcoes<T extends string | number>({
   opcoes,
   aoMudar,
   colunas = 2,
+  recomendado,
 }: {
   rotulo: string
   ajuda?: ReactNode
@@ -25,6 +26,8 @@ export function Opcoes<T extends string | number>({
   opcoes: { valor: T; rotulo: string; descricao?: string }[]
   aoMudar: (v: T) => void
   colunas?: 2 | 3 | 5
+  /** opção em negrito com a etiqueta "recomendado" */
+  recomendado?: T
 }) {
   const grade = { 2: 'grid-cols-2', 3: 'grid-cols-3', 5: 'grid-cols-5' }[colunas]
   return (
@@ -48,8 +51,9 @@ export function Opcoes<T extends string | number>({
                   : 'border-slate-300 bg-white dark:border-slate-700 dark:bg-slate-900'
               }`}
             >
-              <span className="block font-medium">{o.rotulo}</span>
+              <span className={`block ${o.valor === recomendado ? 'font-extrabold' : 'font-medium'}`}>{o.rotulo}</span>
               {o.descricao && <span className="block text-xs text-slate-500 dark:text-slate-400">{o.descricao}</span>}
+              {o.valor === recomendado && <span className="mt-1 block text-xs font-bold uppercase tracking-wide text-emerald-700 dark:text-emerald-400">Recomendado</span>}
             </button>
           )
         })}

@@ -28,6 +28,21 @@ export const OPCOES_ENFASE: { valor: Enfase; rotulo: string; descricao: string }
 
 export const OPCOES_DIAS: { valor: DiasSemana; rotulo: string }[] = [2, 3, 4, 5, 6].map((d) => ({ valor: d as DiasSemana, rotulo: String(d) }))
 
+/** C10: opções de número de treinos (A, B, C…): de 2 até os dias por semana. */
+export function opcoesTreinos(dias: DiasSemana | undefined): { valor: DiasSemana; rotulo: string }[] {
+  return ([2, 3, 4, 5, 6] as DiasSemana[]).filter((n) => n <= (dias ?? 6)).map((n) => ({ valor: n, rotulo: letrasTreinos(n) }))
+}
+
+/** 3 → "A, B, C" */
+export function letrasTreinos(n: number): string {
+  return Array.from({ length: n }, (_, i) => String.fromCharCode(65 + i)).join(', ')
+}
+
+/** C10: sugestão de treinos para os dias (ex: 5 dias → 3 treinos, A B C A B). */
+export function treinosRecomendados(dias: DiasSemana): DiasSemana {
+  return ({ 2: 2, 3: 3, 4: 4, 5: 3, 6: 3 } as const)[dias]
+}
+
 /** C3: barra deslizante de 30 a 120 min, de 5 em 5. */
 export const DURACAO = { min: 30, max: 120, passo: 5, padrao: 60 } as const
 
@@ -79,7 +94,7 @@ export const OPCOES_N: { valor: NConfirmacoes; rotulo: string; descricao: string
 /** Campos preenchidos no formulário (rascunho). */
 export type RascunhoPerfil = Partial<Omit<Perfil, 'id' | 'avisoSaudeAceitoEm' | 'criadoEm' | 'atualizadoEm'>>
 
-export type ErrosPerfil = Partial<Record<'nome' | 'sexo' | 'nascimento' | 'alturaCm' | 'pesoInicialKg' | 'nivel' | 'objetivos' | 'diasSemana' | 'duracaoMin', string>>
+export type ErrosPerfil = Partial<Record<'nome' | 'sexo' | 'nascimento' | 'alturaCm' | 'pesoInicialKg' | 'nivel' | 'objetivos' | 'diasSemana' | 'treinos' | 'duracaoMin', string>>
 
 export function validarDadosPessoais(r: RascunhoPerfil, hoje: string): ErrosPerfil {
   const e: ErrosPerfil = {}
@@ -101,6 +116,7 @@ export function validarTreino(r: RascunhoPerfil): ErrosPerfil {
   if (!r.nivel) e.nivel = 'Escolha seu nível.'
   if (!r.objetivos?.length) e.objetivos = 'Escolha pelo menos um objetivo.'
   if (!r.diasSemana) e.diasSemana = 'Escolha quantos dias.'
+  else if (!r.treinos || r.treinos > r.diasSemana) e.treinos = 'Escolha quantos treinos.'
   if (!r.duracaoMin || r.duracaoMin < DURACAO.min || r.duracaoMin > DURACAO.max) e.duracaoMin = 'Escolha a duração.'
   return e
 }
@@ -113,7 +129,7 @@ const ENFASES: readonly Enfase[] = ['inferior', 'superior', 'gluteos']
  * únicos, duração 30/45/60/75/90) para o formato atual. Usado na atualização
  * do banco e ao importar backup antigo. Perfil já no formato atual passa igual.
  */
-export function normalizarPerfil<T extends object>(bruto: T): T & Pick<Perfil, 'objetivos' | 'enfases' | 'duracaoMin'> {
+export function normalizarPerfil<T extends object>(bruto: T): T & Pick<Perfil, 'objetivos' | 'enfases' | 'duracaoMin' | 'treinos'> {
   const p = bruto as Record<string, unknown>
   const { objetivo, enfase, ...resto } = p
   const objetivos = (Array.isArray(p.objetivos) ? p.objetivos : [objetivo]).filter((o): o is Objetivo => OBJETIVOS.includes(o as Objetivo))
@@ -123,7 +139,15 @@ export function normalizarPerfil<T extends object>(bruto: T): T & Pick<Perfil, '
     objetivos: objetivos.length ? [...new Set(objetivos)] : ['saude'],
     enfases: [...new Set(enfases)],
     duracaoMin: ajustarDuracao(p.duracaoMin),
+    treinos: ajustarTreinos(p.treinos, p.diasSemana),
   }
+}
+
+/** C10: número de treinos válido para os dias (perfil antigo sem o campo: a sugestão para os dias). */
+export function ajustarTreinos(treinos: unknown, dias: unknown): DiasSemana {
+  const d = ([2, 3, 4, 5, 6] as number[]).includes(dias as number) ? (dias as DiasSemana) : 6
+  if (typeof treinos !== 'number' || !Number.isInteger(treinos)) return treinosRecomendados(d)
+  return Math.min(d, Math.max(2, treinos)) as DiasSemana
 }
 
 /** Converte texto digitado ("72,5") em número; vazio ou inválido → undefined. */

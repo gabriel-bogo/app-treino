@@ -16,6 +16,7 @@ const perfil: Perfil = {
   objetivos: ['saude'],
   enfases: [],
   diasSemana: 3,
+  treinos: 3,
   duracaoMin: 60,
   limitacoes: [],
   nConfirmacoes: 2,
@@ -171,6 +172,7 @@ describe('lembrete de backup (§8: mais de 14 dias)', () => {
     expect(p.duracaoMin).toBe(75)
     expect('objetivo' in p).toBe(false)
     expect('enfase' in p).toBe(false)
-    expect(VERSAO_SCHEMA).toBe(2)
+    expect(VERSAO_SCHEMA).toBe(3)
+    expect(p.treinos).toBe(3)
   })
 })

@@ -7,7 +7,7 @@ import type { ItemTreino, Perfil, SerieTreino, Sessao } from '../domain/tipos'
 // Dados fictícios.
 const perfil: Perfil = {
   id: 'perfil', nome: 'Pessoa Teste', sexo: 'feminino', nascimento: '1990-01-01', alturaCm: 165, pesoInicialKg: 60,
-  nivel: 'intermediario', objetivos: ['hipertrofia'], enfases: [], diasSemana: 4, duracaoMin: 60, limitacoes: [],
+  nivel: 'intermediario', objetivos: ['hipertrofia'], enfases: [], diasSemana: 4, treinos: 4, duracaoMin: 60, limitacoes: [],
   nConfirmacoes: 1, avisoSaudeAceitoEm: 'x', criadoEm: 'x', atualizadoEm: 'x',
 }
 

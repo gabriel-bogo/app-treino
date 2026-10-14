@@ -32,7 +32,7 @@ import { normalizarPerfil } from '../domain/perfil'
 // Versionamento: cada mudança de estrutura cria um novo db.version(n) abaixo.
 // VERSAO_SCHEMA vai junto no arquivo de backup.
 
-export const VERSAO_SCHEMA = 2
+export const VERSAO_SCHEMA = 3
 export const NOME_BANCO = 'app-treino'
 
 export class BancoTreino extends Dexie {
@@ -78,6 +78,17 @@ export class BancoTreino extends Dexie {
             delete p.objetivo
             delete p.enfase
             Object.assign(p, novo)
+          }),
+      )
+    // v3: número de treinos (A, B, C…) separado dos dias por semana (C10)
+    this.version(3)
+      .stores({})
+      .upgrade((tx) =>
+        tx
+          .table('perfil')
+          .toCollection()
+          .modify((p) => {
+            Object.assign(p, normalizarPerfil(p))
           }),
       )
   }

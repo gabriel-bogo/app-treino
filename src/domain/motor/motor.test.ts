@@ -11,8 +11,10 @@ import type { AjusteExercicio, DiasSemana, DuracaoMin, Enfase, Exercicio, Limita
 const PROIBIDOS_OMBRO = ['desenvolvimento-nuca', 'puxada-nuca', 'remada-alta', 'mergulho-paralela', 'mergulho-banco', 'mergulho-maquina']
 
 function contexto(perfil: Partial<ContextoMotor['perfil']> = {}, extra: Partial<ContextoMotor> = {}): ContextoMotor {
+  const diasSemana = perfil.diasSemana ?? 4
   return {
-    perfil: { sexo: 'masculino', nivel: 'intermediario', objetivos: ['hipertrofia'], enfases: [], diasSemana: 4, duracaoMin: 60, limitacoes: [], ...perfil },
+    // sem `treinos`: um treino diferente por dia (como antes do C10)
+    perfil: { sexo: 'masculino', nivel: 'intermediario', objetivos: ['hipertrofia'], enfases: [], diasSemana, treinos: diasSemana, duracaoMin: 60, limitacoes: [], ...perfil },
     fase: 'normal',
     semanaReadaptacao: 0,
     nivelVolume: {},
@@ -29,7 +31,7 @@ function problemas(ctx: ContextoMotor, plano: PlanoGerado): string[] {
   const p: string[] = []
   const { perfil, fase } = ctx
   // C9: a readaptação usa a mesma divisão (mesmo número de dias)
-  if (plano.dias.length !== perfil.diasSemana) p.push(`dias: ${plano.dias.length} ≠ ${perfil.diasSemana}`)
+  if (plano.dias.length !== perfil.treinos) p.push(`treinos: ${plano.dias.length} ≠ ${perfil.treinos}`)
   // C8: foco em superiores: nada de glúteo isolado, panturrilha ou abdômen; pernas só no dia de pernas, ~3 exercícios
   if (focoSuperior(perfil.enfases)) {
     for (const dia of plano.dias) {
@@ -114,10 +116,12 @@ describe('motor: todas as combinações (§11)', () => {
               for (const limitacoes of LIMITACOES)
                 for (const [fase, semana] of [['normal', 0], ['readaptacao', 0], ['readaptacao', 2]] as const) {
                   const objetivos = OBJETIVOS[total % OBJETIVOS.length]
-                  const ctx = contexto({ diasSemana, duracaoMin, nivel, enfases, objetivos, sexo, limitacoes }, { fase, semanaReadaptacao: semana })
+                  // C10: de 2 treinos até um por dia (varia junto, sem multiplicar o teste)
+                  const treinos = (2 + (total % (diasSemana - 1))) as DiasSemana
+                  const ctx = contexto({ diasSemana, treinos, duracaoMin, nivel, enfases, objetivos, sexo, limitacoes }, { fase, semanaReadaptacao: semana })
                   const plano = gerarPlano(ctx)
                   total++
-                  const rotulo = `${diasSemana}d ${duracaoMin}min ${nivel} ${enfases.join('+') || 'equilibrado'} ${objetivos.join('+')} ${sexo} ${limitacoes.join('+') || 'sem lim'} ${fase}${semana}`
+                  const rotulo = `${diasSemana}d ${treinos}t ${duracaoMin}min ${nivel} ${enfases.join('+') || 'equilibrado'} ${objetivos.join('+')} ${sexo} ${limitacoes.join('+') || 'sem lim'} ${fase}${semana}`
                   for (const pr of problemas(ctx, plano)) falhas.push(`[${rotulo}] ${pr}`)
                 }
     expect(total).toBe(5 * 19 * 3 * 8 * 2 * 3 * 3)
@@ -174,6 +178,13 @@ describe('divisão (§6.2)', () => {
         expect(read.divisao).toBe(`${normal.divisao} (readaptação)`)
       }
     }
+  })
+  it('C10: 5 dias com 3 treinos → A, B, C revezando; volume conta a frequência real', () => {
+    const p = gerarPlano(contexto({ diasSemana: 5, treinos: 3, duracaoMin: 90, enfases: ['superior'] }))
+    expect(nomes(p)).toEqual(['Treino A · Ombros e tríceps', 'Treino B · Peito, costas e bíceps', 'Treino C · Pernas'])
+    // cada treino cai 5/3 vezes por semana: o volume semanal chega ao alvo
+    for (const g of ['peito', 'costas', 'ombros'] as const) expect(p.volume[g]).toBeGreaterThanOrEqual(p.alvos[g])
+    expect(nomes(gerarPlano(contexto({ diasSemana: 4, treinos: 2 })))).toEqual(['Treino A · Full body', 'Treino B · Full body'])
   })
   it('C8: só "Superiores" marcado vira ficha com foco em superiores', () => {
     const d = (diasSemana: DiasSemana) => nomes(gerarPlano(contexto({ diasSemana, enfases: ['superior'] })))

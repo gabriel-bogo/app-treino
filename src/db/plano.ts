@@ -38,6 +38,7 @@ function assinatura(ctx: ContextoMotor): string {
     [...p.objetivos].sort(),
     [...p.enfases].sort(),
     p.diasSemana,
+    p.treinos,
     p.duracaoMin,
     [...p.limitacoes].sort(),
     ctx.fase,
