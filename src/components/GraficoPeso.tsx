@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { formatarDataCurta, diasEntre, paraDate } from '../domain/datas'
+import { formatarDataCurta, diasEntre, paraDate, FUSO } from '../domain/datas'
 
 // Gráfico de peso (§10): pontos do peso diário (secundários) + linha da média
 // móvel de 7 dias (destaque). Um eixo só, grade discreta, rótulo só no fim da
@@ -160,7 +160,7 @@ export function GraficoPeso({ pontos }: { pontos: PontoPeso[] }) {
             className="pointer-events-none absolute top-0 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm shadow-lg dark:border-slate-700 dark:bg-slate-800"
             style={{ left: Math.min(Math.max(xFoco - 70, 0), largura - 140), width: 140 }}
           >
-            <div className="text-xs text-slate-500 dark:text-slate-400">{paraDate(pf.data).toLocaleDateString('pt-BR')}</div>
+            <div className="text-xs text-slate-500 dark:text-slate-400">{paraDate(pf.data).toLocaleDateString('pt-BR', { timeZone: FUSO })}</div>
             <div className="flex items-center gap-1.5">
               <svg width="12" height="6">
                 <line x1="1" y1="3" x2="11" y2="3" stroke={cores.media} strokeWidth="2" strokeLinecap="round" />

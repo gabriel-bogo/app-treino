@@ -3,7 +3,7 @@ import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '../db/banco'
 import { navegar } from '../app/rotas'
 import { exercicioPorId, NOME_GRUPO } from '../domain/biblioteca'
-import { formatarData, formatarDuracao } from '../domain/datas'
+import { formatarData, formatarDuracaoTreino, formatarHora } from '../domain/datas'
 import { descreverCarga } from '../domain/progressao/carga'
 import { Cartao, Etiqueta, ItemLista, Lista, Tela, Texto } from '../components/ui'
 
@@ -56,7 +56,7 @@ export function Historico() {
                       {s.estado.itens.some((i) => i.dor) && <Etiqueta cor="aviso">Dor</Etiqueta>}
                     </span>
                   }
-                  subtitulo={`${formatarData(s.inicio)} · ${formatarDuracao(s.duracaoSeg ?? 0)} · ${feitas} séries`}
+                  subtitulo={`${formatarData(s.inicio)} às ${formatarHora(s.inicio)} · ${formatarDuracaoTreino(s.duracaoSeg ?? 0)} · ${feitas} séries`}
                 />
               )
             })}

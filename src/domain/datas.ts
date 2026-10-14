@@ -1,5 +1,10 @@
-// Utilitários de data sem dependências. Datas "de calendário" usam o fuso do
-// aparelho e o formato AAAA-MM-DD.
+// Utilitários de data sem dependências. C16: o app trabalha sempre no horário
+// de Brasília (GMT-3, America/Sao_Paulo), não no fuso do aparelho. Datas "de
+// calendário" usam o formato AAAA-MM-DD.
+
+export const FUSO = 'America/Sao_Paulo'
+const formatoData = new Intl.DateTimeFormat('en-CA', { timeZone: FUSO, year: 'numeric', month: '2-digit', day: '2-digit' })
+const formatoHora = new Intl.DateTimeFormat('pt-BR', { timeZone: FUSO, hour: '2-digit', minute: '2-digit', hour12: false })
 
 const DIA_MS = 24 * 60 * 60 * 1000
 
@@ -7,16 +12,21 @@ function doisDigitos(n: number) {
   return String(n).padStart(2, '0')
 }
 
-/** Data local AAAA-MM-DD de um instante. */
+/** Data AAAA-MM-DD de um instante, no horário de Brasília. */
 export function dataLocal(instante: Date | string = new Date()): string {
   const d = typeof instante === 'string' ? new Date(instante) : instante
-  return `${d.getFullYear()}-${doisDigitos(d.getMonth() + 1)}-${doisDigitos(d.getDate())}`
+  return formatoData.format(d)
 }
 
-/** Converte AAAA-MM-DD em um Date ao meio-dia local (evita erros de fuso/horário de verão). */
+/** "21:30" de um instante, no horário de Brasília. */
+export function formatarHora(instante: Date | string): string {
+  return formatoHora.format(typeof instante === 'string' ? new Date(instante) : instante)
+}
+
+/** Converte AAAA-MM-DD em um Date ao meio-dia de Brasília (15:00 UTC). */
 export function paraDate(data: string): Date {
   const [a, m, d] = data.split('-').map(Number)
-  return new Date(a, m - 1, d, 12, 0, 0)
+  return new Date(Date.UTC(a, m - 1, d, 15, 0, 0))
 }
 
 /** Diferença em dias de calendário entre duas datas (b - a). */
@@ -28,7 +38,7 @@ export function diasEntre(a: string | Date, b: string | Date): number {
 
 export function somarDias(data: string, dias: number): string {
   const d = paraDate(data)
-  d.setDate(d.getDate() + dias)
+  d.setUTCDate(d.getUTCDate() + dias)
   return dataLocal(d)
 }
 
@@ -45,14 +55,22 @@ const MESES = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'o
 
 /** "13 out 2026" */
 export function formatarData(data: string): string {
-  const [a, m, d] = data.slice(0, 10).split('-').map(Number)
+  // data com horário (ISO): converte para o dia em Brasília antes
+  const [a, m, d] = (data.length > 10 ? dataLocal(data) : data).split('-').map(Number)
   return `${d} ${MESES[m - 1]} ${a}`
 }
 
 /** "13/10" */
 export function formatarDataCurta(data: string): string {
-  const [, m, d] = data.slice(0, 10).split('-')
+  const [, m, d] = (data.length > 10 ? dataLocal(data) : data).split('-')
   return `${d}/${m}`
+}
+
+/** Duração de treino por extenso: 125 → "2 min"; 3900 → "1 h 05 min" */
+export function formatarDuracaoTreino(segundos: number): string {
+  const min = Math.max(0, Math.round(segundos / 60))
+  const h = Math.floor(min / 60)
+  return h ? `${h} h ${doisDigitos(min % 60)} min` : `${min} min`
 }
 
 /** 75 → "1:15" ; 3725 → "1:02:05" */

@@ -1,7 +1,7 @@
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '../db/banco'
 import { exercicioPorId } from '../domain/biblioteca'
-import { formatarData, formatarDuracao } from '../domain/datas'
+import { formatarData, formatarDuracao, formatarDuracaoTreino, formatarHora } from '../domain/datas'
 import { formatarKg } from '../domain/progressao/carga'
 import type { MotivoTroca, SerieTreino } from '../domain/tipos'
 import { Cartao, Etiqueta, Tela, Texto } from '../components/ui'
@@ -28,7 +28,7 @@ export function HistoricoSessao({ id }: { id: string }) {
   return (
     <Tela titulo={s.nomeDia} voltarPara="/historico">
       <Texto fraco>
-        {formatarData(s.inicio)} · {formatarDuracao(s.duracaoSeg ?? 0)}
+        {formatarData(s.inicio)} às {formatarHora(s.inicio)} · duração {formatarDuracaoTreino(s.duracaoSeg ?? 0)}
         {s.fase === 'readaptacao' && ' · readaptação'}
       </Texto>
       {s.ajustePausa && (

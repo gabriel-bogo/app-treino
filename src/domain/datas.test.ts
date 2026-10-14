@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { dataLocal, diasEntre, formatarDuracao, idadeEm, somarDias, mascaraData, dataDigitadaParaIso, isoParaDataDigitada } from './datas'
+import { dataLocal, diasEntre, formatarDuracao, idadeEm, somarDias, mascaraData, dataDigitadaParaIso, isoParaDataDigitada, formatarData, formatarHora, formatarDuracaoTreino } from './datas'
 
 describe('datas', () => {
   it('diasEntre conta dias de calendário', () => {
@@ -36,5 +36,20 @@ describe('data digitada DD/MM/AAAA', () => {
     expect(dataDigitadaParaIso('31/02/2000')).toBeNull()
     expect(dataDigitadaParaIso('08/07/19')).toBeNull()
     expect(isoParaDataDigitada('1987-07-08')).toBe('08/07/1987')
+  })
+})
+
+describe('C16: horário de Brasília (GMT-3), qualquer que seja o fuso do aparelho', () => {
+  it('treino às 21:30 em Brasília (00:30 UTC do dia seguinte) é do mesmo dia', () => {
+    const instante = '2026-10-14T00:30:00.000Z'
+    expect(dataLocal(instante)).toBe('2026-10-13')
+    expect(formatarData(instante)).toBe('13 out 2026')
+    expect(formatarHora(instante)).toBe('21:30')
+  })
+  it('dias de calendário e duração por extenso', () => {
+    expect(somarDias('2026-10-13', 1)).toBe('2026-10-14')
+    expect(diasEntre('2026-10-13', '2026-10-20')).toBe(7)
+    expect(formatarDuracaoTreino(125)).toBe('2 min')
+    expect(formatarDuracaoTreino(3900)).toBe('1 h 05 min')
   })
 })
