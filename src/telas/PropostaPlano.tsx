@@ -11,7 +11,7 @@ import { CartaoTreino, textoSequencia, treinosUnicos, type TreinoVisivel } from 
 import { TrocaNoPlano } from '../components/TrocaNoPlano'
 import { useMusculosNoPlano } from '../components/MusculosNoPlano'
 import { useIncluirNoPlano } from '../components/IncluirNoPlano'
-import { removerDoPlano } from '../db/plano'
+import { desfazerExclusao, excluirDoPlano, removerDoPlano } from '../db/plano'
 import { letraDoTreino } from '../components/PlanoAgrupado'
 
 // C5: depois do onboarding, o app apresenta o programa de treino montado
@@ -27,6 +27,7 @@ export function PropostaPlano() {
   const [troca, setTroca] = useState<{ exercicioId: string; ids: string[] } | null>(null)
   const musculos = useMusculosNoPlano(dados?.dias, dados?.exercicios)
   const incluir = useIncluirNoPlano()
+  const configPlano = useLiveQuery(() => db.configuracoes.get('app'))
 
   if (!dados?.plano || !perfil || !dados.dias.length) {
     return (
@@ -108,6 +109,9 @@ export function PropostaPlano() {
           aoMudarMusculos={() => musculos.abrir(t.variante)}
           aoIncluir={(grupo, ids) => incluir.abrir({ variante: t.variante, treino: `Treino ${letraDoTreino(t.nome)}`, grupo, ids, minutos: t.minutosEstimados })}
           aoRemover={(id) => void removerDoPlano(t.variante, id)}
+          aoExcluir={(id) => void excluirDoPlano(t.variante, id)}
+          excluidos={(configPlano?.excluidosNoPlano ?? []).filter((x) => x.variante === t.variante).map((x) => x.exercicioId)}
+          aoDesfazerExclusao={(id) => void desfazerExclusao(t.variante, id)}
         />
       ))}
 

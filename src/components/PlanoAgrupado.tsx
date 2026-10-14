@@ -62,6 +62,9 @@ export function CartaoTreino({
   aoMudarMusculos,
   aoIncluir,
   aoRemover,
+  aoExcluir,
+  excluidos = [],
+  aoDesfazerExclusao,
 }: {
   treino: TreinoVisivel
   proximo?: boolean
@@ -73,6 +76,11 @@ export function CartaoTreino({
   aoIncluir?: (grupo: Grupo, idsDoTreino: string[]) => void
   /** C14: tirar um exercício que a pessoa incluiu */
   aoRemover?: (exercicioId: string) => void
+  /** C15: excluir um exercício do treino (nada no lugar) */
+  aoExcluir?: (exercicioId: string) => void
+  /** C15: ids excluídos deste treino, com "Desfazer" */
+  excluidos?: string[]
+  aoDesfazerExclusao?: (exercicioId: string) => void
 }) {
   const ids = treino.exercicios.map((e) => e.exercicioId)
   return (
@@ -117,9 +125,21 @@ export function CartaoTreino({
                     ) : (
                       aoTrocar &&
                       e.papel === 'trabalho' && (
-                        <Botao variante="secundario" className="min-h-10 px-3 text-sm" onClick={() => aoTrocar(ex.id, ids)} aria-label={`Trocar ${ex.nome}`}>
-                          Trocar
-                        </Botao>
+                        <span className="flex items-center gap-1">
+                          <Botao variante="secundario" className="min-h-10 px-3 text-sm" onClick={() => aoTrocar(ex.id, ids)} aria-label={`Trocar ${ex.nome}`}>
+                            Trocar
+                          </Botao>
+                          {aoExcluir && (
+                            <button
+                              type="button"
+                              onClick={() => aoExcluir(ex.id)}
+                              aria-label={`Excluir ${ex.nome}`}
+                              className="flex h-10 w-10 items-center justify-center rounded-xl text-lg text-slate-500 active:bg-slate-100 dark:text-slate-400 dark:active:bg-slate-800"
+                            >
+                              ✕
+                            </button>
+                          )}
+                        </span>
                       )
                     )}
                   </li>
@@ -138,6 +158,23 @@ export function CartaoTreino({
             )}
           </section>
         ))}
+        {excluidos.length > 0 && (
+          <div className="rounded-xl bg-slate-50 p-3 text-sm dark:bg-slate-800/60" data-testid="excluidos">
+            <p className="font-semibold">Excluídos deste treino</p>
+            <ul>
+              {excluidos.map((id) => (
+                <li key={id} className="flex items-center justify-between gap-2">
+                  <span>{exercicioPorId(id)?.nome ?? id}</span>
+                  {aoDesfazerExclusao && (
+                    <button type="button" className="min-h-10 font-semibold text-emerald-700 dark:text-emerald-400" onClick={() => aoDesfazerExclusao(id)} aria-label={`Desfazer exclusão de ${exercicioPorId(id)?.nome ?? id}`}>
+                      Desfazer
+                    </button>
+                  )}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
       </div>
     </Cartao>
   )

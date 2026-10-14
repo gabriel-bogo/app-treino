@@ -48,6 +48,7 @@ function assinatura(ctx: ContextoMotor): string {
     marcados,
     ctx.trocasNoPlano,
     ctx.incluidos ?? [],
+    ctx.excluidos ?? [],
   ])
 }
 
@@ -136,6 +137,7 @@ export async function garantirPlano(agora: Date = new Date()): Promise<void> {
         ajustes: mapaAjustes(await db.ajustesExercicio.toArray()),
         trocasNoPlano: config.trocasNoPlano,
         incluidos: config.incluidosNoPlano ?? [],
+        excluidos: config.excluidosNoPlano ?? [],
       }
       const novaAssinatura = assinatura(ctx)
       const temDias = (await db.diasPlano.count()) > 0
@@ -192,5 +194,21 @@ export async function removerDoPlano(variante: string, exercicioId: string) {
   const config = await obterConfiguracoes()
   const lista = (config.incluidosNoPlano ?? []).filter((i) => !(i.variante === variante && i.exercicioId === exercicioId))
   await db.configuracoes.put({ ...config, incluidosNoPlano: lista })
+  await garantirPlano()
+}
+
+/** C15: exclui um exercício de um treino (o app não coloca outro no lugar). */
+export async function excluirDoPlano(variante: string, exercicioId: string) {
+  const config = await obterConfiguracoes()
+  const lista = (config.excluidosNoPlano ?? []).filter((i) => !(i.variante === variante && i.exercicioId === exercicioId))
+  await db.configuracoes.put({ ...config, excluidosNoPlano: [...lista, { variante, exercicioId }] })
+  await garantirPlano()
+}
+
+/** C15: desfaz a exclusão. */
+export async function desfazerExclusao(variante: string, exercicioId: string) {
+  const config = await obterConfiguracoes()
+  const lista = (config.excluidosNoPlano ?? []).filter((i) => !(i.variante === variante && i.exercicioId === exercicioId))
+  await db.configuracoes.put({ ...config, excluidosNoPlano: lista })
   await garantirPlano()
 }

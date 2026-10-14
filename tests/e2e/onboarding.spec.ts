@@ -193,3 +193,16 @@ test('C14: "+ incluir exercício" lista o músculo com o tempo e dá para remove
   await treinoA.getByRole('button', { name: `Remover ${nome}` }).click()
   await expect(treinoA.getByRole('button', { name: `Remover ${nome}` })).toHaveCount(0)
 })
+
+test('C15: excluir exercício do treino e desfazer', async ({ page }) => {
+  await fazerOnboarding(page, { nivel: 'Intermediário', dias: '5', enfases: ['Superiores'], aprovar: false })
+  const treinoA = page.getByTestId('treino-do-plano').first()
+  const botao = treinoA.getByRole('button', { name: /^Excluir / }).first()
+  const nome = (await botao.getAttribute('aria-label'))!.replace('Excluir ', '')
+  await botao.click()
+  await expect(treinoA.getByRole('button', { name: `Trocar ${nome}`, exact: true })).toHaveCount(0)
+  await expect(treinoA.getByTestId('excluidos')).toContainText(nome)
+  await treinoA.getByRole('button', { name: `Desfazer exclusão de ${nome}` }).click()
+  await expect(treinoA.getByRole('button', { name: `Trocar ${nome}`, exact: true })).toBeVisible()
+  await expect(treinoA.getByTestId('excluidos')).toHaveCount(0)
+})

@@ -230,6 +230,22 @@ describe('divisão (§6.2)', () => {
     expect(p.dias[0].exercicios.filter((e) => e.incluido).map((e) => e.exercicioId).sort()).toEqual([...extras].sort())
     if (p.dias[0].minutosEstimados > 30) expect(p.avisos.some((a) => a.includes('exercícios incluídos'))).toBe(true)
   })
+  it('C15: exercício excluído sai do treino e nada entra no lugar', () => {
+    const base = contexto({ diasSemana: 3, treinos: 3, duracaoMin: 60, musculosPorTreino: [['peito', 'triceps'], ['costas'], ['quadriceps']] })
+    const antes = gerarPlano(base)
+    const a = antes.dias[0]
+    const tira = a.exercicios.filter((e) => e.papel === 'trabalho').slice(0, 2).map((e) => e.exercicioId)
+    const depois = gerarPlano({ ...base, excluidos: tira.map((exercicioId) => ({ variante: a.variante, exercicioId })) })
+    const idsDepois = depois.dias[0].exercicios.map((e) => e.exercicioId)
+    expect(idsDepois).toEqual(a.exercicios.map((e) => e.exercicioId).filter((id) => !tira.includes(id)))
+    expect(depois.dias[0].minutosEstimados).toBeLessThan(a.minutosEstimados)
+    // outros treinos não mudam
+    expect(depois.dias[1]).toEqual(antes.dias[1])
+    // tirar todo o tríceps: avisa
+    const triceps = a.exercicios.filter((e) => ex(e.exercicioId).grupo === 'triceps').map((e) => e.exercicioId)
+    const semTriceps = gerarPlano({ ...base, excluidos: triceps.map((exercicioId) => ({ variante: a.variante, exercicioId })) })
+    expect(semTriceps.avisos.some((x) => x.includes('ficou sem exercício de tríceps'))).toBe(true)
+  })
   it('C8: só "Superiores" marcado vira ficha com foco em superiores', () => {
     const d = (diasSemana: DiasSemana) => nomes(gerarPlano(contexto({ diasSemana, enfases: ['superior'] })))
     expect(d(2)).toEqual(['Treino A · Peito, ombros e tríceps', 'Treino B · Costas, bíceps e pernas'])

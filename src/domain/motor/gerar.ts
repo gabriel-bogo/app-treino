@@ -55,6 +55,8 @@ export interface ContextoMotor {
   trocasNoPlano: Record<string, string>
   /** C14: exercícios incluídos pela pessoa em cada treino */
   incluidos?: { variante: string; exercicioId: string }[]
+  /** C15: exercícios excluídos pela pessoa de cada treino */
+  excluidos?: { variante: string; exercicioId: string }[]
   biblioteca?: Exercicio[]
 }
 
@@ -596,6 +598,17 @@ export function gerarPlano(ctx: ContextoMotor): PlanoGerado {
   completarComSobra(ctx, dias, alvosDoPlano, sel)
   encherTempo(ctx, dias, alvosDoPlano, sel)
   if (fase === 'readaptacao') aplicarReadaptacao(ctx, dias)
+
+  // C15: excluídos pela pessoa saem do treino montado, sem nada no lugar
+  for (const exc of ctx.excluidos ?? []) {
+    const dia = porVariante.get(exc.variante)
+    if (dia) dia.itens = dia.itens.filter((i) => i.ex.id !== exc.exercicioId)
+  }
+  for (const d of dias) {
+    if (!(ctx.excluidos ?? []).some((e) => e.variante === d.variante)) continue
+    const vazios = d.grupos.filter((g) => g !== 'core' && !d.itens.some((i) => i.ex.grupo === g))
+    if (vazios.length) avisos.push(`${d.nome.split(' · ')[0]} ficou sem exercício de ${vazios.map((g) => NOME_GRUPO[g].toLowerCase()).join(', ')}.`)
+  }
 
   // aquecimento específico de ombro nos dias com empurrar (§6.7, §6.11)
   const aquecOmbro = aquecimentoOmbro(ctx)

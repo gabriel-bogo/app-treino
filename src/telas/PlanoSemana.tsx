@@ -10,7 +10,7 @@ import { CartaoTreino, textoSequencia, treinosUnicos } from '../components/Plano
 import { TrocaNoPlano } from '../components/TrocaNoPlano'
 import { useMusculosNoPlano } from '../components/MusculosNoPlano'
 import { useIncluirNoPlano } from '../components/IncluirNoPlano'
-import { removerDoPlano } from '../db/plano'
+import { desfazerExclusao, excluirDoPlano, removerDoPlano } from '../db/plano'
 import { letraDoTreino } from '../components/PlanoAgrupado'
 
 // Plano da semana (§3 tela 3): todos os dias de treino gerados.
@@ -21,6 +21,7 @@ export function PlanoSemana() {
   const [troca, setTroca] = useState<{ exercicioId: string; ids: string[] } | null>(null)
   const musculos = useMusculosNoPlano(dados?.dias, dados?.exercicios)
   const incluir = useIncluirNoPlano()
+  const configPlano = useLiveQuery(() => db.configuracoes.get('app'))
   if (!dados?.plano || !perfil) return <Tela titulo="Plano da semana">{null}</Tela>
   const { plano, dias, exercicios } = dados
   const readaptacao = plano.fase === 'readaptacao'
@@ -58,6 +59,9 @@ export function PlanoSemana() {
           aoMudarMusculos={() => musculos.abrir(d.variante)}
           aoIncluir={(grupo, ids) => incluir.abrir({ variante: d.variante, treino: `Treino ${letraDoTreino(d.nome)}`, grupo, ids, minutos: d.minutosEstimados })}
           aoRemover={(id) => void removerDoPlano(d.variante, id)}
+          aoExcluir={(id) => void excluirDoPlano(d.variante, id)}
+          excluidos={(configPlano?.excluidosNoPlano ?? []).filter((x) => x.variante === d.variante).map((x) => x.exercicioId)}
+          aoDesfazerExclusao={(id) => void desfazerExclusao(d.variante, id)}
         />
       ))}
 

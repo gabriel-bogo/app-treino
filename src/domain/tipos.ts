@@ -414,6 +414,8 @@ export interface Configuracoes {
   trocasNoPlano: Record<string, string>
   /** C14: exercícios que a pessoa incluiu num treino do plano (variante do treino → exercício) */
   incluidosNoPlano?: { variante: string; exercicioId: string }[]
+  /** C15: exercícios que a pessoa excluiu de um treino (sem nada no lugar) */
+  excluidosNoPlano?: { variante: string; exercicioId: string }[]
   /** id da última sessão para a qual o ajuste de pausa já foi aplicado (§6.12) */
   pausaAplicadaApos?: string
 }
