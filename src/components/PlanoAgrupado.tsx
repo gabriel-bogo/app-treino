@@ -1,7 +1,7 @@
 import { navegar } from '../app/rotas'
 import { exercicioPorId, NOME_GRUPO } from '../domain/biblioteca'
 import { formatarDuracao } from '../domain/datas'
-import type { ExercicioPlano } from '../domain/tipos'
+import type { ExercicioPlano, Grupo } from '../domain/tipos'
 import { Botao, Cartao, Etiqueta } from './ui'
 
 // Treinos do plano agrupados por músculo (C4, C5), como numa ficha de academia:
@@ -10,7 +10,7 @@ import { Botao, Cartao, Etiqueta } from './ui'
 //     Ombros: exercício 3 …
 // Usado na proposta do plano (depois do onboarding) e na aba Plano.
 
-export type ItemVisivel = Pick<ExercicioPlano, 'exercicioId' | 'papel' | 'series' | 'repsMin' | 'repsMax' | 'descansoSeg' | 'alerta'>
+export type ItemVisivel = Pick<ExercicioPlano, 'exercicioId' | 'papel' | 'series' | 'repsMin' | 'repsMax' | 'descansoSeg' | 'alerta' | 'incluido'>
 
 export interface TreinoVisivel {
   variante: string
@@ -26,7 +26,7 @@ export function textoSeries(e: Pick<ItemVisivel, 'series' | 'repsMin' | 'repsMax
 }
 
 /** Seções consecutivas por músculo principal, na ordem do treino (o aquecimento de ombro vem à parte). */
-export function secoesPorMusculo(itens: ItemVisivel[]): { titulo: string; itens: ItemVisivel[] }[] {
+export function secoesPorMusculo(itens: ItemVisivel[]): { chave: string; titulo: string; itens: ItemVisivel[] }[] {
   const secoes: { chave: string; titulo: string; itens: ItemVisivel[] }[] = []
   for (const i of itens) {
     const ex = exercicioPorId(i.exercicioId)
@@ -60,6 +60,8 @@ export function CartaoTreino({
   proximo,
   aoTrocar,
   aoMudarMusculos,
+  aoIncluir,
+  aoRemover,
 }: {
   treino: TreinoVisivel
   proximo?: boolean
@@ -67,6 +69,10 @@ export function CartaoTreino({
   aoTrocar?: (exercicioId: string, idsDoTreino: string[]) => void
   /** C11: mostra o botão "Mudar músculos" */
   aoMudarMusculos?: () => void
+  /** C14: "+ incluir exercício" no fim de cada músculo */
+  aoIncluir?: (grupo: Grupo, idsDoTreino: string[]) => void
+  /** C14: tirar um exercício que a pessoa incluiu */
+  aoRemover?: (exercicioId: string) => void
 }) {
   const ids = treino.exercicios.map((e) => e.exercicioId)
   return (
@@ -104,15 +110,32 @@ export function CartaoTreino({
                       </span>
                       {e.alerta && <span className="block text-xs text-amber-700 dark:text-amber-300">{e.alerta}</span>}
                     </button>
-                    {aoTrocar && e.papel === 'trabalho' && (
-                      <Botao variante="secundario" className="min-h-10 px-3 text-sm" onClick={() => aoTrocar(ex.id, ids)} aria-label={`Trocar ${ex.nome}`}>
-                        Trocar
+                    {e.incluido && aoRemover ? (
+                      <Botao variante="secundario" className="min-h-10 px-3 text-sm" onClick={() => aoRemover(ex.id)} aria-label={`Remover ${ex.nome}`}>
+                        Remover
                       </Botao>
+                    ) : (
+                      aoTrocar &&
+                      e.papel === 'trabalho' && (
+                        <Botao variante="secundario" className="min-h-10 px-3 text-sm" onClick={() => aoTrocar(ex.id, ids)} aria-label={`Trocar ${ex.nome}`}>
+                          Trocar
+                        </Botao>
+                      )
                     )}
                   </li>
                 )
               })}
             </ul>
+            {aoIncluir && s.chave !== 'aquecimento' && (
+              <button
+                type="button"
+                onClick={() => aoIncluir(s.chave as Grupo, ids)}
+                className="mt-1 min-h-10 text-sm font-semibold text-emerald-700 dark:text-emerald-400"
+                aria-label={`Incluir exercício de ${s.titulo}`}
+              >
+                + incluir exercício
+              </button>
+            )}
           </section>
         ))}
       </div>

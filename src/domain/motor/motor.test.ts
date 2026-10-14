@@ -209,6 +209,27 @@ describe('divisão (§6.2)', () => {
     // escolha com número de itens diferente dos treinos: ignorada
     expect(nomes(gerarPlano(contexto({ diasSemana: 3, treinos: 3, musculosPorTreino: [['peito']] })))[0]).not.toMatch(/Peito$/)
   })
+  it('C13: usa o tempo escolhido (mais exercícios nos músculos do treino)', () => {
+    const musculosPorTreino: ContextoMotor['perfil']['musculosPorTreino'] = [['peito', 'triceps'], ['costas', 'ombros', 'biceps'], ['quadriceps', 'posteriores']]
+    const p = gerarPlano(contexto({ diasSemana: 5, treinos: 3, duracaoMin: 60, enfases: ['superior'], limitacoes: ['ombro'], musculosPorTreino }))
+    const a = p.dias[0].exercicios.filter((e) => e.papel === 'trabalho').map((e) => ex(e.exercicioId).grupo)
+    expect(a.filter((g) => g === 'triceps').length).toBeGreaterThanOrEqual(2)
+    for (const d of p.dias) expect(d.minutosEstimados, d.nome).toBeGreaterThanOrEqual(50)
+    for (const d of p.dias) expect(d.minutosEstimados, d.nome).toBeLessThanOrEqual(60)
+    // todo músculo escolhido tem exercício
+    expect(new Set(p.dias[1].exercicios.filter((e) => e.papel === 'trabalho').map((e) => ex(e.exercicioId).grupo))).toEqual(new Set(['costas', 'ombros', 'biceps']))
+  })
+  it('C14: exercício incluído pela pessoa entra no treino, não é cortado e avisa se passar do tempo', () => {
+    const base = contexto({ diasSemana: 3, treinos: 3, duracaoMin: 30, musculosPorTreino: [['peito'], ['costas'], ['quadriceps']] })
+    const normal = gerarPlano(base)
+    const extras = ['elevacao-lateral', 'desenvolvimento-maquina', 'voador-invertido'].filter((id) => exercicioPorId(id))
+    expect(extras.length).toBeGreaterThan(0)
+    const p = gerarPlano({ ...base, incluidos: extras.map((exercicioId) => ({ variante: normal.dias[0].variante, exercicioId })) })
+    const ids = p.dias[0].exercicios.map((e) => e.exercicioId)
+    for (const id of extras) expect(ids).toContain(id)
+    expect(p.dias[0].exercicios.filter((e) => e.incluido).map((e) => e.exercicioId).sort()).toEqual([...extras].sort())
+    if (p.dias[0].minutosEstimados > 30) expect(p.avisos.some((a) => a.includes('exercícios incluídos'))).toBe(true)
+  })
   it('C8: só "Superiores" marcado vira ficha com foco em superiores', () => {
     const d = (diasSemana: DiasSemana) => nomes(gerarPlano(contexto({ diasSemana, enfases: ['superior'] })))
     expect(d(2)).toEqual(['Treino A · Peito, ombros e tríceps', 'Treino B · Costas, bíceps e pernas'])

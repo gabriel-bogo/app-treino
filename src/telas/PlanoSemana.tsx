@@ -9,6 +9,9 @@ import { Cartao, Tela, Texto } from '../components/ui'
 import { CartaoTreino, textoSequencia, treinosUnicos } from '../components/PlanoAgrupado'
 import { TrocaNoPlano } from '../components/TrocaNoPlano'
 import { useMusculosNoPlano } from '../components/MusculosNoPlano'
+import { useIncluirNoPlano } from '../components/IncluirNoPlano'
+import { removerDoPlano } from '../db/plano'
+import { letraDoTreino } from '../components/PlanoAgrupado'
 
 // Plano da semana (§3 tela 3): todos os dias de treino gerados.
 export function PlanoSemana() {
@@ -17,6 +20,7 @@ export function PlanoSemana() {
   const [verVolume, setVerVolume] = useState(false)
   const [troca, setTroca] = useState<{ exercicioId: string; ids: string[] } | null>(null)
   const musculos = useMusculosNoPlano(dados?.dias, dados?.exercicios)
+  const incluir = useIncluirNoPlano()
   if (!dados?.plano || !perfil) return <Tela titulo="Plano da semana">{null}</Tela>
   const { plano, dias, exercicios } = dados
   const readaptacao = plano.fase === 'readaptacao'
@@ -52,6 +56,8 @@ export function PlanoSemana() {
           proximo={dias[plano.proximoIndice]?.variante === d.variante}
           aoTrocar={(exercicioId, ids) => setTroca({ exercicioId, ids })}
           aoMudarMusculos={() => musculos.abrir(d.variante)}
+          aoIncluir={(grupo, ids) => incluir.abrir({ variante: d.variante, treino: `Treino ${letraDoTreino(d.nome)}`, grupo, ids, minutos: d.minutosEstimados })}
+          aoRemover={(id) => void removerDoPlano(d.variante, id)}
         />
       ))}
 
@@ -85,6 +91,7 @@ export function PlanoSemana() {
       )}
       <TrocaNoPlano alvo={troca} aoFechar={() => setTroca(null)} />
       {musculos.dialogo}
+      {incluir.dialogo}
     </Tela>
   )
 }

@@ -231,6 +231,8 @@ export interface ExercicioPlano {
   descansoSeg: number
   /** contraindicação leve para alguma limitação do perfil (§6.7) */
   alerta?: string
+  /** C14: incluído pela pessoa ("+ incluir exercício") */
+  incluido?: boolean
 }
 
 // ───────────────────────── Treino (§3, §7) ─────────────────────────
@@ -410,6 +412,8 @@ export interface Configuracoes {
   som: boolean
   /** "Trocar no plano" (§6.10): original → substituto */
   trocasNoPlano: Record<string, string>
+  /** C14: exercícios que a pessoa incluiu num treino do plano (variante do treino → exercício) */
+  incluidosNoPlano?: { variante: string; exercicioId: string }[]
   /** id da última sessão para a qual o ajuste de pausa já foi aplicado (§6.12) */
   pausaAplicadaApos?: string
 }

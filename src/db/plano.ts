@@ -23,7 +23,7 @@ export function semanaDaReadaptacao(treinosNaFase: number, diasSemana: number): 
 }
 
 /** Muda quando as regras do motor mudam: o plano salvo é refeito na próxima abertura. */
-const VERSAO_MOTOR = 4
+const VERSAO_MOTOR = 5
 
 function assinatura(ctx: ContextoMotor): string {
   const marcados = [...ctx.ajustes.values()]
@@ -47,6 +47,7 @@ function assinatura(ctx: ContextoMotor): string {
     ctx.nivelVolume,
     marcados,
     ctx.trocasNoPlano,
+    ctx.incluidos ?? [],
   ])
 }
 
@@ -134,6 +135,7 @@ export async function garantirPlano(agora: Date = new Date()): Promise<void> {
         nivelVolume: plano.nivelVolume,
         ajustes: mapaAjustes(await db.ajustesExercicio.toArray()),
         trocasNoPlano: config.trocasNoPlano,
+        incluidos: config.incluidosNoPlano ?? [],
       }
       const novaAssinatura = assinatura(ctx)
       const temDias = (await db.diasPlano.count()) > 0
@@ -175,4 +177,20 @@ export async function garantirPlano(agora: Date = new Date()): Promise<void> {
 export async function dispensarMensagemFase() {
   const plano = await db.plano.get('atual')
   if (plano) await db.plano.put({ ...plano, mensagemFase: null })
+}
+
+/** C14: inclui um exercício num treino do plano (vale nos próximos treinos). */
+export async function incluirNoPlano(variante: string, exercicioId: string) {
+  const config = await obterConfiguracoes()
+  const lista = (config.incluidosNoPlano ?? []).filter((i) => !(i.variante === variante && i.exercicioId === exercicioId))
+  await db.configuracoes.put({ ...config, incluidosNoPlano: [...lista, { variante, exercicioId }] })
+  await garantirPlano()
+}
+
+/** C14: tira do treino um exercício que a pessoa tinha incluído. */
+export async function removerDoPlano(variante: string, exercicioId: string) {
+  const config = await obterConfiguracoes()
+  const lista = (config.incluidosNoPlano ?? []).filter((i) => !(i.variante === variante && i.exercicioId === exercicioId))
+  await db.configuracoes.put({ ...config, incluidosNoPlano: lista })
+  await garantirPlano()
 }

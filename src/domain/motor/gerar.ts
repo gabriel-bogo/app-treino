@@ -32,6 +32,7 @@ import {
   ORDEM_PREENCHIMENTO,
   PESO_SECUNDARIO,
   VOLUME_INICIAL_GRANDE,
+  VOLUME_MAXIMO_GRANDE,
   VOLUME_MINIMO,
   descansoSegundos,
   focoSuperior,
@@ -52,6 +53,8 @@ export interface ContextoMotor {
   ajustes: Map<string, AjusteExercicio>
   /** "Trocar no plano" (§6.10): original → substituto */
   trocasNoPlano: Record<string, string>
+  /** C14: exercícios incluídos pela pessoa em cada treino */
+  incluidos?: { variante: string; exercicioId: string }[]
   biblioteca?: Exercicio[]
 }
 
@@ -63,6 +66,7 @@ export interface ExercicioGerado {
   repsMax: number
   descansoSeg: number
   alerta?: string
+  incluido?: boolean
 }
 
 export interface DiaGerado {
@@ -89,6 +93,8 @@ interface Item {
   ex: Exercicio
   series: number
   papel: 'trabalho' | 'aquecimento_ombro'
+  /** C14: incluído pela pessoa; o motor não corta */
+  fixo?: boolean
 }
 
 interface DiaTrabalho extends ModeloDia {
@@ -158,6 +164,38 @@ function garantirTodosOsGrupos(dias: DiaTrabalho[], sel: Seletor) {
   }
 }
 
+/**
+ * C13: se o corte por tempo tirou o único exercício de um músculo do treino,
+ * tira um exercício do músculo que tem mais (isolado primeiro) e devolve o
+ * lugar para o músculo que ficou sem nada.
+ */
+function reequilibrarGrupos(ctx: ContextoMotor, dias: DiaTrabalho[], sel: Seletor) {
+  for (const dia of dias) {
+    for (const g of dia.grupos) {
+      if (g === 'core' && !dia.temCore) continue
+      const doGrupo = (x: Grupo) => dia.itens.filter((i) => i.papel === 'trabalho' && i.ex.grupo === x)
+      if (doGrupo(g).length) continue
+      const doador = [...dia.grupos].filter((x) => x !== g).sort((a, b) => doGrupo(b).length - doGrupo(a).length)[0]
+      const itensDoador = doador ? doGrupo(doador).filter((i) => !i.fixo) : []
+      if (itensDoador.length < 2) continue
+      const sai = itensDoador.find((i) => i.ex.tipo === 'isolado') ?? itensDoador[itensDoador.length - 1]
+      const pos = dia.itens.indexOf(sai)
+      dia.itens.splice(pos, 1)
+      sel.devolver(sai.ex)
+      const ex = sel.escolher(g, dia)
+      const novo = ex ? { ex, series: Math.min(3, sai.series), papel: 'trabalho' as const } : null
+      if (novo) dia.itens.push(novo)
+      if (!novo || minutos(ctx, dia) > ctx.perfil.duracaoMin) {
+        if (novo) {
+          dia.itens.pop()
+          sel.devolver(novo.ex)
+        }
+        dia.itens.splice(pos, 0, sai)
+      }
+    }
+  }
+}
+
 // ─────────────────────── Escolha de exercícios ───────────────────────
 
 const composto = (e: Exercicio) => e.tipo === 'composto'
@@ -198,6 +236,8 @@ class Seletor {
         niveis.includes(e.nivel) &&
         (!categoriaOmbro || e.categoria === categoriaOmbro) &&
         !noDia.has(e.id) &&
+        // trocado pela pessoa e o substituto já está no treino: não volta como exercício extra
+        !(this.ctx.trocasNoPlano[e.id] && noDia.has(this.ctx.trocasNoPlano[e.id])) &&
         exercicioPermitido(e, this.ctx.perfil.limitacoes, this.ctx.ajustes),
     )
   }
@@ -341,6 +381,7 @@ function cortarAteCaber(ctx: ContextoMotor, dias: DiaTrabalho[], alvos: Record<G
         const vol = contarVolume(dias)
         const trabalho = dia.itens.filter((i) => i.papel === 'trabalho')
         const cortaveis = trabalho.filter((i) => {
+          if (i.fixo) return false
           const perde = i.series > 2 ? dia.ocorrencias : i.series * dia.ocorrencias
           if (i.series <= 2 && trabalho.length <= 1) return false
           return vol[i.ex.grupo] - perde >= piso(etapa, i.ex.grupo) - 1e-9 // frequência fracionada (C10)
@@ -406,6 +447,58 @@ function completarComSobra(ctx: ContextoMotor, dias: DiaTrabalho[], alvos: Recor
         fechados.add(diaLivre)
         break
       }
+    }
+  }
+}
+
+/**
+ * C13: usa o tempo escolhido. Depois de bater a meta semanal, se ainda sobra
+ * tempo no treino, coloca mais exercícios nos músculos daquele treino (o que
+ * tem menos exercícios primeiro; até 4 nos grandes e 3 nos pequenos) e depois
+ * mais séries (até 4), sem passar da duração nem do teto semanal do músculo.
+ * O dia de pernas do foco em superiores fica como está (uns 3 exercícios, C8).
+ */
+function encherTempo(ctx: ContextoMotor, dias: DiaTrabalho[], alvos: Record<Grupo, number>, sel: Seletor) {
+  const enfase = gruposDaEnfase(ctx.perfil.enfases)
+  const teto = (g: Grupo) => Math.max(alvos[g], Math.round(VOLUME_MAXIMO_GRANDE * (enfase.includes(g) ? MULT_ENFASE : 1)))
+  const maxExercicios = (g: Grupo) => (GRANDES.includes(g) ? 4 : 3)
+  const cabe = (dia: DiaTrabalho, extra: number) => minutos(ctx, dia) + extra <= ctx.perfil.duracaoMin
+  for (const dia of dias) {
+    if (dia.tipo === 'pernas' || dia.tipo === 'costas_biceps_pernas') continue
+    const grupos = dia.grupos.filter((g) => (g === 'core' ? dia.temCore : alvos[g] > 0))
+    const qtd = (g: Grupo) => dia.itens.filter((i) => i.papel === 'trabalho' && i.ex.grupo === g).length
+    const esgotados = new Set<Grupo>()
+    for (let seguranca = 0; seguranca < 30; seguranca++) {
+      const vol = contarVolume(dias)
+      const candidatos = grupos
+        .filter((g) => !esgotados.has(g) && qtd(g) < maxExercicios(g) && vol[g] + 3 * dia.ocorrencias <= teto(g))
+        .sort((a, b) => qtd(a) - qtd(b) || Number(enfase.includes(b)) - Number(enfase.includes(a)) || ORDEM_PREENCHIMENTO.indexOf(a) - ORDEM_PREENCHIMENTO.indexOf(b))
+      let mudou = false
+      for (const g of candidatos) {
+        const ex = sel.escolher(g, dia)
+        if (!ex) {
+          esgotados.add(g)
+          continue
+        }
+        if (!cabe(dia, 3 * MIN_POR_SERIE[ex.tipo])) {
+          sel.devolver(ex)
+          continue
+        }
+        dia.itens.push({ ex, series: 3, papel: 'trabalho' })
+        if (minutos(ctx, dia) > ctx.perfil.duracaoMin) {
+          dia.itens.pop()
+          sel.devolver(ex)
+          continue
+        }
+        mudou = true
+        break
+      }
+      if (mudou) continue
+      // sem espaço para exercício novo: mais uma série nos que têm menos de 4
+      const vol2 = contarVolume(dias)
+      const item = dia.itens.find((i) => i.papel === 'trabalho' && i.series < 4 && grupos.includes(i.ex.grupo) && vol2[i.ex.grupo] + dia.ocorrencias <= teto(i.ex.grupo) && cabe(dia, MIN_POR_SERIE[i.ex.tipo]))
+      if (!item) break
+      item.series++
     }
   }
 }
@@ -484,6 +577,13 @@ export function gerarPlano(ctx: ContextoMotor): PlanoGerado {
   for (const d of porVariante.values()) d.ocorrencias *= vezesPorSemana
   const dias = [...porVariante.values()]
   const sel = new Seletor(ctx)
+  // C14: exercícios incluídos pela pessoa entram primeiro e não são cortados
+  for (const inc of ctx.incluidos ?? []) {
+    const dia = porVariante.get(inc.variante)
+    const ex = exercicioPorId(inc.exercicioId)
+    if (!dia || !ex || dia.itens.some((i) => i.ex.id === ex.id) || !exercicioPermitido(ex, perfil.limitacoes, ctx.ajustes)) continue
+    dia.itens.push({ ex, series: 3, papel: 'trabalho', fixo: true })
+  }
   const { alvos, semEnfase } = calcularAlvos(ctx)
 
   // C8/C9: mesmo preenchimento nas duas fases; a readaptação só tem menos séries
@@ -492,7 +592,9 @@ export function gerarPlano(ctx: ContextoMotor): PlanoGerado {
   preencherVolume(dias, alvosDoPlano, sel, avisos)
   if (focoSuperior(perfil.enfases) || personalizada) garantirTodosOsGrupos(dias, sel)
   cortarAteCaber(ctx, dias, alvosDoPlano, semEnfase)
+  if (focoSuperior(perfil.enfases) || personalizada) reequilibrarGrupos(ctx, dias, sel)
   completarComSobra(ctx, dias, alvosDoPlano, sel)
+  encherTempo(ctx, dias, alvosDoPlano, sel)
   if (fase === 'readaptacao') aplicarReadaptacao(ctx, dias)
 
   // aquecimento específico de ombro nos dias com empurrar (§6.7, §6.11)
@@ -525,6 +627,13 @@ export function gerarPlano(ctx: ContextoMotor): PlanoGerado {
     })
   }
 
+  for (const d of dias) {
+    const m = minutos(ctx, d)
+    if (m > perfil.duracaoMin && d.itens.some((i) => i.fixo)) {
+      avisos.push(`${d.nome.split(' · ')[0]} fica com ~${m} min por causa dos exercícios incluídos (seu tempo é de ${perfil.duracaoMin} min).`)
+    }
+  }
+
   const gerarDia = (d: DiaTrabalho): DiaGerado => ({
     variante: d.variante,
     grupos: d.grupos,
@@ -545,6 +654,7 @@ export function gerarPlano(ctx: ContextoMotor): PlanoGerado {
         repsMax: pesoCorpo ? (i.ex.tetoReps ?? FAIXA_NORMAL.max) : faixa.max,
         descansoSeg: descansoSegundos(perfil.objetivos, i.ex.tipo, perfil.sexo, fase),
         ...(textoAlerta(i.ex, perfil.limitacoes) ? { alerta: textoAlerta(i.ex, perfil.limitacoes) } : {}),
+        ...(i.fixo ? { incluido: true } : {}),
       }
     }),
   })

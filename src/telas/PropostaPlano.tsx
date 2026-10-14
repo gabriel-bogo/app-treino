@@ -10,6 +10,9 @@ import { Botao, Cartao, Tela, Texto } from '../components/ui'
 import { CartaoTreino, textoSequencia, treinosUnicos, type TreinoVisivel } from '../components/PlanoAgrupado'
 import { TrocaNoPlano } from '../components/TrocaNoPlano'
 import { useMusculosNoPlano } from '../components/MusculosNoPlano'
+import { useIncluirNoPlano } from '../components/IncluirNoPlano'
+import { removerDoPlano } from '../db/plano'
+import { letraDoTreino } from '../components/PlanoAgrupado'
 
 // C5: depois do onboarding, o app apresenta o programa de treino montado
 // (Treino A, Treino B…, agrupado por músculo) para a pessoa aprovar, trocar
@@ -23,6 +26,7 @@ export function PropostaPlano() {
   const [verDepois, setVerDepois] = useState(false)
   const [troca, setTroca] = useState<{ exercicioId: string; ids: string[] } | null>(null)
   const musculos = useMusculosNoPlano(dados?.dias, dados?.exercicios)
+  const incluir = useIncluirNoPlano()
 
   if (!dados?.plano || !perfil || !dados.dias.length) {
     return (
@@ -97,7 +101,14 @@ export function PropostaPlano() {
       </Texto>
 
       {treinos.map((t) => (
-        <CartaoTreino key={t.variante} treino={t} aoTrocar={aoTrocar} aoMudarMusculos={() => musculos.abrir(t.variante)} />
+        <CartaoTreino
+          key={t.variante}
+          treino={t}
+          aoTrocar={aoTrocar}
+          aoMudarMusculos={() => musculos.abrir(t.variante)}
+          aoIncluir={(grupo, ids) => incluir.abrir({ variante: t.variante, treino: `Treino ${letraDoTreino(t.nome)}`, grupo, ids, minutos: t.minutosEstimados })}
+          aoRemover={(id) => void removerDoPlano(t.variante, id)}
+        />
       ))}
 
       {depois && (
@@ -124,6 +135,7 @@ export function PropostaPlano() {
 
       <TrocaNoPlano alvo={troca} aoFechar={() => setTroca(null)} />
       {musculos.dialogo}
+      {incluir.dialogo}
     </Tela>
   )
 }
