@@ -54,7 +54,7 @@ export function Perfil({ voltarPara }: { voltarPara?: string } = {}) {
       </Texto>
       <Cartao titulo="Dados pessoais">
         <div className="flex flex-col gap-5">
-          <CamposPessoais r={r} mudar={mudar} textos={textos} setTextos={(t) => (setSalvo(false), setTextos(t))} erros={erros} hoje={hoje} />
+          <CamposPessoais r={r} mudar={mudar} textos={textos} setTextos={(t) => (setSalvo(false), setTextos(t))} erros={erros} />
           <Texto fraco>O peso aqui é o peso inicial. Para registrar o peso de hoje, use a aba Saúde.</Texto>
         </div>
       </Cartao>

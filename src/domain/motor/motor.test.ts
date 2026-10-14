@@ -186,6 +186,29 @@ describe('divisão (§6.2)', () => {
     for (const g of ['peito', 'costas', 'ombros'] as const) expect(p.volume[g]).toBeGreaterThanOrEqual(p.alvos[g])
     expect(nomes(gerarPlano(contexto({ diasSemana: 4, treinos: 2 })))).toEqual(['Treino A · Full body', 'Treino B · Full body'])
   })
+  it('C11: músculos escolhidos por treino (ex: peito + tríceps / ombros + costas + bíceps / pernas)', () => {
+    const musculosPorTreino: ContextoMotor['perfil']['musculosPorTreino'] = [['peito', 'triceps'], ['costas', 'ombros', 'biceps'], ['quadriceps', 'posteriores']]
+    for (const fase of ['normal', 'readaptacao'] as const) {
+      const ctx = contexto({ diasSemana: 5, treinos: 3, duracaoMin: 90, enfases: ['superior'], limitacoes: ['ombro'], musculosPorTreino }, { fase })
+      const p = gerarPlano(ctx)
+      expect(nomes(p)).toEqual(['Treino A · Peito e tríceps', 'Treino B · Costas, ombros e bíceps', 'Treino C · Quadríceps e posteriores'])
+      p.dias.forEach((d, i) => {
+        const grupos = new Set(d.exercicios.filter((e) => e.papel === 'trabalho').map((e) => ex(e.exercicioId).grupo))
+        expect(grupos, d.nome).toEqual(new Set(musculosPorTreino![i]))
+        expect(d.minutosEstimados).toBeLessThanOrEqual(90)
+      })
+      expect(p.avisos.filter((a) => a.includes('abaixo do recomendado'))).toEqual([])
+    }
+    // abdômen só quando escolhido
+    const comCore = gerarPlano(contexto({ diasSemana: 3, treinos: 3, musculosPorTreino: [['peito', 'core'], ['costas'], ['quadriceps']] }))
+    expect(comCore.dias[0].exercicios.some((e) => ex(e.exercicioId).grupo === 'core')).toBe(true)
+    expect(comCore.dias[1].exercicios.some((e) => ex(e.exercicioId).grupo === 'core')).toBe(false)
+    // mesmo músculo em treinos seguidos: só avisa
+    const seguidos = gerarPlano(contexto({ diasSemana: 3, treinos: 3, musculosPorTreino: [['peito'], ['peito', 'costas'], ['quadriceps']] }))
+    expect(seguidos.avisos.some((a) => a.includes('Treino A e Treino B trabalham peito'))).toBe(true)
+    // escolha com número de itens diferente dos treinos: ignorada
+    expect(nomes(gerarPlano(contexto({ diasSemana: 3, treinos: 3, musculosPorTreino: [['peito']] })))[0]).not.toMatch(/Peito$/)
+  })
   it('C8: só "Superiores" marcado vira ficha com foco em superiores', () => {
     const d = (diasSemana: DiasSemana) => nomes(gerarPlano(contexto({ diasSemana, enfases: ['superior'] })))
     expect(d(2)).toEqual(['Treino A · Peito, ombros e tríceps', 'Treino B · Costas, bíceps e pernas'])

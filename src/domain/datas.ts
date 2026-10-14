@@ -63,3 +63,27 @@ export function formatarDuracao(segundos: number): string {
   const r = s % 60
   return h > 0 ? `${h}:${doisDigitos(m)}:${doisDigitos(r)}` : `${m}:${doisDigitos(r)}`
 }
+
+/** Máscara DD/MM/AAAA enquanto a pessoa digita (só números; barras automáticas). */
+export function mascaraData(texto: string): string {
+  const d = texto.replace(/\D/g, '').slice(0, 8)
+  if (d.length <= 2) return d
+  if (d.length <= 4) return `${d.slice(0, 2)}/${d.slice(2)}`
+  return `${d.slice(0, 2)}/${d.slice(2, 4)}/${d.slice(4)}`
+}
+
+/** "08/07/1987" → "1987-07-08"; incompleta ou inexistente (ex: 31/02) → null. */
+export function dataDigitadaParaIso(texto: string): string | null {
+  const m = /^(\d{2})\/(\d{2})\/(\d{4})$/.exec(texto)
+  if (!m) return null
+  const [dia, mes, ano] = [Number(m[1]), Number(m[2]), Number(m[3])]
+  const d = new Date(Date.UTC(ano, mes - 1, dia))
+  if (d.getUTCFullYear() !== ano || d.getUTCMonth() !== mes - 1 || d.getUTCDate() !== dia) return null
+  return `${m[3]}-${m[2]}-${m[1]}`
+}
+
+/** "1987-07-08" → "08/07/1987" */
+export function isoParaDataDigitada(iso: string | undefined): string {
+  const m = iso ? /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso) : null
+  return m ? `${m[3]}/${m[2]}/${m[1]}` : ''
+}

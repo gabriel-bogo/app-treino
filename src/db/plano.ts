@@ -23,7 +23,7 @@ export function semanaDaReadaptacao(treinosNaFase: number, diasSemana: number): 
 }
 
 /** Muda quando as regras do motor mudam: o plano salvo é refeito na próxima abertura. */
-const VERSAO_MOTOR = 3
+const VERSAO_MOTOR = 4
 
 function assinatura(ctx: ContextoMotor): string {
   const marcados = [...ctx.ajustes.values()]
@@ -39,6 +39,7 @@ function assinatura(ctx: ContextoMotor): string {
     [...p.enfases].sort(),
     p.diasSemana,
     p.treinos,
+    p.musculosPorTreino ?? null,
     p.duracaoMin,
     [...p.limitacoes].sort(),
     ctx.fase,
@@ -148,6 +149,7 @@ export async function garantirPlano(agora: Date = new Date()): Promise<void> {
         nome: d.nome,
         tipo: d.tipo,
         variante: d.variante,
+        grupos: d.grupos,
         minutosEstimados: d.minutosEstimados,
       }))
       const exercicios: ExercicioPlano[] = gerado.dias.flatMap((d, ordem) =>

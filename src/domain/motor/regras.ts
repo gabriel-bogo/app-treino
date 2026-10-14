@@ -111,6 +111,28 @@ export const GRUPOS_DO_DIA: Record<TipoDia, Grupo[]> = {
   peito_ombros_triceps: ['peito', 'ombros', 'triceps'],
   costas_biceps_pernas: ['costas', 'biceps', 'quadriceps', 'posteriores'],
   pernas: ['quadriceps', 'posteriores'],
+  personalizado: [],
+}
+
+/** C11: nomes curtos dos músculos para o nome do treino ("Peito e tríceps"). */
+export const NOME_CURTO: Record<Grupo, string> = {
+  peito: 'peito',
+  costas: 'costas',
+  ombros: 'ombros',
+  quadriceps: 'quadríceps',
+  posteriores: 'posteriores',
+  gluteos: 'glúteos',
+  panturrilha: 'panturrilha',
+  biceps: 'bíceps',
+  triceps: 'tríceps',
+  core: 'abdômen',
+}
+
+/** ["peito", "tríceps"] → "Peito e tríceps" */
+export function nomeDosMusculos(grupos: readonly Grupo[]): string {
+  const n = grupos.map((g) => NOME_CURTO[g])
+  const t = n.length <= 1 ? (n[0] ?? '') : `${n.slice(0, -1).join(', ')} e ${n[n.length - 1]}`
+  return t.charAt(0).toUpperCase() + t.slice(1)
 }
 
 /** Em dia de push só entra ombro "push"; em dia de pull, só ombro "pull" (deltoide posterior). */

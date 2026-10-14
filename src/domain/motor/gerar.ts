@@ -16,14 +16,13 @@
 
 import { BIBLIOTECA, contraindicacaoPara, exercicioPermitido, exercicioPorId, textoAlerta, NOME_GRUPO } from '../biblioteca'
 import type { AjusteExercicio, Exercicio, Fase, Grupo, Perfil, TipoDia } from '../tipos'
-import { definirDivisao, diaTemCore, type ModeloDia } from './divisao'
+import { definirDivisao, diaTemCore, musculosValidos, type ModeloDia } from './divisao'
 import {
   AQUECIMENTO_OMBRO,
   CATEGORIA_OMBRO_DO_DIA,
   FAIXA_NORMAL,
   FAIXA_READAPTACAO,
   GRANDES,
-  GRUPOS_DO_DIA,
   MIN_AQUECIMENTO,
   MIN_AQUECIMENTO_OMBRO,
   MIN_POR_SERIE,
@@ -44,7 +43,7 @@ import {
 } from './regras'
 
 export interface ContextoMotor {
-  perfil: Pick<Perfil, 'sexo' | 'nivel' | 'objetivos' | 'enfases' | 'diasSemana' | 'treinos' | 'duracaoMin' | 'limitacoes'>
+  perfil: Pick<Perfil, 'sexo' | 'nivel' | 'objetivos' | 'enfases' | 'diasSemana' | 'treinos' | 'musculosPorTreino' | 'duracaoMin' | 'limitacoes'>
   fase: Fase
   /** 0, 1 ou 2 (semana atual da readaptação) */
   semanaReadaptacao: number
@@ -68,6 +67,7 @@ export interface ExercicioGerado {
 
 export interface DiaGerado {
   variante: string
+  grupos: Grupo[]
   nome: string
   tipo: TipoDia
   exercicios: ExercicioGerado[]
@@ -136,7 +136,7 @@ function alvosDosDias(ctx: ContextoMotor, dias: DiaTrabalho[], alvos: Record<Gru
     ajustados[g] = Math.max(alvos[g], Math.round(base * sexo * MULT_ENFASE))
   }
   for (const g of ['quadriceps', 'posteriores'] as const) {
-    const diasComG = dias.filter((d) => GRUPOS_DO_DIA[d.tipo].includes(g)).reduce((n, d) => n + d.ocorrencias, 0)
+    const diasComG = dias.filter((d) => d.grupos.includes(g)).reduce((n, d) => n + d.ocorrencias, 0)
     ajustados[g] = (PERNAS_FOCO_SUPERIOR[g] ?? 0) * diasComG
   }
   return ajustados
@@ -149,8 +149,9 @@ function alvosDosDias(ctx: ContextoMotor, dias: DiaTrabalho[], alvos: Record<Gru
  */
 function garantirTodosOsGrupos(dias: DiaTrabalho[], sel: Seletor) {
   for (const dia of dias) {
-    for (const g of GRUPOS_DO_DIA[dia.tipo]) {
+    for (const g of dia.grupos) {
       if (dia.itens.some((i) => i.ex.grupo === g)) continue
+      if (g === 'core' && !dia.temCore) continue
       const ex = sel.escolher(g, dia)
       if (ex) dia.itens.push({ ex, series: 3, papel: 'trabalho' })
     }
@@ -291,7 +292,7 @@ function contarVolume(dias: DiaTrabalho[]): Record<Grupo, number> {
 
 function preencherVolume(dias: DiaTrabalho[], alvos: Record<Grupo, number>, sel: Seletor, avisos: string[]) {
   for (const g of ORDEM_PREENCHIMENTO) {
-    const diasG = dias.filter((d) => (g === 'core' ? d.temCore : GRUPOS_DO_DIA[d.tipo].includes(g)))
+    const diasG = dias.filter((d) => (g === 'core' ? d.temCore : d.grupos.includes(g)))
     if (!diasG.length) continue
     const vol = contarVolume(dias)
     const ocorrencias = diasG.reduce((s, d) => s + d.ocorrencias, 0) / diasG.length
@@ -375,7 +376,7 @@ function completarComSobra(ctx: ContextoMotor, dias: DiaTrabalho[], alvos: Recor
   const fechados = new Set<DiaTrabalho>()
   for (const g of ORDEM_PREENCHIMENTO) {
     let seguranca = 40
-    const diasG = dias.filter((d) => !fechados.has(d) && (g === 'core' ? d.temCore : GRUPOS_DO_DIA[d.tipo].includes(g)))
+    const diasG = dias.filter((d) => !fechados.has(d) && (g === 'core' ? d.temCore : d.grupos.includes(g)))
     while (contarVolume(dias)[g] < alvos[g] && seguranca-- > 0) {
       // 1º: mais uma série num exercício do grupo que tenha menos de 4
       const comItem = diasG
@@ -468,7 +469,8 @@ function ordenar(enfases: Perfil['enfases'], itens: Item[]): Item[] {
 export function gerarPlano(ctx: ContextoMotor): PlanoGerado {
   const { perfil, fase } = ctx
   // C10: a divisão tem `treinos` treinos diferentes, que se revezam nos dias da semana
-  const divisao = definirDivisao({ diasSemana: perfil.treinos, nivel: perfil.nivel, enfases: perfil.enfases, fase })
+  const divisao = definirDivisao({ diasSemana: perfil.treinos, nivel: perfil.nivel, enfases: perfil.enfases, fase, musculosPorTreino: perfil.musculosPorTreino })
+  const personalizada = !!musculosValidos(perfil.musculosPorTreino, perfil.treinos)
   const vezesPorSemana = perfil.diasSemana / divisao.sequencia.length
   const avisos: string[] = []
 
@@ -477,7 +479,7 @@ export function gerarPlano(ctx: ContextoMotor): PlanoGerado {
   divisao.sequencia.forEach((m, idx) => {
     const existente = porVariante.get(m.variante)
     if (existente) existente.ocorrencias++
-    else porVariante.set(m.variante, { ...m, ocorrencias: 1, temCore: diaTemCore(idx, perfil.enfases), itens: [] })
+    else porVariante.set(m.variante, { ...m, ocorrencias: 1, temCore: personalizada ? m.grupos.includes('core') : diaTemCore(idx, perfil.enfases), itens: [] })
   })
   for (const d of porVariante.values()) d.ocorrencias *= vezesPorSemana
   const dias = [...porVariante.values()]
@@ -486,8 +488,9 @@ export function gerarPlano(ctx: ContextoMotor): PlanoGerado {
 
   // C8/C9: mesmo preenchimento nas duas fases; a readaptação só tem menos séries
   const alvosDoPlano = alvosDosDias(ctx, dias, alvos)
+  if (personalizada) for (const g of TODOS_GRUPOS) if (!dias.some((d) => d.grupos.includes(g))) alvosDoPlano[g] = 0
   preencherVolume(dias, alvosDoPlano, sel, avisos)
-  if (focoSuperior(perfil.enfases)) garantirTodosOsGrupos(dias, sel)
+  if (focoSuperior(perfil.enfases) || personalizada) garantirTodosOsGrupos(dias, sel)
   cortarAteCaber(ctx, dias, alvosDoPlano, semEnfase)
   completarComSobra(ctx, dias, alvosDoPlano, sel)
   if (fase === 'readaptacao') aplicarReadaptacao(ctx, dias)
@@ -510,8 +513,21 @@ export function gerarPlano(ctx: ContextoMotor): PlanoGerado {
     }
   }
 
+  // C11: treinos seguidos com o mesmo músculo: só avisa (a pessoa escolheu assim)
+  if (personalizada) {
+    divisao.sequencia.forEach((m, i) => {
+      const prox = divisao.sequencia[(i + 1) % divisao.sequencia.length]
+      if (prox === m) return
+      const repetidos = m.grupos.filter((g) => g !== 'core' && prox.grupos.includes(g))
+      if (repetidos.length && i + 1 < divisao.sequencia.length) {
+        avisos.push(`${m.nome.split(' · ')[0]} e ${prox.nome.split(' · ')[0]} trabalham ${repetidos.map((g) => NOME_GRUPO[g].toLowerCase()).join(', ')}. Se forem em dias seguidos, esse músculo descansa menos de 48 h.`)
+      }
+    })
+  }
+
   const gerarDia = (d: DiaTrabalho): DiaGerado => ({
     variante: d.variante,
+    grupos: d.grupos,
     nome: d.nome,
     tipo: d.tipo,
     minutosEstimados: minutos(ctx, d),

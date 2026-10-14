@@ -31,6 +31,11 @@ export interface Perfil {
   diasSemana: DiasSemana
   /** C10: quantos treinos diferentes (A, B, C…), de 2 até os dias por semana; eles se revezam nos dias */
   treinos: DiasSemana
+  /**
+   * C11: músculos de cada treino escolhidos pela pessoa (um item por treino, na
+   * ordem A, B, C…). Ausente = o app decide. Só vale se tiver `treinos` itens.
+   */
+  musculosPorTreino?: Grupo[][]
   duracaoMin: DuracaoMin
   /** vazio = "nenhuma" (§6.7: padrão no onboarding) */
   limitacoes: Limitacao[]
@@ -170,6 +175,8 @@ export type TipoDia =
   | 'peito_ombros_triceps'
   | 'costas_biceps_pernas'
   | 'pernas'
+  // C11: músculos escolhidos pela pessoa
+  | 'personalizado'
 
 export interface Plano {
   id: 'atual'
@@ -203,6 +210,8 @@ export interface DiaPlano {
   tipo: TipoDia
   /** dias com a mesma variante têm os mesmos exercícios (ex: A/B/A/B) */
   variante: string
+  /** C11: músculos que este treino trabalha */
+  grupos: Grupo[]
   /** estimativa pela regra da §6.4 */
   minutosEstimados: number
 }

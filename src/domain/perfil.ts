@@ -100,7 +100,7 @@ export function validarDadosPessoais(r: RascunhoPerfil, hoje: string): ErrosPerf
   const e: ErrosPerfil = {}
   if (!r.nome?.trim()) e.nome = 'Digite seu nome ou apelido.'
   if (!r.sexo) e.sexo = 'Escolha uma opção.'
-  if (!r.nascimento || !/^\d{4}-\d{2}-\d{2}$/.test(r.nascimento)) e.nascimento = 'Informe a data de nascimento.'
+  if (!r.nascimento || !/^\d{4}-\d{2}-\d{2}$/.test(r.nascimento)) e.nascimento = 'Digite uma data válida no formato DD/MM/AAAA.'
   else if (r.nascimento > hoje) e.nascimento = 'A data não pode ser no futuro.'
   else {
     const idade = idadeEm(r.nascimento, hoje)

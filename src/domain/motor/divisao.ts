@@ -1,7 +1,7 @@
 // Divisão do treino conforme os dias por semana (§6.2) e a fase (§6.1).
 
-import type { DiasSemana, Enfase, Fase, Nivel, TipoDia } from '../tipos'
-import { enfaseSoInferior, focoSuperior } from './regras'
+import type { DiasSemana, Enfase, Fase, Grupo, Nivel, TipoDia } from '../tipos'
+import { GRUPOS_DO_DIA, enfaseSoInferior, focoSuperior, nomeDosMusculos } from './regras'
 
 export interface ModeloDia {
   /** variante única (dias com o mesmo modelo repetem exatamente os mesmos exercícios) */
@@ -9,6 +9,8 @@ export interface ModeloDia {
   /** C5: "Treino A · Superior" (a letra é a mesma para a mesma variante) */
   nome: string
   tipo: TipoDia
+  /** C11: músculos do treino (core à parte, em dias alternados, quando não é personalizado) */
+  grupos: Grupo[]
 }
 
 export interface Divisao {
@@ -21,6 +23,7 @@ interface Base {
   variante: string
   rotulo: string
   tipo: TipoDia
+  grupos?: Grupo[]
 }
 
 const fb = (l: string): Base => ({ variante: `fb-${l}`, rotulo: 'Full body', tipo: 'fullbody' })
@@ -30,15 +33,30 @@ const dia = (variante: string, rotulo: string, tipo: TipoDia): Base => ({ varian
 function comLetras(nome: string, bases: Base[]): Divisao {
   const letras = new Map<string, string>()
   for (const b of bases) if (!letras.has(b.variante)) letras.set(b.variante, String.fromCharCode(65 + letras.size))
-  return { nome, sequencia: bases.map((b) => ({ variante: b.variante, tipo: b.tipo, nome: `Treino ${letras.get(b.variante)} · ${b.rotulo}` })) }
+  return {
+    nome,
+    sequencia: bases.map((b) => ({ variante: b.variante, tipo: b.tipo, grupos: b.grupos ?? GRUPOS_DO_DIA[b.tipo], nome: `Treino ${letras.get(b.variante)} · ${b.rotulo}` })),
+  }
 }
 
 /**
  * C9: a readaptação usa a mesma divisão escolhida (não força mais full body);
  * o que muda nela são séries, repetições e cargas (§6.1).
  */
-export function definirDivisao(params: { diasSemana: DiasSemana; nivel: Nivel; enfases: readonly Enfase[]; fase: Fase }): Divisao {
-  const d = divisaoBase(params)
+export function definirDivisao(params: {
+  diasSemana: DiasSemana
+  nivel: Nivel
+  enfases: readonly Enfase[]
+  fase: Fase
+  musculosPorTreino?: Grupo[][]
+}): Divisao {
+  const m = musculosValidos(params.musculosPorTreino, params.diasSemana)
+  const d = m
+    ? comLetras(
+        'Personalizada',
+        m.map((grupos, i) => ({ variante: `p-${i}`, rotulo: nomeDosMusculos(grupos), tipo: 'personalizado', grupos })),
+      )
+    : divisaoBase(params)
   return params.fase === 'readaptacao' ? { ...d, nome: `${d.nome} (readaptação)` } : d
 }
 
@@ -112,6 +130,11 @@ function divisaoBase(params: { diasSemana: DiasSemana; nivel: Nivel; enfases: re
         dia('legs-B', 'Legs', 'legs'),
       ])
   }
+}
+
+/** C11: a escolha da pessoa só vale se tiver um item (não vazio) por treino. */
+export function musculosValidos(m: Grupo[][] | undefined, treinos: number): Grupo[][] | null {
+  return m && m.length === treinos && m.every((g) => g.length > 0) ? m : null
 }
 
 /** B16: core no fim do treino, em dias alternados da sequência (posições 0, 2, 4). C8: sem core no foco em superiores. */

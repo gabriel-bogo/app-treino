@@ -28,7 +28,7 @@ export async function fazerOnboarding(page: Page, o: OpcoesOnboarding = {}) {
 
   await page.getByLabel('Nome ou apelido').fill(o.nome ?? 'Pessoa Teste')
   await page.getByRole('radio', { name: o.sexo ?? 'Feminino' }).click()
-  await page.getByLabel('Data de nascimento').fill(o.nascimento ?? '1992-03-15')
+  await page.getByLabel('Data de nascimento').fill(o.nascimento ?? '15/03/1992')
   await page.getByLabel('Altura (cm)').fill(o.altura ?? '168')
   await page.getByLabel('Peso (kg)').fill(o.peso ?? '64,5')
   await page.getByRole('button', { name: 'Continuar' }).click()

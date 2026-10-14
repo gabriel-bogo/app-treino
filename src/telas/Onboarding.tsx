@@ -103,7 +103,7 @@ export function Onboarding() {
         {passo === 1 && (
           <>
             <h1 className="text-2xl font-bold">Sobre você</h1>
-            <CamposPessoais r={r} mudar={mudar} textos={textos} setTextos={setTextos} erros={erros} hoje={hoje} />
+            <CamposPessoais r={r} mudar={mudar} textos={textos} setTextos={setTextos} erros={erros} />
           </>
         )}
 

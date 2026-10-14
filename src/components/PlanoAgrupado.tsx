@@ -59,11 +59,14 @@ export function CartaoTreino({
   treino,
   proximo,
   aoTrocar,
+  aoMudarMusculos,
 }: {
   treino: TreinoVisivel
   proximo?: boolean
   /** mostra o botão "Trocar" em cada exercício */
   aoTrocar?: (exercicioId: string, idsDoTreino: string[]) => void
+  /** C11: mostra o botão "Mudar músculos" */
+  aoMudarMusculos?: () => void
 }) {
   const ids = treino.exercicios.map((e) => e.exercicioId)
   return (
@@ -77,6 +80,11 @@ export function CartaoTreino({
       }
     >
       <div className="flex flex-col gap-3" data-testid="treino-do-plano">
+        {aoMudarMusculos && (
+          <Botao variante="secundario" className="min-h-10 self-start px-3 text-sm" onClick={aoMudarMusculos}>
+            Mudar músculos deste treino
+          </Botao>
+        )}
         {secoesPorMusculo(treino.exercicios).map((s, n) => (
           <section key={n}>
             <h3 className="text-sm font-bold uppercase tracking-wide text-emerald-700 dark:text-emerald-400">{s.titulo}</h3>

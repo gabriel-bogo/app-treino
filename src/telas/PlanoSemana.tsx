@@ -8,6 +8,7 @@ import { totalTreinosReadaptacao } from '../domain/motor/regras'
 import { Cartao, Tela, Texto } from '../components/ui'
 import { CartaoTreino, textoSequencia, treinosUnicos } from '../components/PlanoAgrupado'
 import { TrocaNoPlano } from '../components/TrocaNoPlano'
+import { useMusculosNoPlano } from '../components/MusculosNoPlano'
 
 // Plano da semana (§3 tela 3): todos os dias de treino gerados.
 export function PlanoSemana() {
@@ -15,6 +16,7 @@ export function PlanoSemana() {
   const perfil = useLiveQuery(() => db.perfil.get('perfil'))
   const [verVolume, setVerVolume] = useState(false)
   const [troca, setTroca] = useState<{ exercicioId: string; ids: string[] } | null>(null)
+  const musculos = useMusculosNoPlano(dados?.dias, dados?.exercicios)
   if (!dados?.plano || !perfil) return <Tela titulo="Plano da semana">{null}</Tela>
   const { plano, dias, exercicios } = dados
   const readaptacao = plano.fase === 'readaptacao'
@@ -49,6 +51,7 @@ export function PlanoSemana() {
           treino={{ ...d, exercicios: exercicios.filter((e) => e.diaId === d.id).sort((x, y) => x.ordem - y.ordem) }}
           proximo={dias[plano.proximoIndice]?.variante === d.variante}
           aoTrocar={(exercicioId, ids) => setTroca({ exercicioId, ids })}
+          aoMudarMusculos={() => musculos.abrir(d.variante)}
         />
       ))}
 
@@ -81,6 +84,7 @@ export function PlanoSemana() {
         </Cartao>
       )}
       <TrocaNoPlano alvo={troca} aoFechar={() => setTroca(null)} />
+      {musculos.dialogo}
     </Tela>
   )
 }

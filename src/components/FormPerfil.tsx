@@ -1,4 +1,6 @@
+import { useState } from 'react'
 import { CampoTexto, Deslizante, Multipla, Opcoes } from './Campos'
+import { dataDigitadaParaIso, isoParaDataDigitada, mascaraData } from '../domain/datas'
 import { Cartao, Texto } from './ui'
 import {
   DURACAO,
@@ -44,27 +46,46 @@ function Mensagem({ m, forte }: { m: MensagemObjetivo; forte?: boolean }) {
   )
 }
 
+/** Data digitada com máscara DD/MM/AAAA; guarda no perfil só quando completa e válida. */
+function CampoData({ valorIso, aoMudar, erro }: { valorIso?: string; aoMudar: (iso: string) => void; erro?: string }) {
+  const [texto, setTexto] = useState(() => isoParaDataDigitada(valorIso))
+  return (
+    <CampoTexto
+      rotulo="Data de nascimento"
+      inputMode="numeric"
+      placeholder="DD/MM/AAAA"
+      autoComplete="bday"
+      maxLength={10}
+      value={texto}
+      onChange={(e) => {
+        const t = mascaraData(e.target.value)
+        setTexto(t)
+        aoMudar(dataDigitadaParaIso(t) ?? '')
+      }}
+      erro={erro}
+    />
+  )
+}
+
 export function CamposPessoais({
   r,
   mudar,
   textos,
   setTextos,
   erros,
-  hoje,
 }: {
   r: RascunhoPerfil
   mudar: (m: RascunhoPerfil) => void
   textos: { altura: string; peso: string }
   setTextos: (t: { altura: string; peso: string }) => void
   erros: ErrosPerfil
-  hoje: string
 }) {
   return (
     <>
       <CampoTexto rotulo="Nome ou apelido" value={r.nome ?? ''} onChange={(e) => mudar({ nome: e.target.value })} autoComplete="off" erro={erros.nome} />
       <Opcoes rotulo="Sexo" ajuda="Usado só em ajustes finos de descanso e volume. Não define a ênfase do treino." valor={r.sexo} opcoes={OPCOES_SEXO} aoMudar={(v) => mudar({ sexo: v })} />
       <Erro texto={erros.sexo} />
-      <CampoTexto rotulo="Data de nascimento" type="date" max={hoje} value={r.nascimento ?? ''} onChange={(e) => mudar({ nascimento: e.target.value })} erro={erros.nascimento} />
+      <CampoData valorIso={r.nascimento} aoMudar={(iso) => mudar({ nascimento: iso })} erro={erros.nascimento} />
       <div className="grid grid-cols-2 gap-3">
         <CampoTexto rotulo="Altura (cm)" inputMode="numeric" placeholder="170" value={textos.altura} onChange={(e) => setTextos({ ...textos, altura: e.target.value })} erro={erros.alturaCm} />
         <CampoTexto rotulo="Peso (kg)" inputMode="decimal" placeholder="70,5" value={textos.peso} onChange={(e) => setTextos({ ...textos, peso: e.target.value })} erro={erros.pesoInicialKg} />

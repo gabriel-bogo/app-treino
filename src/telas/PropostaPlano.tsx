@@ -9,6 +9,7 @@ import { totalTreinosReadaptacao } from '../domain/motor/regras'
 import { Botao, Cartao, Tela, Texto } from '../components/ui'
 import { CartaoTreino, textoSequencia, treinosUnicos, type TreinoVisivel } from '../components/PlanoAgrupado'
 import { TrocaNoPlano } from '../components/TrocaNoPlano'
+import { useMusculosNoPlano } from '../components/MusculosNoPlano'
 
 // C5: depois do onboarding, o app apresenta o programa de treino montado
 // (Treino A, Treino B…, agrupado por músculo) para a pessoa aprovar, trocar
@@ -21,6 +22,7 @@ export function PropostaPlano() {
   const config = useLiveQuery(() => db.configuracoes.get('app'))
   const [verDepois, setVerDepois] = useState(false)
   const [troca, setTroca] = useState<{ exercicioId: string; ids: string[] } | null>(null)
+  const musculos = useMusculosNoPlano(dados?.dias, dados?.exercicios)
 
   if (!dados?.plano || !perfil || !dados.dias.length) {
     return (
@@ -57,7 +59,7 @@ export function PropostaPlano() {
   return (
     <Tela titulo="Seu plano de treino">
       <Texto>
-        Este é o programa que o app montou para você. Toque em <strong>Trocar</strong> para mudar um exercício ou em{' '}
+        Este é o programa que o app montou para você. Toque em <strong>Trocar</strong> para mudar um exercício, em <strong>Mudar músculos</strong> para escolher o que cada treino trabalha ou em{' '}
         <strong>Mudar minhas escolhas</strong> para ajustar dias, duração, objetivo ou ênfase.
       </Texto>
 
@@ -95,7 +97,7 @@ export function PropostaPlano() {
       </Texto>
 
       {treinos.map((t) => (
-        <CartaoTreino key={t.variante} treino={t} aoTrocar={aoTrocar} />
+        <CartaoTreino key={t.variante} treino={t} aoTrocar={aoTrocar} aoMudarMusculos={() => musculos.abrir(t.variante)} />
       ))}
 
       {depois && (
@@ -121,6 +123,7 @@ export function PropostaPlano() {
       </div>
 
       <TrocaNoPlano alvo={troca} aoFechar={() => setTroca(null)} />
+      {musculos.dialogo}
     </Tela>
   )
 }

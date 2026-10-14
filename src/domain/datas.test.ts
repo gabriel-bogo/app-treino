@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { dataLocal, diasEntre, formatarDuracao, idadeEm, somarDias } from './datas'
+import { dataLocal, diasEntre, formatarDuracao, idadeEm, somarDias, mascaraData, dataDigitadaParaIso, isoParaDataDigitada } from './datas'
 
 describe('datas', () => {
   it('diasEntre conta dias de calendário', () => {
@@ -21,5 +21,20 @@ describe('datas', () => {
   it('formata duração', () => {
     expect(formatarDuracao(75)).toBe('1:15')
     expect(formatarDuracao(3725)).toBe('1:02:05')
+  })
+})
+
+describe('data digitada DD/MM/AAAA', () => {
+  it('máscara coloca as barras sozinha e ignora letras', () => {
+    expect(mascaraData('0807')).toBe('08/07')
+    expect(mascaraData('08071987')).toBe('08/07/1987')
+    expect(mascaraData('08/07/19870')).toBe('08/07/1987')
+    expect(mascaraData('a1b')).toBe('1')
+  })
+  it('converte só datas completas e que existem', () => {
+    expect(dataDigitadaParaIso('08/07/1987')).toBe('1987-07-08')
+    expect(dataDigitadaParaIso('31/02/2000')).toBeNull()
+    expect(dataDigitadaParaIso('08/07/19')).toBeNull()
+    expect(isoParaDataDigitada('1987-07-08')).toBe('08/07/1987')
   })
 })
