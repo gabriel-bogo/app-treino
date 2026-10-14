@@ -1,4 +1,6 @@
 import { describe, expect, it } from 'vitest'
+import { avisoFrequencia, frequenciaPorMusculo, textoAvisoFrequencia } from './divisao'
+import { treinosRecomendados } from '../perfil'
 import { gerarPlano, minutosDoDia, type ContextoMotor, type PlanoGerado } from './gerar'
 import { descansoSegundos, focoSuperior, GRANDES, GRUPOS_DO_DIA, gruposDaEnfase } from './regras'
 import { BIBLIOTECA, contraindicacaoPara, exercicioPorId } from '../biblioteca'
@@ -253,6 +255,22 @@ describe('divisão (§6.2)', () => {
     const semTriceps = gerarPlano({ ...base, excluidos: triceps.map((exercicioId) => ({ variante: a.variante, exercicioId })) })
     expect(semTriceps.avisos.some((x) => x.includes('ficou sem exercício de tríceps'))).toBe(true)
   })
+  it('C19: avisa quando algum músculo treina só 1 vez por semana e sugere menos treinos', () => {
+    const base = { nivel: 'intermediario' as const, enfases: [] as Enfase[] }
+    // 3 dias com 3 treinos (PPL): tudo 1×/semana → sugere 2 (Superior/Inferior revezando = 1,5×)
+    expect(frequenciaPorMusculo({ ...base, diasSemana: 3, treinos: 3 }).peito).toBe(1)
+    expect(avisoFrequencia({ ...base, diasSemana: 3, treinos: 3 })?.sugestao).toBe(2)
+    expect(textoAvisoFrequencia({ ...base, diasSemana: 3, treinos: 3 })).toMatch(/Sugestão: 2 treinos/)
+    // 5 dias com 3 treinos: ~1,7× → sem aviso; 4 dias com 4 treinos: 2× → sem aviso
+    expect(avisoFrequencia({ ...base, diasSemana: 5, treinos: 3 })).toBeNull()
+    expect(avisoFrequencia({ ...base, diasSemana: 4, treinos: 4 })).toBeNull()
+    // 2 dias: não tem como chegar a 2× sem full body → avisa sem sugestão
+    expect(avisoFrequencia({ ...base, diasSemana: 2, treinos: 2 })?.sugestao).toBeNull()
+    // a sugestão padrão de treinos para os dias nunca deixa músculo a 1×, exceto com 2 dias
+    for (const d of [3, 4, 5, 6] as DiasSemana[]) expect(avisoFrequencia({ ...base, diasSemana: d, treinos: treinosRecomendados(d) }), `${d} dias`).toBeNull()
+    // o aviso também vai para o plano
+    expect(gerarPlano(contexto({ diasSemana: 3, treinos: 3 })).avisos.some((a) => a.includes('só 1 vez por semana'))).toBe(true)
+  })
   it('C8: só "Superiores" marcado vira ficha com foco em superiores', () => {
     const d = (diasSemana: DiasSemana) => nomes(gerarPlano(contexto({ diasSemana, enfases: ['superior'] })))
     expect(d(2)).toEqual(['Treino A · Peito, ombros e tríceps', 'Treino B · Costas, bíceps e pernas'])
@@ -349,7 +367,9 @@ describe('descanso e faixas (§6.5, §6.1)', () => {
   it('descanso padrão por objetivo (meio da faixa)', () => {
     expect(descansoSegundos(['hipertrofia'], 'isolado', 'masculino', 'normal')).toBe(75)
     expect(descansoSegundos(['emagrecimento'], 'composto', 'masculino', 'normal')).toBe(75)
-    expect(descansoSegundos(['emagrecimento'], 'isolado', 'masculino', 'normal')).toBe(55)
+    // C20: nunca abaixo de 60 s (52,5 → 60)
+    expect(descansoSegundos(['emagrecimento'], 'isolado', 'masculino', 'normal')).toBe(60)
+    expect(descansoSegundos(['emagrecimento'], 'isolado', 'feminino', 'normal')).toBe(60)
     expect(descansoSegundos(['saude'], 'composto', 'masculino', 'normal')).toBe(90)
     expect(descansoSegundos(['saude'], 'isolado', 'masculino', 'normal')).toBe(60)
     expect(descansoSegundos(['hipertrofia'], 'composto', 'masculino', 'readaptacao')).toBe(90)

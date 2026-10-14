@@ -18,6 +18,7 @@ import {
   type ErrosPerfil,
   type RascunhoPerfil,
 } from '../domain/perfil'
+import { textoAvisoFrequencia } from '../domain/motor/divisao'
 import { alertasObjetivo, avaliarPeso, mensagensClassificacao, objetivosRecomendados, type MensagemObjetivo } from '../domain/saude'
 
 // Partes do formulário de perfil (§4), usadas no onboarding e na tela Perfil.
@@ -150,6 +151,14 @@ export function CamposTreino({ r, mudar, erros, hoje }: { r: RascunhoPerfil; mud
             colunas={2}
           />
           <Erro texto={erros.treinos} />
+          {r.treinos && r.nivel && (() => {
+            const aviso = textoAvisoFrequencia({ diasSemana: r.diasSemana, treinos: r.treinos, nivel: r.nivel, enfases: r.enfases ?? [] })
+            return aviso ? (
+              <Cartao destaque="aviso">
+                <Texto>{aviso}</Texto>
+              </Cartao>
+            ) : null
+          })()}
         </>
       )}
       <Deslizante

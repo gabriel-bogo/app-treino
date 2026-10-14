@@ -1,7 +1,7 @@
 // Divisão do treino conforme os dias por semana (§6.2) e a fase (§6.1).
 
 import type { DiasSemana, Enfase, Fase, Grupo, Nivel, TipoDia } from '../tipos'
-import { GRUPOS_DO_DIA, enfaseSoInferior, focoSuperior, nomeDosMusculos } from './regras'
+import { FREQUENCIA_MINIMA, GRUPOS_DA_ENFASE, NOME_CURTO, GRUPOS_DO_DIA, enfaseSoInferior, focoSuperior, nomeDosMusculos } from './regras'
 
 export interface ModeloDia {
   /** variante única (dias com o mesmo modelo repetem exatamente os mesmos exercícios) */
@@ -140,4 +140,56 @@ export function diaTemCore(indice: number, enfases: readonly Enfase[] = [], tota
   // C18: com número ímpar de treinos, o último não tem core (senão repete no treino seguinte, o A)
   if (total % 2 === 1 && indice === total - 1) return false
   return !focoSuperior(enfases) && indice % 2 === 0
+}
+
+export interface ParamsFrequencia {
+  diasSemana: DiasSemana
+  treinos: DiasSemana
+  nivel: Nivel
+  enfases: readonly Enfase[]
+  musculosPorTreino?: Grupo[][]
+}
+
+/**
+ * C19: quantas vezes por semana cada músculo é treinado (dias ÷ treinos × treinos
+ * em que ele aparece). Abdômen fica de fora; no foco em superiores, as pernas
+ * também (é de propósito que elas treinam menos, C8).
+ */
+export function frequenciaPorMusculo(p: ParamsFrequencia): Partial<Record<Grupo, number>> {
+  const d = definirDivisao({ diasSemana: p.treinos, nivel: p.nivel, enfases: p.enfases, fase: 'normal', musculosPorTreino: p.musculosPorTreino })
+  const ignorar = new Set<Grupo>(['core', ...(focoSuperior(p.enfases) && !musculosValidos(p.musculosPorTreino, p.treinos) ? GRUPOS_DA_ENFASE.inferior : [])])
+  const freq: Partial<Record<Grupo, number>> = {}
+  const vezes = p.diasSemana / d.sequencia.length
+  for (const m of d.sequencia) for (const g of new Set(m.grupos)) if (!ignorar.has(g)) freq[g] = (freq[g] ?? 0) + vezes
+  return freq
+}
+
+/** C19: músculos que treinam menos de 1,5 vez por semana e a sugestão de número de treinos. */
+export function avisoFrequencia(p: ParamsFrequencia): { musculos: Grupo[]; sugestao: DiasSemana | null } | null {
+  const baixos = (q: ParamsFrequencia) =>
+    Object.entries(frequenciaPorMusculo(q))
+      .filter(([, f]) => (f ?? 0) + 1e-9 < FREQUENCIA_MINIMA)
+      .map(([g]) => g as Grupo)
+  const musculos = baixos(p)
+  if (!musculos.length) return null
+  // menos treinos diferentes = cada um se repete mais na semana (sem a escolha manual de músculos)
+  let sugestao: DiasSemana | null = null
+  for (let n = p.treinos - 1; n >= 2; n--) {
+    if (!baixos({ ...p, treinos: n as DiasSemana, musculosPorTreino: undefined }).length) {
+      sugestao = n as DiasSemana
+      break
+    }
+  }
+  return { musculos, sugestao }
+}
+
+/** C19: texto do aviso de frequência (null = tudo certo). */
+export function textoAvisoFrequencia(p: ParamsFrequencia): string | null {
+  const a = avisoFrequencia(p)
+  if (!a) return null
+  const lista = a.musculos.map((g) => NOME_CURTO[g])
+  const quais = lista.length > 4 ? 'a maioria dos músculos' : lista.join(', ')
+  const base = `Com ${p.diasSemana} dias e ${p.treinos} treinos, ${quais} ${lista.length === 1 ? 'treina' : 'treinam'} só 1 vez por semana. O ideal é 2 vezes.`
+  if (a.sugestao) return `${base} Sugestão: ${a.sugestao} treinos diferentes (eles se revezam e cada músculo treina mais vezes).`
+  return `${base} Com mais dias por semana dá para chegar perto disso.`
 }

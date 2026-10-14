@@ -38,9 +38,9 @@ export function letrasTreinos(n: number): string {
   return Array.from({ length: n }, (_, i) => String.fromCharCode(65 + i)).join(', ')
 }
 
-/** C10: sugestão de treinos para os dias (ex: 5 dias → 3 treinos, A B C A B). */
+/** C10/C19: sugestão de treinos para os dias (ex: 5 dias → 3 treinos, A B C A B), com cada músculo ~2× por semana. */
 export function treinosRecomendados(dias: DiasSemana): DiasSemana {
-  return ({ 2: 2, 3: 3, 4: 4, 5: 3, 6: 3 } as const)[dias]
+  return ({ 2: 2, 3: 2, 4: 4, 5: 3, 6: 3 } as const)[dias]
 }
 
 /** C3: barra deslizante de 30 a 120 min, de 5 em 5. */

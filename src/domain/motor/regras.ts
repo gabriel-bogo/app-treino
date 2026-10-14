@@ -149,6 +149,14 @@ const DESCANSO: Record<Objetivo, { composto: number; isolado: number }> = {
   saude: { composto: 90, isolado: 60 },
 }
 
+/** C20: descanso mínimo entre séries, em segundos. */
+export const DESCANSO_MINIMO = 60
+
+/** C19: frequência semanal mínima desejada por músculo (Schoenfeld et al. 2016: 2× > 1×). */
+export const FREQUENCIA_IDEAL = 2
+/** C19: abaixo disso o app avisa e sugere menos treinos diferentes. */
+export const FREQUENCIA_MINIMA = 1.5
+
 export function arredondar5(seg: number): number {
   return Math.round(seg / 5) * 5
 }
@@ -157,7 +165,8 @@ export function arredondar5(seg: number): number {
 export function descansoSegundos(objetivos: readonly Objetivo[], tipo: 'composto' | 'isolado', sexo: Sexo, fase: Fase): number {
   const usados: readonly Objetivo[] = fase === 'readaptacao' || !objetivos.length ? ['saude'] : objetivos
   const base = usados.reduce((soma, o) => soma + DESCANSO[o][tipo], 0) / usados.length
-  return arredondar5(sexo === 'feminino' ? base * MULT_DESCANSO_FEMININO : base)
+  // C20: nunca menos de 60 s (Singer et al. 2024: descansar mais de 60 s dá um pequeno ganho)
+  return Math.max(DESCANSO_MINIMO, arredondar5(sexo === 'feminino' ? base * MULT_DESCANSO_FEMININO : base))
 }
 
 /** §6.1 + A4: 2 séries na primeira semana de readaptação, 3 depois. */

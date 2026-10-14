@@ -16,7 +16,7 @@
 
 import { BIBLIOTECA, contraindicacaoPara, exercicioPermitido, exercicioPorId, textoAlerta, NOME_GRUPO } from '../biblioteca'
 import type { AjusteExercicio, Exercicio, Fase, Grupo, Perfil, TipoDia } from '../tipos'
-import { definirDivisao, diaTemCore, musculosValidos, type ModeloDia } from './divisao'
+import { definirDivisao, diaTemCore, musculosValidos, textoAvisoFrequencia, type ModeloDia } from './divisao'
 import {
   AQUECIMENTO_OMBRO,
   CATEGORIA_OMBRO_DO_DIA,
@@ -646,6 +646,10 @@ export function gerarPlano(ctx: ContextoMotor): PlanoGerado {
       avisos.push(`${d.nome.split(' · ')[0]} fica com ~${m} min por causa dos exercícios incluídos (seu tempo é de ${perfil.duracaoMin} min).`)
     }
   }
+
+  // C19: músculo treinado só ~1 vez por semana
+  const avisoFreq = textoAvisoFrequencia({ diasSemana: perfil.diasSemana, treinos: perfil.treinos, nivel: perfil.nivel, enfases: perfil.enfases, musculosPorTreino: perfil.musculosPorTreino })
+  if (avisoFreq) avisos.push(avisoFreq)
 
   const gerarDia = (d: DiaTrabalho): DiaGerado => ({
     variante: d.variante,
