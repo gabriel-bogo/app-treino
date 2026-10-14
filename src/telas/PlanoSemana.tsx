@@ -3,9 +3,8 @@ import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '../db/banco'
 import { usePlano } from '../app/usePlano'
 import { NOME_GRUPO, GRUPOS } from '../domain/biblioteca'
-import { calcularAlvos, volumeDoPlano } from '../domain/motor/gerar'
+import { gerarPlano, volumeDoPlano } from '../domain/motor/gerar'
 import { totalTreinosReadaptacao } from '../domain/motor/regras'
-import { definirDivisao } from '../domain/motor/divisao'
 import { Cartao, Tela, Texto } from '../components/ui'
 import { CartaoTreino, textoSequencia, treinosUnicos } from '../components/PlanoAgrupado'
 import { TrocaNoPlano } from '../components/TrocaNoPlano'
@@ -20,7 +19,7 @@ export function PlanoSemana() {
   const { plano, dias, exercicios } = dados
   const readaptacao = plano.fase === 'readaptacao'
   const volume = volumeDoPlano(exercicios)
-  const { alvos } = calcularAlvos({ perfil, fase: plano.fase, semanaReadaptacao: 0, nivelVolume: plano.nivelVolume, ajustes: new Map(), trocasNoPlano: {} })
+  const { alvos } = gerarPlano({ perfil, fase: 'normal', semanaReadaptacao: 0, nivelVolume: plano.nivelVolume, ajustes: new Map(), trocasNoPlano: {} })
 
   return (
     <Tela titulo="Plano da semana">
@@ -29,8 +28,8 @@ export function PlanoSemana() {
         {readaptacao ? (
           <Texto>
             Fase de readaptação: treino {Math.min(plano.treinosNaFase + 1, totalTreinosReadaptacao(perfil.diasSemana))} de{' '}
-            {totalTreinosReadaptacao(perfil.diasSemana)}. Use cargas leves e termine cada série com 3 a 4 repetições sobrando. Depois o
-            app passa para {definirDivisao({ diasSemana: perfil.diasSemana, nivel: perfil.nivel, enfases: perfil.enfases, fase: 'normal' }).nome}.
+            {totalTreinosReadaptacao(perfil.diasSemana)}. Use cargas leves e termine cada série com 3 a 4 repetições sobrando. Depois
+            os mesmos treinos passam para 3 a 4 séries de 8 a 12 repetições.
           </Texto>
         ) : (
           <Texto>Ciclo de 8 a 12 repetições. Termine cada série com 1 a 3 repetições sobrando.</Texto>

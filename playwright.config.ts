@@ -1,5 +1,9 @@
 import { defineConfig, devices } from '@playwright/test'
 
+// Os testes montam datas fictícias no Node; o fuso precisa ser o mesmo do navegador
+// (senão, perto da meia-noite, "hoje" é um dia diferente em cada lado).
+process.env.TZ = 'America/Sao_Paulo'
+
 // Testes de ponta a ponta: rodam o app de verdade (build de produção) num
 // Chromium e verificam offline, ausência de requisições externas, retomada de
 // treino etc. Para rodar: npm run build && npm run test:e2e

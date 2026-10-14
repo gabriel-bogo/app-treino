@@ -35,7 +35,10 @@ import {
   VOLUME_INICIAL_GRANDE,
   VOLUME_MINIMO,
   descansoSegundos,
+  focoSuperior,
   gruposDaEnfase,
+  PERNAS_FOCO_SUPERIOR,
+  FOCO_SUPERIOR_BASE,
   niveisCompativeis,
   seriesReadaptacao,
 } from './regras'
@@ -116,6 +119,42 @@ export function calcularAlvos(ctx: ContextoMotor): { alvos: Record<Grupo, number
     alvos[g] = Math.round(base * sexo * (enfase.includes(g) ? MULT_ENFASE : 1))
   }
   return { alvos, semEnfase }
+}
+
+/**
+ * C8: no foco em superiores as pernas têm volume fixo por dia de pernas
+ * (uns 3 exercícios) e glúteo isolado, panturrilha e core ficam de fora.
+ */
+function alvosDosDias(ctx: ContextoMotor, dias: DiaTrabalho[], alvos: Record<Grupo, number>): Record<Grupo, number> {
+  if (!focoSuperior(ctx.perfil.enfases)) return alvos
+  const ajustados = { ...alvos, gluteos: 0, panturrilha: 0, core: 0 }
+  // superiores começam no topo da faixa inicial (§6.3: 8 a 10; pequenos 8) com a ênfase,
+  // para usar o tempo que sobra sem perna, glúteo e abdômen
+  const sexo = ctx.perfil.sexo === 'feminino' ? MULT_VOLUME_FEMININO : 1
+  for (const g of ['peito', 'costas', 'ombros', 'biceps', 'triceps'] as const) {
+    const base = GRANDES.includes(g) ? FOCO_SUPERIOR_BASE.grande : FOCO_SUPERIOR_BASE.pequeno
+    ajustados[g] = Math.max(alvos[g], Math.round(base * sexo * MULT_ENFASE))
+  }
+  for (const g of ['quadriceps', 'posteriores'] as const) {
+    const diasComG = dias.filter((d) => GRUPOS_DO_DIA[d.tipo].includes(g)).reduce((n, d) => n + d.ocorrencias, 0)
+    ajustados[g] = (PERNAS_FOCO_SUPERIOR[g] ?? 0) * diasComG
+  }
+  return ajustados
+}
+
+/**
+ * C8: na ficha de foco em superiores, todo músculo do nome do dia tem pelo
+ * menos um exercício (ex: o dia "Ombros e tríceps" sempre tem tríceps, mesmo
+ * que o volume já viesse dos supinos como músculo secundário).
+ */
+function garantirTodosOsGrupos(dias: DiaTrabalho[], sel: Seletor) {
+  for (const dia of dias) {
+    for (const g of GRUPOS_DO_DIA[dia.tipo]) {
+      if (dia.itens.some((i) => i.ex.grupo === g)) continue
+      const ex = sel.escolher(g, dia)
+      if (ex) dia.itens.push({ ex, series: 3, papel: 'trabalho' })
+    }
+  }
 }
 
 // ─────────────────────── Escolha de exercícios ───────────────────────
@@ -359,30 +398,13 @@ function completarComSobra(ctx: ContextoMotor, dias: DiaTrabalho[], alvos: Recor
 
 // ───────────────────────── Readaptação (§6.1) ─────────────────────────
 
-const ORDEM_READAPTACAO: Record<string, Grupo[]> = {
-  A: ['quadriceps', 'peito', 'costas', 'posteriores', 'ombros', 'gluteos', 'triceps', 'biceps', 'panturrilha', 'core'],
-  B: ['posteriores', 'costas', 'peito', 'quadriceps', 'gluteos', 'ombros', 'biceps', 'triceps', 'panturrilha', 'core'],
-  C: ['gluteos', 'peito', 'costas', 'quadriceps', 'ombros', 'posteriores', 'triceps', 'biceps', 'panturrilha', 'core'],
-}
-
-function preencherReadaptacao(ctx: ContextoMotor, dias: DiaTrabalho[], sel: Seletor) {
-  // §6.1: 2 a 3 séries. Se nem 3 compostos cabem com 3 séries, usa 2 (cobre mais movimentos).
-  let series = seriesReadaptacao(ctx.semanaReadaptacao)
-  const orcamento = ctx.perfil.duracaoMin - MIN_AQUECIMENTO
-  if (series === 3 && 3 * series * MIN_POR_SERIE.composto > orcamento) series = 2
-  for (const dia of dias) {
-    const ordem = ORDEM_READAPTACAO[dia.variante.slice(-1)] ?? ORDEM_READAPTACAO.A
-    for (const g of ordem) {
-      if (g === 'core' && !dia.temCore) continue
-      const ex = sel.escolher(g, dia)
-      if (!ex) continue
-      dia.itens.push({ ex, series, papel: 'trabalho' })
-      if (minutos(ctx, dia) > ctx.perfil.duracaoMin) {
-        dia.itens.pop()
-        sel.devolver(ex)
-      }
-    }
-  }
+/**
+ * C9: a readaptação monta o mesmo treino da fase normal (mesma divisão e
+ * exercícios) e só reduz para 2 séries na 1ª semana e 3 depois (§6.1, A4).
+ */
+function aplicarReadaptacao(ctx: ContextoMotor, dias: DiaTrabalho[]) {
+  const series = seriesReadaptacao(ctx.semanaReadaptacao)
+  for (const dia of dias) for (const i of dia.itens) if (i.papel === 'trabalho') i.series = Math.min(i.series, series)
 }
 
 // ───────────────────── Aquecimento de ombro (§6.11) ─────────────────────
@@ -440,19 +462,19 @@ export function gerarPlano(ctx: ContextoMotor): PlanoGerado {
   divisao.sequencia.forEach((m, idx) => {
     const existente = porVariante.get(m.variante)
     if (existente) existente.ocorrencias++
-    else porVariante.set(m.variante, { ...m, ocorrencias: 1, temCore: diaTemCore(idx), itens: [] })
+    else porVariante.set(m.variante, { ...m, ocorrencias: 1, temCore: diaTemCore(idx, perfil.enfases), itens: [] })
   })
   const dias = [...porVariante.values()]
   const sel = new Seletor(ctx)
   const { alvos, semEnfase } = calcularAlvos(ctx)
 
-  if (fase === 'readaptacao') {
-    preencherReadaptacao(ctx, dias, sel)
-  } else {
-    preencherVolume(dias, alvos, sel, avisos)
-    cortarAteCaber(ctx, dias, alvos, semEnfase)
-    completarComSobra(ctx, dias, alvos, sel)
-  }
+  // C8/C9: mesmo preenchimento nas duas fases; a readaptação só tem menos séries
+  const alvosDoPlano = alvosDosDias(ctx, dias, alvos)
+  preencherVolume(dias, alvosDoPlano, sel, avisos)
+  if (focoSuperior(perfil.enfases)) garantirTodosOsGrupos(dias, sel)
+  cortarAteCaber(ctx, dias, alvosDoPlano, semEnfase)
+  completarComSobra(ctx, dias, alvosDoPlano, sel)
+  if (fase === 'readaptacao') aplicarReadaptacao(ctx, dias)
 
   // aquecimento específico de ombro nos dias com empurrar (§6.7, §6.11)
   const aquecOmbro = aquecimentoOmbro(ctx)
@@ -464,7 +486,7 @@ export function gerarPlano(ctx: ContextoMotor): PlanoGerado {
 
   const volume = contarVolume(dias)
   if (fase === 'normal') {
-    const abaixo = TODOS_GRUPOS.filter((g) => volume[g] + 1e-9 < Math.min(alvos[g], VOLUME_MINIMO))
+    const abaixo = TODOS_GRUPOS.filter((g) => volume[g] + 1e-9 < Math.min(alvosDoPlano[g], VOLUME_MINIMO))
     if (abaixo.length) {
       avisos.push(
         `Com ${perfil.duracaoMin} min por treino, o volume semanal fica abaixo do recomendado para: ${abaixo.map((g) => NOME_GRUPO[g].toLowerCase()).join(', ')}.`,
@@ -500,7 +522,7 @@ export function gerarPlano(ctx: ContextoMotor): PlanoGerado {
     divisao: divisao.nome,
     dias: divisao.sequencia.map((m) => gerarDia(porVariante.get(m.variante)!)),
     volume,
-    alvos,
+    alvos: alvosDoPlano,
     avisos,
   }
 }

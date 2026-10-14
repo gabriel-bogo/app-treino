@@ -13,7 +13,7 @@ Este app dá sugestões gerais de treino. Ele **não substitui** médico, fisiot
 ## O que o app faz
 
 - **Perfil:** um ou mais objetivos, nível, dias por semana, duração do treino (30 min a 2 h), ênfase opcional (inferiores, superiores e/ou glúteos) e limitações (joelho, lombar, ombro, punho).
-- **Plano automático:** divisão de 2 a 6 dias (Treino A, B, C…), volume semanal por grupo muscular, exercícios agrupados por músculo e descanso. Respeita a duração escolhida e as limitações. Quem está começando (ou voltando) passa por 3 semanas de readaptação.
+- **Plano automático:** divisão de 2 a 6 dias (Treino A, B, C…), volume semanal por grupo muscular, exercícios agrupados por músculo e descanso. Respeita a duração escolhida e as limitações. Marcando só "Superiores", o treino vira uma ficha com foco em superiores (ex: ombros + tríceps / peito + costas + bíceps / pernas). Quem está começando (ou voltando) passa por 3 semanas de readaptação, nos mesmos treinos, mais leves.
 - **Você aprova o plano:** ao terminar o cadastro, o app mostra o programa completo. Dá para trocar qualquer exercício ou voltar e mudar as escolhas antes de começar.
 - **Treino guiado:**
   - carga e repetições já preenchidas: se você fez igual, basta tocar no ✓;

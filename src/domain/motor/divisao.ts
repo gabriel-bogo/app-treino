@@ -1,7 +1,7 @@
 // Divisão do treino conforme os dias por semana (§6.2) e a fase (§6.1).
 
 import type { DiasSemana, Enfase, Fase, Nivel, TipoDia } from '../tipos'
-import { MAX_DIAS_READAPTACAO, enfaseSoInferior } from './regras'
+import { enfaseSoInferior, focoSuperior } from './regras'
 
 export interface ModeloDia {
   /** variante única (dias com o mesmo modelo repetem exatamente os mesmos exercícios) */
@@ -33,15 +33,42 @@ function comLetras(nome: string, bases: Base[]): Divisao {
   return { nome, sequencia: bases.map((b) => ({ variante: b.variante, tipo: b.tipo, nome: `Treino ${letras.get(b.variante)} · ${b.rotulo}` })) }
 }
 
+/**
+ * C9: a readaptação usa a mesma divisão escolhida (não força mais full body);
+ * o que muda nela são séries, repetições e cargas (§6.1).
+ */
 export function definirDivisao(params: { diasSemana: DiasSemana; nivel: Nivel; enfases: readonly Enfase[]; fase: Fase }): Divisao {
-  const { nivel, enfases, fase } = params
-  if (fase === 'readaptacao') {
-    // §6.1: full body, máximo 4 dias na semana nessa fase
-    const dias = Math.min(params.diasSemana, MAX_DIAS_READAPTACAO)
-    if (dias === 2) return comLetras('Full body A / B (readaptação)', [fb('A'), fb('B')])
-    if (dias === 3) return comLetras('Full body A / B / C (readaptação)', [fb('A'), fb('B'), fb('C')])
-    return comLetras('Full body A / B (readaptação)', [fb('A'), fb('B'), fb('A'), fb('B')])
+  const d = divisaoBase(params)
+  return params.fase === 'readaptacao' ? { ...d, nome: `${d.nome} (readaptação)` } : d
+}
+
+/**
+ * C8: foco em superiores (só "Superiores" marcado), no estilo de ficha de academia:
+ * ombros + tríceps, peito + costas + bíceps e um dia curto de pernas.
+ */
+function divisaoFocoSuperior(dias: DiasSemana): Divisao {
+  const ot = (v: string) => dia(`ot-${v}`, 'Ombros e tríceps', 'ombros_triceps')
+  const pcb = (v: string) => dia(`pcb-${v}`, 'Peito, costas e bíceps', 'peito_costas_biceps')
+  const pernas = (v: string) => dia(`pernas-${v}`, 'Pernas', 'pernas')
+  const nome = 'Foco em superiores'
+  switch (dias) {
+    case 2:
+      return comLetras(nome, [dia('pot', 'Peito, ombros e tríceps', 'peito_ombros_triceps'), dia('cbp', 'Costas, bíceps e pernas', 'costas_biceps_pernas')])
+    case 3:
+      return comLetras(nome, [ot('A'), pcb('A'), pernas('A')])
+    case 4:
+      // peito/costas 2× (o "B" depois das pernas), sem repetir músculo em dias seguidos
+      return comLetras(nome, [ot('A'), pcb('A'), pernas('A'), pcb('B')])
+    case 5:
+      return comLetras(nome, [ot('A'), pcb('A'), pernas('A'), ot('B'), pcb('B')])
+    case 6:
+      return comLetras(nome, [ot('A'), pcb('A'), pernas('A'), ot('B'), pcb('B'), pernas('B')])
   }
+}
+
+function divisaoBase(params: { diasSemana: DiasSemana; nivel: Nivel; enfases: readonly Enfase[] }): Divisao {
+  const { nivel, enfases } = params
+  if (focoSuperior(enfases)) return divisaoFocoSuperior(params.diasSemana)
   switch (params.diasSemana) {
     case 2:
       return comLetras('Full body A / B', [fb('A'), fb('B')])
@@ -87,7 +114,7 @@ export function definirDivisao(params: { diasSemana: DiasSemana; nivel: Nivel; e
   }
 }
 
-/** B16: core no fim do treino, em dias alternados da sequência (posições 0, 2, 4). */
-export function diaTemCore(indice: number): boolean {
-  return indice % 2 === 0
+/** B16: core no fim do treino, em dias alternados da sequência (posições 0, 2, 4). C8: sem core no foco em superiores. */
+export function diaTemCore(indice: number, enfases: readonly Enfase[] = []): boolean {
+  return !focoSuperior(enfases) && indice % 2 === 0
 }

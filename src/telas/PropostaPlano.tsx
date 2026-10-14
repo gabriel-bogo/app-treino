@@ -5,8 +5,7 @@ import { usePlano } from '../app/usePlano'
 import { navegar } from '../app/rotas'
 import { mapaAjustes } from '../domain/biblioteca'
 import { gerarPlano } from '../domain/motor/gerar'
-import { definirDivisao } from '../domain/motor/divisao'
-import { MAX_DIAS_READAPTACAO, totalTreinosReadaptacao } from '../domain/motor/regras'
+import { totalTreinosReadaptacao } from '../domain/motor/regras'
 import { Botao, Cartao, Tela, Texto } from '../components/ui'
 import { CartaoTreino, textoSequencia, treinosUnicos, type TreinoVisivel } from '../components/PlanoAgrupado'
 import { TrocaNoPlano } from '../components/TrocaNoPlano'
@@ -43,7 +42,6 @@ export function PropostaPlano() {
   const readaptacao = plano.fase === 'readaptacao'
   const porNivel = perfil.nivel === 'iniciante' || perfil.nivel === 'retornando'
   const total = totalTreinosReadaptacao(perfil.diasSemana)
-  const divisaoDepois = definirDivisao({ diasSemana: perfil.diasSemana, nivel: perfil.nivel, enfases: perfil.enfases, fase: 'normal' })
   const depois =
     readaptacao && verDepois
       ? gerarPlano({
@@ -66,15 +64,13 @@ export function PropostaPlano() {
       {readaptacao ? (
         <Cartao titulo="Primeiro: 3 semanas de readaptação" destaque="info">
           <div className="flex flex-col gap-2">
+            <p className="text-lg font-bold">{plano.divisao}</p>
             <Texto>
               {porNivel
-                ? `Como você marcou nível ${perfil.nivel === 'iniciante' ? 'iniciante' : 'retornando'}, os primeiros ${total} treinos são de corpo inteiro (full body), mais leves, com 12 a 15 repetições, para o corpo se acostumar.`
-                : `Pelo IMC, o app começa com ${total} treinos de readaptação: corpo inteiro (full body), mais leves, com 12 a 15 repetições.`}
-              {perfil.diasSemana > MAX_DIAS_READAPTACAO && ` Nessa fase são no máximo ${MAX_DIAS_READAPTACAO} treinos por semana.`}
+                ? `Como você marcou nível ${perfil.nivel === 'iniciante' ? 'iniciante' : 'retornando'}, os primeiros ${total} treinos são mais leves: 2 a 3 séries de 12 a 15 repetições, para o corpo se acostumar.`
+                : `Pelo IMC, os primeiros ${total} treinos são mais leves: 2 a 3 séries de 12 a 15 repetições.`}
             </Texto>
-            <Texto>
-              Depois o app passa sozinho para <strong>{divisaoDepois.nome}</strong>, com {perfil.diasSemana} treinos por semana.
-            </Texto>
+            <Texto>Os treinos e exercícios são os mesmos de depois. Depois da readaptação sobem para 3 a 4 séries de 8 a 12 repetições.</Texto>
             {porNivel && <Texto fraco>Já treina com regularidade? Toque em &quot;Mudar minhas escolhas&quot; e marque nível intermediário.</Texto>}
             <Botao variante="secundario" onClick={() => setVerDepois((v) => !v)}>
               {verDepois ? 'Esconder o plano de depois' : 'Ver como fica depois da readaptação'}

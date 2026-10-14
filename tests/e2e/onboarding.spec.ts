@@ -73,15 +73,15 @@ test('C7: IMC antes do objetivo, em vermelho, com a classificação e o objetivo
 
 test('C5: depois do onboarding mostra o plano para aprovar, trocar exercício ou mudar as escolhas', async ({ page }) => {
   await fazerOnboarding(page, { nivel: 'Iniciante', dias: '5', enfases: ['Superiores'], aprovar: false })
-  // readaptação explicada, com a divisão de depois
+  // C8/C9: só "Superiores" → ficha com foco em superiores, já na readaptação (sem full body)
   await expect(page.getByText('Primeiro: 3 semanas de readaptação')).toBeVisible()
-  await expect(page.getByText(/os primeiros 12 treinos são de corpo inteiro/)).toBeVisible()
-  await expect(page.getByText(/no máximo 4 treinos por semana/)).toBeVisible()
-  await expect(page.getByText('Superior / Inferior / Push / Pull / Legs', { exact: true })).toBeVisible()
-  await expect(page.getByText(/^Treino [AB] · Full body$/)).toHaveCount(2)
-  await page.getByRole('button', { name: 'Ver como fica depois da readaptação' }).click()
-  await expect(page.getByText('Treino E · Legs', { exact: true })).toBeVisible()
-  await page.getByRole('button', { name: 'Esconder o plano de depois' }).click()
+  await expect(page.getByText(/os primeiros 15 treinos são mais leves/)).toBeVisible()
+  await expect(page.getByText('Foco em superiores (readaptação)', { exact: true })).toBeVisible()
+  for (const nome of ['Treino A · Ombros e tríceps', 'Treino B · Peito, costas e bíceps', 'Treino C · Pernas', 'Treino D · Ombros e tríceps', 'Treino E · Peito, costas e bíceps']) {
+    await expect(page.getByText(nome, { exact: true })).toBeVisible()
+  }
+  await expect(page.getByText(/Full body/)).toHaveCount(0)
+  await expect(page.getByRole('heading', { name: /Abdômen|Glúteos|Panturrilha/ })).toHaveCount(0)
 
   // trocar um exercício do Treino A
   const treinoA = page.getByTestId('treino-do-plano').first()
@@ -102,12 +102,10 @@ test('C5: depois do onboarding mostra o plano para aprovar, trocar exercício ou
   await page.getByRole('radio', { name: /^Intermediário/ }).click()
   await page.getByRole('button', { name: 'Salvar e ver o plano' }).click()
   await expect(page.getByRole('heading', { name: 'Seu plano de treino' })).toBeVisible()
-  await expect(page.getByText('Superior / Inferior / Push / Pull / Legs', { exact: true })).toBeVisible()
-  for (const nome of ['Treino A · Superior', 'Treino B · Inferior', 'Treino C · Push', 'Treino D · Pull', 'Treino E · Legs']) {
-    await expect(page.getByText(nome, { exact: true })).toBeVisible()
-  }
+  await expect(page.getByText('Foco em superiores', { exact: true })).toBeVisible()
+  await expect(page.getByText('Primeiro: 3 semanas de readaptação')).toHaveCount(0)
   await page.getByRole('button', { name: 'Aprovar plano' }).click()
-  await expect(page.getByText('Treino A · Superior', { exact: true })).toBeVisible()
+  await expect(page.getByText('Treino A · Ombros e tríceps', { exact: true })).toBeVisible()
   await expect(page.getByRole('button', { name: 'Começar treino' })).toBeVisible()
 })
 

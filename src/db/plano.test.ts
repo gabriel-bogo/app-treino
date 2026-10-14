@@ -105,7 +105,7 @@ describe('plano ativo', () => {
   it('readaptação: semanas por treinos feitos e fim após 3 semanas de treino (A4)', async () => {
     expect(semanaDaReadaptacao(0, 3)).toBe(0)
     expect(semanaDaReadaptacao(3, 3)).toBe(1)
-    expect(semanaDaReadaptacao(8, 6)).toBe(2) // 6 dias → 4 na readaptação
+    expect(semanaDaReadaptacao(12, 6)).toBe(2) // C9: readaptação na divisão escolhida (6 dias)
     await db.perfil.put({ ...perfil, nivel: 'iniciante', diasSemana: 3 })
     await garantirPlano()
     let plano = (await db.plano.get('atual'))!
@@ -122,7 +122,7 @@ describe('plano ativo', () => {
     await db.perfil.put({ ...perfil, nivel: 'iniciante', diasSemana: 5 })
     await garantirPlano()
     expect((await db.plano.get('atual'))!.fase).toBe('readaptacao')
-    expect(await db.diasPlano.count()).toBe(4)
+    expect(await db.diasPlano.count()).toBe(5)
     // na revisão do plano, a pessoa muda para intermediário
     await db.perfil.put({ ...perfil, nivel: 'intermediario', diasSemana: 5 })
     await garantirPlano()

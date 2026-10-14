@@ -25,9 +25,6 @@ export const MINIMO_PESO_CORPO = 5
 /** §6.11: aquecimento específico de ombro, 2 séries de 15. */
 export const AQUECIMENTO_OMBRO = { series: 2, reps: 15 } as const
 
-/** §6.1: máximo de 4 dias por semana na readaptação. */
-export const MAX_DIAS_READAPTACAO = 4
-
 /** §6.1 + A4: readaptação dura 3 "semanas de treino" (3 × dias efetivos). */
 export const SEMANAS_READAPTACAO = 3
 
@@ -69,6 +66,22 @@ export function gruposDaEnfase(enfases: readonly Enfase[]): Grupo[] {
   return [...new Set(efetivas.flatMap((e) => GRUPOS_DA_ENFASE[e]))]
 }
 
+/** C8: a ênfase efetiva é só de membros superiores → divisão com foco em superiores. */
+export function focoSuperior(enfases: readonly Enfase[]): boolean {
+  const grupos = gruposDaEnfase(enfases)
+  return grupos.length > 0 && grupos.every((g) => GRUPOS_DA_ENFASE.superior.includes(g))
+}
+
+/**
+ * C8: no foco em superiores, pernas entram só no dia de pernas, com uns 3
+ * exercícios (2 de quadríceps e 1 de posteriores, 3 séries cada). Sem glúteo
+ * isolado, panturrilha nem abdômen. Séries por dia de pernas.
+ */
+/** C8: séries semanais base dos superiores no foco em superiores (antes da ênfase de +35%). */
+export const FOCO_SUPERIOR_BASE = { grande: 10, pequeno: 8 } as const
+
+export const PERNAS_FOCO_SUPERIOR: Partial<Record<Grupo, number>> = { quadriceps: 6, posteriores: 3 }
+
 /** §6.2 + A12: a ênfase efetiva é só de membros inferiores (inferior e/ou glúteos). */
 export function enfaseSoInferior(enfases: readonly Enfase[]): boolean {
   const grupos = gruposDaEnfase(enfases)
@@ -93,10 +106,15 @@ export const GRUPOS_DO_DIA: Record<TipoDia, Grupo[]> = {
   push: ['peito', 'ombros', 'triceps'],
   pull: ['costas', 'ombros', 'biceps'],
   legs: ['quadriceps', 'posteriores', 'gluteos', 'panturrilha'],
+  ombros_triceps: ['ombros', 'triceps'],
+  peito_costas_biceps: ['peito', 'costas', 'biceps'],
+  peito_ombros_triceps: ['peito', 'ombros', 'triceps'],
+  costas_biceps_pernas: ['costas', 'biceps', 'quadriceps', 'posteriores'],
+  pernas: ['quadriceps', 'posteriores'],
 }
 
 /** Em dia de push só entra ombro "push"; em dia de pull, só ombro "pull" (deltoide posterior). */
-export const CATEGORIA_OMBRO_DO_DIA: Partial<Record<TipoDia, 'push' | 'pull'>> = { push: 'push', pull: 'pull' }
+export const CATEGORIA_OMBRO_DO_DIA: Partial<Record<TipoDia, 'push' | 'pull'>> = { push: 'push', pull: 'pull', peito_ombros_triceps: 'push' }
 
 /**
  * §6.5 + B6: descanso padrão (meio da faixa), em segundos.
@@ -130,7 +148,7 @@ export function niveisCompativeis(nivel: Nivel): NivelExercicio[] {
   return nivel === 'iniciante' ? ['iniciante'] : ['iniciante', 'intermediario']
 }
 
-/** Quantos treinos dura a readaptação (A4: 3 semanas de treino). */
+/** Quantos treinos dura a readaptação (A4: 3 semanas de treino; C9: na divisão escolhida). */
 export function totalTreinosReadaptacao(diasSemana: number): number {
-  return SEMANAS_READAPTACAO * Math.min(diasSemana, MAX_DIAS_READAPTACAO)
+  return SEMANAS_READAPTACAO * diasSemana
 }

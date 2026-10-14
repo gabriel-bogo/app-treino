@@ -21,10 +21,11 @@ test('iniciante começa na readaptação com full body', async ({ page }) => {
   await fazerOnboarding(page, { nivel: 'Iniciante', dias: '5', duracao: 45 })
   await expect(page.getByText('Readaptação', { exact: true })).toBeVisible()
   await page.goto('/#/plano')
-  await expect(page.getByText(/Fase de readaptação: treino 1 de 12/)).toBeVisible()
-  await expect(page.getByText(/^Treino [AB] · Full body$/)).toHaveCount(2)
-  await expect(page.getByText(/Ordem dos treinos: A → B → A → B/)).toBeVisible()
-  await expect(page.getByText(/Depois o app passa para Superior \/ Inferior \/ Push \/ Pull \/ Legs/)).toBeVisible()
+  await expect(page.getByText(/Fase de readaptação: treino 1 de 15/)).toBeVisible()
+  // C9: readaptação na divisão escolhida (5 dias), só mais leve
+  await expect(page.getByText(/^Treino [A-E] · /)).toHaveCount(5)
+  await expect(page.getByText(/Ordem dos treinos: A → B → C → D → E/)).toBeVisible()
+  await expect(page.getByText(/os mesmos treinos passam para 3 a 4 séries de 8 a 12/)).toBeVisible()
 })
 
 test('com limitação de ombro: aquecimento específico e nada da lista proibida (§11)', async ({ page }) => {

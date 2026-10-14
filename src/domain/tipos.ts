@@ -155,7 +155,19 @@ export interface AjusteExercicio {
 
 export type Fase = 'readaptacao' | 'normal'
 
-export type TipoDia = 'fullbody' | 'superior' | 'inferior' | 'push' | 'pull' | 'legs'
+export type TipoDia =
+  | 'fullbody'
+  | 'superior'
+  | 'inferior'
+  | 'push'
+  | 'pull'
+  | 'legs'
+  // C8: divisões com foco em superiores
+  | 'ombros_triceps'
+  | 'peito_costas_biceps'
+  | 'peito_ombros_triceps'
+  | 'costas_biceps_pernas'
+  | 'pernas'
 
 export interface Plano {
   id: 'atual'

@@ -93,5 +93,6 @@ test('mais de 60 dias: pergunta se quer refazer a readaptação', async ({ page 
   await page.getByRole('button', { name: 'Começar treino' }).click()
   await page.getByRole('button', { name: 'Refazer a readaptação' }).click()
   await expect(page.getByText(/Termine cada série com 3 a 4 repetições sobrando/)).toBeVisible()
-  await expect(page.getByText(/Full body/)).toBeVisible()
+  // C9: a readaptação segue a divisão escolhida (não vira full body)
+  await expect(page.getByText(/Treino A · Superior/).first()).toBeVisible()
 })

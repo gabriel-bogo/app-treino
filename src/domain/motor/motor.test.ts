@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { gerarPlano, minutosDoDia, type ContextoMotor, type PlanoGerado } from './gerar'
-import { descansoSegundos, GRANDES, GRUPOS_DO_DIA, gruposDaEnfase } from './regras'
+import { descansoSegundos, focoSuperior, GRANDES, GRUPOS_DO_DIA, gruposDaEnfase } from './regras'
 import { BIBLIOTECA, contraindicacaoPara, exercicioPorId } from '../biblioteca'
 import type { AjusteExercicio, DiasSemana, DuracaoMin, Enfase, Exercicio, Limitacao, Nivel, Objetivo, Sexo } from '../tipos'
 
@@ -28,8 +28,17 @@ const ex = (id: string) => exercicioPorId(id) as Exercicio
 function problemas(ctx: ContextoMotor, plano: PlanoGerado): string[] {
   const p: string[] = []
   const { perfil, fase } = ctx
-  const esperadoDias = fase === 'readaptacao' ? Math.min(perfil.diasSemana, 4) : perfil.diasSemana
-  if (plano.dias.length !== esperadoDias) p.push(`dias: ${plano.dias.length} ≠ ${esperadoDias}`)
+  // C9: a readaptação usa a mesma divisão (mesmo número de dias)
+  if (plano.dias.length !== perfil.diasSemana) p.push(`dias: ${plano.dias.length} ≠ ${perfil.diasSemana}`)
+  // C8: foco em superiores: nada de glúteo isolado, panturrilha ou abdômen; pernas só no dia de pernas, ~3 exercícios
+  if (focoSuperior(perfil.enfases)) {
+    for (const dia of plano.dias) {
+      const grupos = dia.exercicios.filter((e) => e.papel === 'trabalho').map((e) => ex(e.exercicioId).grupo)
+      if (grupos.some((g) => ['gluteos', 'panturrilha', 'core'].includes(g))) p.push(`${dia.nome}: tem ${grupos.join(',')}`)
+      const pernas = grupos.filter((g) => g === 'quadriceps' || g === 'posteriores').length
+      if (pernas > 3) p.push(`${dia.nome}: ${pernas} exercícios de perna`)
+    }
+  }
   for (const dia of plano.dias) {
     const trabalho = dia.exercicios.filter((e) => e.papel === 'trabalho')
     if (!trabalho.length) p.push(`${dia.nome}: sem exercícios`)
@@ -57,7 +66,7 @@ function problemas(ctx: ContextoMotor, plano: PlanoGerado): string[] {
       if (x.soAquecimento) p.push(`${dia.nome}: ${x.id} é só aquecimento`)
       if (perfil.nivel === 'iniciante' && x.nivel !== 'iniciante') p.push(`${dia.nome}: ${x.id} nível ${x.nivel}`)
       if (x.nivel === 'avancado') p.push(`${dia.nome}: ${x.id} avançado`)
-      if (fase === 'readaptacao' ? ![2, 3].includes(e.series) : e.series < 2 || e.series > 4) p.push(`${dia.nome}: ${x.id} com ${e.series} séries`)
+      if (e.series < 2 || e.series > (fase === 'readaptacao' ? 3 : 4)) p.push(`${dia.nome}: ${x.id} com ${e.series} séries`)
       if (x.tipoCarga !== 'pesoCorpo') {
         const faixa = fase === 'readaptacao' ? [12, 15] : [8, 12]
         if (e.repsMin !== faixa[0] || e.repsMax !== faixa[1]) p.push(`${dia.nome}: ${x.id} faixa ${e.repsMin}-${e.repsMax}`)
@@ -133,13 +142,14 @@ describe('divisão (§6.2)', () => {
     expect(nomes(gerarPlano(contexto({ diasSemana: 3, nivel: 'intermediario' })))).toEqual(['Treino A · Push', 'Treino B · Pull', 'Treino C · Legs'])
   })
   it('4 dias: Superior/Inferior; com ênfase só de inferiores vira Inferior/Superior/Inferior/Full body (C2)', () => {
+    // (só "Superiores" marcado usa a divisão de foco em superiores, C8)
     const supInf = ['Treino A · Superior', 'Treino B · Inferior', 'Treino C · Superior', 'Treino D · Inferior']
     const infSup = ['Treino A · Inferior', 'Treino B · Superior', 'Treino C · Inferior', 'Treino D · Full body']
     expect(nomes(gerarPlano(contexto({ diasSemana: 4 })))).toEqual(supInf)
     for (const enfases of [['inferior'], ['gluteos'], ['inferior', 'gluteos'], ['inferior', 'superior', 'gluteos']] as Enfase[][]) {
       expect(nomes(gerarPlano(contexto({ diasSemana: 4, enfases }))), enfases.join('+')).toEqual(infSup)
     }
-    for (const enfases of [['superior'], ['superior', 'gluteos'], ['superior', 'inferior']] as Enfase[][]) {
+    for (const enfases of [['superior', 'gluteos'], ['superior', 'inferior']] as Enfase[][]) {
       expect(nomes(gerarPlano(contexto({ diasSemana: 4, enfases }))), enfases.join('+')).toEqual(supInf)
     }
   })
@@ -154,28 +164,52 @@ describe('divisão (§6.2)', () => {
       'Treino F · Legs',
     ])
   })
-  it('readaptação: full body, no máximo 4 dias (§6.1); dias repetidos mantêm a letra', () => {
+  it('C9: readaptação usa a mesma divisão e os mesmos exercícios, só com menos séries', () => {
     for (const diasSemana of DIAS) {
-      const p = gerarPlano(contexto({ diasSemana, nivel: 'iniciante' }, { fase: 'readaptacao' }))
-      expect(p.dias.length).toBe(Math.min(diasSemana, 4))
-      expect(p.dias.every((d) => d.tipo === 'fullbody')).toBe(true)
+      for (const enfases of [[], ['superior']] as Enfase[][]) {
+        const normal = gerarPlano(contexto({ diasSemana, nivel: 'retornando', enfases }))
+        const read = gerarPlano(contexto({ diasSemana, nivel: 'retornando', enfases }, { fase: 'readaptacao' }))
+        expect(nomes(read)).toEqual(nomes(normal))
+        expect(read.dias.map((d) => d.exercicios.map((e) => e.exercicioId))).toEqual(normal.dias.map((d) => d.exercicios.map((e) => e.exercicioId)))
+        expect(read.divisao).toBe(`${normal.divisao} (readaptação)`)
+      }
     }
-    expect(nomes(gerarPlano(contexto({ diasSemana: 5, nivel: 'iniciante' }, { fase: 'readaptacao' })))).toEqual([
-      'Treino A · Full body',
-      'Treino B · Full body',
-      'Treino A · Full body',
-      'Treino B · Full body',
+  })
+  it('C8: só "Superiores" marcado vira ficha com foco em superiores', () => {
+    const d = (diasSemana: DiasSemana) => nomes(gerarPlano(contexto({ diasSemana, enfases: ['superior'] })))
+    expect(d(2)).toEqual(['Treino A · Peito, ombros e tríceps', 'Treino B · Costas, bíceps e pernas'])
+    expect(d(3)).toEqual(['Treino A · Ombros e tríceps', 'Treino B · Peito, costas e bíceps', 'Treino C · Pernas'])
+    expect(d(4)).toEqual(['Treino A · Ombros e tríceps', 'Treino B · Peito, costas e bíceps', 'Treino C · Pernas', 'Treino D · Peito, costas e bíceps'])
+    expect(d(5)).toEqual([
+      'Treino A · Ombros e tríceps',
+      'Treino B · Peito, costas e bíceps',
+      'Treino C · Pernas',
+      'Treino D · Ombros e tríceps',
+      'Treino E · Peito, costas e bíceps',
     ])
+    expect(d(6)).toHaveLength(6)
+    // dia de pernas: 3 exercícios (2 de quadríceps, 1 de posteriores), 3 séries cada
+    const p = gerarPlano(contexto({ diasSemana: 5, duracaoMin: 90, enfases: ['superior'] }))
+    const pernas = p.dias[2].exercicios.map((e) => ex(e.exercicioId))
+    expect(pernas.map((x) => x.grupo).sort()).toEqual(['posteriores', 'quadriceps', 'quadriceps'])
+    // dia de ombros e tríceps só tem ombros e tríceps
+    expect(new Set(p.dias[0].exercicios.map((e) => ex(e.exercicioId).grupo))).toEqual(new Set(['ombros', 'triceps']))
   })
   it('48 h entre o mesmo grupo nas divisões que separam grupos (§6.3)', () => {
     const porcao = (id: string) => {
       const x = ex(id)
       return x.grupo === 'ombros' ? `ombros-${x.categoria}` : x.grupo
     }
-    const casos: [DiasSemana, Nivel][] = [[3, 'intermediario'], [4, 'intermediario'], [5, 'intermediario'], [6, 'intermediario']]
-    for (const [diasSemana, nivel] of casos) {
+    const casos: [DiasSemana, Nivel, Enfase[]][] = [
+      [3, 'intermediario', []],
+      [4, 'intermediario', []],
+      [5, 'intermediario', []],
+      [6, 'intermediario', []],
+      ...([2, 3, 4, 5, 6] as DiasSemana[]).map((d): [DiasSemana, Nivel, Enfase[]] => [d, 'intermediario', ['superior']]),
+    ]
+    for (const [diasSemana, nivel, enfases] of casos) {
       for (const duracaoMin of DURACOES) {
-        const p = gerarPlano(contexto({ diasSemana, nivel, duracaoMin }))
+        const p = gerarPlano(contexto({ diasSemana, nivel, duracaoMin, enfases }))
         p.dias.forEach((d, i) => {
           const prox = p.dias[(i + 1) % p.dias.length]
           const a = new Set(d.exercicios.filter((e) => e.papel === 'trabalho' && ex(e.exercicioId).grupo !== 'core').map((e) => porcao(e.exercicioId)))
@@ -192,6 +226,7 @@ describe('volume semanal (§6.3, §6.6)', () => {
     for (const diasSemana of [4, 5, 6] as const) {
       for (const enfases of ENFASES) {
         const p = gerarPlano(contexto({ diasSemana, duracaoMin: 90, enfases }))
+        if (focoSuperior(enfases)) continue // C8: pernas com volume fixo, conferido no teste da divisão
         for (const [g, alvo] of Object.entries(p.alvos)) expect(p.volume[g as keyof typeof p.volume], `${diasSemana}d ${enfases.join('+')} ${g}`).toBeGreaterThanOrEqual(alvo)
         expect(p.avisos).toEqual([])
       }
@@ -263,7 +298,8 @@ describe('descanso e faixas (§6.5, §6.1)', () => {
     const s1 = gerarPlano(contexto({ nivel: 'iniciante', duracaoMin: 60 }, { fase: 'readaptacao', semanaReadaptacao: 1 }))
     const trabalho = (p: PlanoGerado) => p.dias.flatMap((d) => d.exercicios.filter((e) => e.papel === 'trabalho' && ex(e.exercicioId).tipoCarga !== 'pesoCorpo'))
     expect(trabalho(s0).every((e) => e.series === 2 && e.repsMin === 12 && e.repsMax === 15)).toBe(true)
-    expect(trabalho(s1).every((e) => e.series === 3)).toBe(true)
+    expect(trabalho(s1).every((e) => e.series >= 2 && e.series <= 3)).toBe(true)
+    expect(trabalho(s1).some((e) => e.series === 3)).toBe(true)
   })
 })
 

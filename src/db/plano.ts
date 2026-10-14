@@ -3,7 +3,7 @@ import { dataLocal, diasEntre } from '../domain/datas'
 import { avaliarPeso, exigeLiberacaoMedica, pesoTendencia, registrosDePeso } from '../domain/saude'
 import { gerarPlano, type ContextoMotor } from '../domain/motor/gerar'
 import { revisarVolume } from '../domain/motor/volume'
-import { DIAS_REVISAO_VOLUME, MAX_DIAS_READAPTACAO, totalTreinosReadaptacao } from '../domain/motor/regras'
+import { DIAS_REVISAO_VOLUME, totalTreinosReadaptacao } from '../domain/motor/regras'
 import { exercicioPorId, mapaAjustes } from '../domain/biblioteca'
 import type { DiaPlano, ExercicioPlano, Fase, Grupo, Perfil, Plano } from '../domain/tipos'
 
@@ -19,8 +19,11 @@ export function precisaReadaptacao(perfil: Perfil, pesoAtualKg: number, hoje: st
 }
 
 export function semanaDaReadaptacao(treinosNaFase: number, diasSemana: number): number {
-  return Math.floor(treinosNaFase / Math.min(diasSemana, MAX_DIAS_READAPTACAO))
+  return Math.floor(treinosNaFase / diasSemana)
 }
+
+/** Muda quando as regras do motor mudam: o plano salvo é refeito na próxima abertura. */
+const VERSAO_MOTOR = 3
 
 function assinatura(ctx: ContextoMotor): string {
   const marcados = [...ctx.ajustes.values()]
@@ -29,6 +32,7 @@ function assinatura(ctx: ContextoMotor): string {
     .sort()
   const p = ctx.perfil
   return JSON.stringify([
+    VERSAO_MOTOR,
     p.sexo,
     p.nivel,
     [...p.objetivos].sort(),
@@ -103,7 +107,7 @@ export async function garantirPlano(agora: Date = new Date()): Promise<void> {
           nivelVolume: {},
           ultimaRevisaoVolume: iso,
           mensagemFase:
-            'Readaptação concluída! A partir de agora o treino segue a divisão normal, com o ciclo de 8 a 12 repetições. No primeiro treino de cada exercício, escolha uma carga para fazer cerca de 8 repetições com 1 a 3 sobrando.',
+            'Readaptação concluída! A partir de agora o treino segue o ciclo de 8 a 12 repetições, com mais séries. No primeiro treino de cada exercício, escolha uma carga para fazer cerca de 8 repetições com 1 a 3 sobrando.',
         }
       }
 
