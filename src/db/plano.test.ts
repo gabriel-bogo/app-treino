@@ -116,7 +116,7 @@ describe('plano ativo', () => {
     plano = (await db.plano.get('atual'))!
     expect(plano.fase).toBe('normal')
     expect(plano.mensagemFase).toMatch(/Readaptação concluída/)
-    expect(plano.divisao).toBe('Full body A / B / C')
+    expect(plano.divisao).toBe('Push / Pull / Legs')
   })
 
   it('C6: antes do primeiro treino, a fase acompanha o nível do perfil', async () => {

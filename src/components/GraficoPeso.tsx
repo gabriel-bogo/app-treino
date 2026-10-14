@@ -8,7 +8,7 @@ import { formatarDataCurta, diasEntre, paraDate, FUSO } from '../domain/datas'
 
 const PALETA = {
   claro: { media: '#047857', dia: '#10b981', grade: '#e2e8f0', superficie: '#ffffff' },
-  escuro: { media: '#1aa67c', dia: '#05704f', grade: '#1e293b', superficie: '#0f172a' },
+  escuro: { media: '#1aa67c', dia: '#05704f', grade: '#262626', superficie: '#171717' },
 }
 
 export interface PontoPeso {

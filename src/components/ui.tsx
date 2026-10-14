@@ -54,7 +54,7 @@ export function Cartao({
     aviso: 'border-amber-300 bg-amber-50 dark:border-amber-700/60 dark:bg-amber-950/40',
     perigo: 'border-red-300 bg-red-50 dark:border-red-800/60 dark:bg-red-950/40',
     sucesso: 'border-emerald-300 bg-emerald-50 dark:border-emerald-800/60 dark:bg-emerald-950/40',
-    info: 'border-sky-300 bg-sky-50 dark:border-sky-800/60 dark:bg-sky-950/40',
+    info: 'border-sky-300 bg-sky-50 dark:border-sky-700/60 dark:bg-slate-900',
   }
   const base = destaque
     ? cores[destaque]

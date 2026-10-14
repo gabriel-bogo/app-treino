@@ -574,7 +574,7 @@ export function gerarPlano(ctx: ContextoMotor): PlanoGerado {
   divisao.sequencia.forEach((m, idx) => {
     const existente = porVariante.get(m.variante)
     if (existente) existente.ocorrencias++
-    else porVariante.set(m.variante, { ...m, ocorrencias: 1, temCore: personalizada ? m.grupos.includes('core') : diaTemCore(idx, perfil.enfases), itens: [] })
+    else porVariante.set(m.variante, { ...m, ocorrencias: 1, temCore: personalizada ? m.grupos.includes('core') : diaTemCore(idx, perfil.enfases, divisao.sequencia.length), itens: [] })
   })
   for (const d of porVariante.values()) d.ocorrencias *= vezesPorSemana
   const dias = [...porVariante.values()]

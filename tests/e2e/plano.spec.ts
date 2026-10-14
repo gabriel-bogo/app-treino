@@ -44,5 +44,5 @@ test('mudar o perfil refaz o plano', async ({ page }) => {
   await page.getByRole('radiogroup', { name: 'Dias por semana' }).getByRole('radio', { name: '2', exact: true }).click()
   await page.getByRole('button', { name: 'Salvar alterações' }).click()
   await page.goto('/#/plano')
-  await expect(page.getByText('Full body A / B', { exact: true })).toBeVisible()
+  await expect(page.getByText('Superior / Inferior', { exact: true })).toBeVisible()
 })

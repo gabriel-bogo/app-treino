@@ -136,19 +136,26 @@ describe('motor: todas as combinações (§11)', () => {
 
 describe('divisão (§6.2)', () => {
   const nomes = (p: PlanoGerado) => p.dias.map((d) => d.nome)
-  it('2 dias: full body A/B', () => {
-    expect(nomes(gerarPlano(contexto({ diasSemana: 2 })))).toEqual(['Treino A · Full body', 'Treino B · Full body'])
+  it('C18: 2 treinos: Superior/Inferior (nunca full body)', () => {
+    expect(nomes(gerarPlano(contexto({ diasSemana: 2 })))).toEqual(['Treino A · Superior', 'Treino B · Inferior'])
+    expect(nomes(gerarPlano(contexto({ diasSemana: 2, enfases: ['gluteos'] })))).toEqual(['Treino A · Inferior', 'Treino B · Superior'])
   })
-  it('3 dias: full body A/B/C para iniciante e retornando; PPL para intermediário', () => {
-    const fb3 = ['Treino A · Full body', 'Treino B · Full body', 'Treino C · Full body']
-    expect(nomes(gerarPlano(contexto({ diasSemana: 3, nivel: 'iniciante' })))).toEqual(fb3)
-    expect(nomes(gerarPlano(contexto({ diasSemana: 3, nivel: 'retornando' })))).toEqual(fb3)
-    expect(nomes(gerarPlano(contexto({ diasSemana: 3, nivel: 'intermediario' })))).toEqual(['Treino A · Push', 'Treino B · Pull', 'Treino C · Legs'])
+  it('C18: 3 treinos: Push/Pull/Legs para qualquer nível (nunca full body)', () => {
+    for (const nivel of NIVEIS) {
+      expect(nomes(gerarPlano(contexto({ diasSemana: 3, nivel })))).toEqual(['Treino A · Push', 'Treino B · Pull', 'Treino C · Legs'])
+    }
   })
-  it('4 dias: Superior/Inferior; com ênfase só de inferiores vira Inferior/Superior/Inferior/Full body (C2)', () => {
+  it('C18: nenhuma divisão sugerida é full body', () => {
+    for (const diasSemana of DIAS)
+      for (const nivel of NIVEIS)
+        for (const enfases of ENFASES)
+          for (const fase of ['normal', 'readaptacao'] as const)
+            expect(gerarPlano(contexto({ diasSemana, nivel, enfases }, { fase })).dias.some((d) => d.tipo === 'fullbody'), `${diasSemana} ${nivel} ${enfases}`).toBe(false)
+  })
+  it('4 dias: Superior/Inferior; com ênfase só de inferiores começa por Inferior (C2, C18)', () => {
     // (só "Superiores" marcado usa a divisão de foco em superiores, C8)
     const supInf = ['Treino A · Superior', 'Treino B · Inferior', 'Treino C · Superior', 'Treino D · Inferior']
-    const infSup = ['Treino A · Inferior', 'Treino B · Superior', 'Treino C · Inferior', 'Treino D · Full body']
+    const infSup = ['Treino A · Inferior', 'Treino B · Superior', 'Treino C · Inferior', 'Treino D · Superior']
     expect(nomes(gerarPlano(contexto({ diasSemana: 4 })))).toEqual(supInf)
     for (const enfases of [['inferior'], ['gluteos'], ['inferior', 'gluteos'], ['inferior', 'superior', 'gluteos']] as Enfase[][]) {
       expect(nomes(gerarPlano(contexto({ diasSemana: 4, enfases }))), enfases.join('+')).toEqual(infSup)
@@ -184,7 +191,7 @@ describe('divisão (§6.2)', () => {
     expect(nomes(p)).toEqual(['Treino A · Ombros e tríceps', 'Treino B · Peito, costas e bíceps', 'Treino C · Pernas'])
     // cada treino cai 5/3 vezes por semana: o volume semanal chega ao alvo
     for (const g of ['peito', 'costas', 'ombros'] as const) expect(p.volume[g]).toBeGreaterThanOrEqual(p.alvos[g])
-    expect(nomes(gerarPlano(contexto({ diasSemana: 4, treinos: 2 })))).toEqual(['Treino A · Full body', 'Treino B · Full body'])
+    expect(nomes(gerarPlano(contexto({ diasSemana: 4, treinos: 2 })))).toEqual(['Treino A · Superior', 'Treino B · Inferior'])
   })
   it('C11: músculos escolhidos por treino (ex: peito + tríceps / ombros + costas + bíceps / pernas)', () => {
     const musculosPorTreino: ContextoMotor['perfil']['musculosPorTreino'] = [['peito', 'triceps'], ['costas', 'ombros', 'biceps'], ['quadriceps', 'posteriores']]
@@ -266,25 +273,20 @@ describe('divisão (§6.2)', () => {
     // dia de ombros e tríceps só tem ombros e tríceps
     expect(new Set(p.dias[0].exercicios.map((e) => ex(e.exercicioId).grupo))).toEqual(new Set(['ombros', 'triceps']))
   })
-  it('48 h entre o mesmo grupo nas divisões que separam grupos (§6.3)', () => {
+  it('48 h: treinos seguidos nunca repetem músculo, inclusive abdômen (§6.3, C18)', () => {
     const porcao = (id: string) => {
       const x = ex(id)
       return x.grupo === 'ombros' ? `ombros-${x.categoria}` : x.grupo
     }
-    const casos: [DiasSemana, Nivel, Enfase[]][] = [
-      [3, 'intermediario', []],
-      [4, 'intermediario', []],
-      [5, 'intermediario', []],
-      [6, 'intermediario', []],
-      ...([2, 3, 4, 5, 6] as DiasSemana[]).map((d): [DiasSemana, Nivel, Enfase[]] => [d, 'intermediario', ['superior']]),
-    ]
+    const casos: [DiasSemana, Nivel, Enfase[]][] = DIAS.flatMap((d) => NIVEIS.flatMap((n) => ENFASES.map((e): [DiasSemana, Nivel, Enfase[]] => [d, n, e])))
     for (const [diasSemana, nivel, enfases] of casos) {
-      for (const duracaoMin of DURACOES) {
+      for (const duracaoMin of [30, 60, 90, 120]) {
         const p = gerarPlano(contexto({ diasSemana, nivel, duracaoMin, enfases }))
         p.dias.forEach((d, i) => {
           const prox = p.dias[(i + 1) % p.dias.length]
-          const a = new Set(d.exercicios.filter((e) => e.papel === 'trabalho' && ex(e.exercicioId).grupo !== 'core').map((e) => porcao(e.exercicioId)))
-          const b = prox.exercicios.filter((e) => e.papel === 'trabalho' && ex(e.exercicioId).grupo !== 'core').map((e) => porcao(e.exercicioId))
+          if (prox === d) return
+          const a = new Set(d.exercicios.filter((e) => e.papel === 'trabalho').map((e) => porcao(e.exercicioId)))
+          const b = prox.exercicios.filter((e) => e.papel === 'trabalho').map((e) => porcao(e.exercicioId))
           expect(b.filter((g) => a.has(g)), `${diasSemana}d ${duracaoMin}min ${d.nome}→${prox.nome}`).toEqual([])
         })
       }

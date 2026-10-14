@@ -26,7 +26,6 @@ interface Base {
   grupos?: Grupo[]
 }
 
-const fb = (l: string): Base => ({ variante: `fb-${l}`, rotulo: 'Full body', tipo: 'fullbody' })
 const dia = (variante: string, rotulo: string, tipo: TipoDia): Base => ({ variante, rotulo, tipo })
 
 /** C5: cada variante recebe uma letra (Treino A, B, C…) na ordem em que aparece. */
@@ -85,25 +84,24 @@ function divisaoFocoSuperior(dias: DiasSemana): Divisao {
 }
 
 function divisaoBase(params: { diasSemana: DiasSemana; nivel: Nivel; enfases: readonly Enfase[] }): Divisao {
-  const { nivel, enfases } = params
+  const { enfases } = params
   if (focoSuperior(enfases)) return divisaoFocoSuperior(params.diasSemana)
   switch (params.diasSemana) {
+    // C18: nada de full body; cada treino trabalha músculos diferentes do seguinte
     case 2:
-      return comLetras('Full body A / B', [fb('A'), fb('B')])
+      return enfaseSoInferior(enfases)
+        ? comLetras('Inferior / Superior', [dia('inf', 'Inferior', 'inferior'), dia('sup', 'Superior', 'superior')])
+        : comLetras('Superior / Inferior', [dia('sup', 'Superior', 'superior'), dia('inf', 'Inferior', 'inferior')])
     case 3:
-      if (nivel === 'intermediario') {
-        return comLetras('Push / Pull / Legs', [dia('push', 'Push', 'push'), dia('pull', 'Pull', 'pull'), dia('legs', 'Legs', 'legs')])
-      }
-      return comLetras('Full body A / B / C', [fb('A'), fb('B'), fb('C')])
+      return comLetras('Push / Pull / Legs', [dia('push', 'Push', 'push'), dia('pull', 'Pull', 'pull'), dia('legs', 'Legs', 'legs')])
     case 4:
-      // §6.2: ênfase inferior ou glúteos com 4 dias vira Inferior / Superior / Inferior / Full body
-      // (A12: automático; C2: só quando a ênfase efetiva é toda de membros inferiores)
+      // ênfase só em inferiores: começa pelas pernas (C18: o 4º treino deixa de ser full body)
       if (enfaseSoInferior(enfases)) {
-        return comLetras('Inferior / Superior / Inferior / Full body', [
+        return comLetras('Inferior / Superior / Inferior / Superior', [
           dia('inf-A', 'Inferior', 'inferior'),
-          dia('sup', 'Superior', 'superior'),
+          dia('sup-A', 'Superior', 'superior'),
           dia('inf-B', 'Inferior', 'inferior'),
-          fb('A'),
+          dia('sup-B', 'Superior', 'superior'),
         ])
       }
       return comLetras('Superior / Inferior / Superior / Inferior', [
@@ -138,6 +136,8 @@ export function musculosValidos(m: Grupo[][] | undefined, treinos: number): Grup
 }
 
 /** B16: core no fim do treino, em dias alternados da sequência (posições 0, 2, 4). C8: sem core no foco em superiores. */
-export function diaTemCore(indice: number, enfases: readonly Enfase[] = []): boolean {
+export function diaTemCore(indice: number, enfases: readonly Enfase[] = [], total = 0): boolean {
+  // C18: com número ímpar de treinos, o último não tem core (senão repete no treino seguinte, o A)
+  if (total % 2 === 1 && indice === total - 1) return false
   return !focoSuperior(enfases) && indice % 2 === 0
 }

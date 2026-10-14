@@ -20,7 +20,7 @@ export function aplicarTema(tema: Tema = lerTema()) {
   const escuro = tema === 'escuro' || (tema === 'auto' && consulta().matches)
   document.documentElement.classList.toggle('dark', escuro)
   const meta = document.querySelector('meta[name="theme-color"]')
-  meta?.setAttribute('content', escuro ? '#0f172a' : '#f8fafc')
+  meta?.setAttribute('content', escuro ? '#0a0a0a' : '#fafafa')
 }
 
 export function salvarTema(tema: Tema) {
