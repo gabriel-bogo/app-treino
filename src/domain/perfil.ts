@@ -12,6 +12,7 @@ export const OPCOES_NIVEL: { valor: Nivel; rotulo: string; descricao: string }[]
   { valor: 'iniciante', rotulo: 'Iniciante', descricao: 'Nunca treinou ou treinou pouco' },
   { valor: 'retornando', rotulo: 'Retornando', descricao: 'Já treinou, mas está voltando após uma pausa' },
   { valor: 'intermediario', rotulo: 'Intermediário', descricao: 'Treina com regularidade' },
+  { valor: 'avancado', rotulo: 'Avançado', descricao: 'Treina há anos, com técnica e cargas altas' },
 ]
 
 export const OPCOES_OBJETIVO: { valor: Objetivo; rotulo: string; descricao: string }[] = [
@@ -40,7 +41,7 @@ export function letrasTreinos(n: number): string {
 
 /** C10/C19: sugestão de treinos para os dias (ex: 5 dias → 3 treinos, A B C A B), com cada músculo ~2× por semana. */
 export function treinosRecomendados(dias: DiasSemana): DiasSemana {
-  return ({ 2: 2, 3: 2, 4: 4, 5: 3, 6: 3 } as const)[dias]
+  return ({ 2: 2, 3: 2, 4: 4, 5: 5, 6: 6 } as const)[dias]
 }
 
 /** C3: barra deslizante de 30 a 120 min, de 5 em 5. */

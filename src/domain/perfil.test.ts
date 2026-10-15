@@ -14,7 +14,9 @@ describe('perfil (§4, C1 a C3)', () => {
   })
 
   it('C10: número de treinos de 2 até os dias, com sugestão', () => {
-    expect(treinosRecomendados(5)).toBe(3)
+    expect(treinosRecomendados(5)).toBe(5)
+    expect(treinosRecomendados(6)).toBe(6)
+    expect(treinosRecomendados(3)).toBe(2)
     expect(opcoesTreinos(3).map((o) => o.valor)).toEqual([2, 3])
     expect(ajustarTreinos(6, 4)).toBe(4)
     expect(validarTreino({ nivel: 'iniciante', diasSemana: 3, treinos: 4, duracaoMin: 60, objetivos: ['saude'], enfases: [] }).treinos).toBeDefined()
@@ -37,8 +39,8 @@ describe('perfil (§4, C1 a C3)', () => {
   it('converte perfil da versão anterior e deixa o atual igual', () => {
     const antigo = { id: 'perfil', nome: 'Teste', objetivo: 'saude', enfase: 'equilibrado', duracaoMin: 75, diasSemana: 5 }
     const novo = normalizarPerfil(antigo)
-    // C10: sem número de treinos salvo, usa a sugestão para os dias (5 dias → 3 treinos)
-    expect(novo).toEqual({ id: 'perfil', nome: 'Teste', objetivos: ['saude'], enfases: [], duracaoMin: 75, diasSemana: 5, treinos: 3 })
+    // C10: sem número de treinos salvo, usa a sugestão para os dias (5 dias → 5 treinos)
+    expect(novo).toEqual({ id: 'perfil', nome: 'Teste', objetivos: ['saude'], enfases: [], duracaoMin: 75, diasSemana: 5, treinos: 5 })
     expect(normalizarPerfil(novo)).toEqual(novo)
     expect(normalizarPerfil({ objetivo: 'hipertrofia', enfase: 'superior' })).toMatchObject({ objetivos: ['hipertrofia'], enfases: ['superior'] })
     // valor inválido não quebra: objetivo cai para saúde geral

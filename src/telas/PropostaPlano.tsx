@@ -74,8 +74,8 @@ export function PropostaPlano() {
             <p className="text-lg font-bold">{plano.divisao}</p>
             <Texto>
               {porNivel
-                ? `Como você marcou nível ${perfil.nivel === 'iniciante' ? 'iniciante' : 'retornando'}, os primeiros ${total} treinos são mais leves: 2 a 3 séries de 12 a 15 repetições, para o corpo se acostumar.`
-                : `Pelo IMC, os primeiros ${total} treinos são mais leves: 2 a 3 séries de 12 a 15 repetições.`}
+                ? `Como você marcou nível ${perfil.nivel === 'iniciante' ? 'iniciante' : 'retornando'}, os primeiros ${total} treinos são mais leves: 3 séries de 12 a 15 repetições, para o corpo se acostumar.`
+                : `Pelo IMC, os primeiros ${total} treinos são mais leves: 3 séries de 12 a 15 repetições.`}
             </Texto>
             <Texto>Os treinos e exercícios são os mesmos de depois. Depois da readaptação sobem para 3 a 4 séries de 8 a 12 repetições.</Texto>
             {porNivel && <Texto fraco>Já treina com regularidade? Toque em &quot;Mudar minhas escolhas&quot; e marque nível intermediário.</Texto>}

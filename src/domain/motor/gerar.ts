@@ -32,7 +32,10 @@ import {
   ORDEM_PREENCHIMENTO,
   PESO_SECUNDARIO,
   VOLUME_INICIAL_GRANDE,
-  VOLUME_MAXIMO_GRANDE,
+  VOLUME_INICIAL_AVANCADO,
+  SERIES_PADRAO,
+  SERIES_MAXIMO,
+  TETO_SEMANAL_ENCHER,
   VOLUME_MINIMO,
   descansoSegundos,
   focoSuperior,
@@ -122,7 +125,8 @@ export function calcularAlvos(ctx: ContextoMotor): { alvos: Record<Grupo, number
   const enfase = gruposDaEnfase(ctx.perfil.enfases)
   const sexo = ctx.perfil.sexo === 'feminino' ? MULT_VOLUME_FEMININO : 1
   for (const g of TODOS_GRUPOS) {
-    const base = GRANDES.includes(g) ? (ctx.nivelVolume[g] ?? VOLUME_INICIAL_GRANDE) : VOLUME_MINIMO
+    const inicial = ctx.perfil.nivel === 'avancado' ? VOLUME_INICIAL_AVANCADO : VOLUME_INICIAL_GRANDE
+    const base = GRANDES.includes(g) ? (ctx.nivelVolume[g] ?? inicial) : VOLUME_MINIMO
     semEnfase[g] = Math.round(base * sexo)
     alvos[g] = Math.round(base * sexo * (enfase.includes(g) ? MULT_ENFASE : 1))
   }
@@ -185,7 +189,7 @@ function reequilibrarGrupos(ctx: ContextoMotor, dias: DiaTrabalho[], sel: Seleto
       dia.itens.splice(pos, 1)
       sel.devolver(sai.ex)
       const ex = sel.escolher(g, dia)
-      const novo = ex ? { ex, series: Math.min(3, sai.series), papel: 'trabalho' as const } : null
+      const novo = ex ? { ex, series: SERIES_PADRAO, papel: 'trabalho' as const } : null
       if (novo) dia.itens.push(novo)
       if (!novo || minutos(ctx, dia) > ctx.perfil.duracaoMin) {
         if (novo) {
@@ -297,11 +301,16 @@ function espalhar<T>(lista: T[], k: number): T[] {
 }
 
 /** Séries de um grupo num dia → partes por exercício (2 a 4 cada; ~3 por exercício, A3). */
+/** C22: cada exercício com 3 séries (até 4); sobra pequena vira mais uma série, não exercício de 2. */
 function partesPorExercicio(series: number): number[] {
-  let n = Math.max(1, Math.round(series / 3))
-  while (series > 4 * n) n++
-  while (n > 1 && series < 2 * n) n--
-  return dividir(series, n)
+  let n = Math.max(1, Math.floor(series / SERIES_PADRAO))
+  while (series > SERIES_MAXIMO * n) n++
+  return dividir(series, n).map((p) => Math.max(SERIES_PADRAO, p))
+}
+
+/** C22: na readaptação o máximo é 3 séries; na fase normal, 4. */
+function maxSeries(ctx: ContextoMotor): number {
+  return ctx.fase === 'readaptacao' ? SERIES_PADRAO : SERIES_MAXIMO
 }
 
 export function minutosDoDia(itens: { ex: Exercicio; series: number; papel: string }[], comAquecimentoOmbro: boolean): number {
@@ -384,8 +393,8 @@ function cortarAteCaber(ctx: ContextoMotor, dias: DiaTrabalho[], alvos: Record<G
         const trabalho = dia.itens.filter((i) => i.papel === 'trabalho')
         const cortaveis = trabalho.filter((i) => {
           if (i.fixo) return false
-          const perde = i.series > 2 ? dia.ocorrencias : i.series * dia.ocorrencias
-          if (i.series <= 2 && trabalho.length <= 1) return false
+          const perde = i.series > SERIES_PADRAO ? dia.ocorrencias : i.series * dia.ocorrencias
+          if (i.series <= SERIES_PADRAO && trabalho.length <= 1) return false
           return vol[i.ex.grupo] - perde >= piso(etapa, i.ex.grupo) - 1e-9 // frequência fracionada (C10)
         })
         if (!cortaveis.length) break
@@ -394,7 +403,7 @@ function cortarAteCaber(ctx: ContextoMotor, dias: DiaTrabalho[], alvos: Record<G
         // (ex: dois exercícios de perna num full body curto) e do grupo mais perto do alvo.
         const redundancia = (i: Item) => trabalho.filter((o) => o.ex.categoria === i.ex.categoria).length
         const proporcao = (i: Item) => vol[i.ex.grupo] / Math.max(1, alvos[i.ex.grupo])
-        const chave = (i: Item) => [importancia(i), i.series > 2 ? 0 : 1, -redundancia(i), -proporcao(i), -i.series, -dia.itens.indexOf(i)]
+        const chave = (i: Item) => [importancia(i), i.series > SERIES_PADRAO ? 0 : 1, -redundancia(i), -proporcao(i), -i.series, -dia.itens.indexOf(i)]
         cortaveis.sort((a, b) => {
           const ka = chave(a)
           const kb = chave(b)
@@ -402,7 +411,7 @@ function cortarAteCaber(ctx: ContextoMotor, dias: DiaTrabalho[], alvos: Record<G
           return 0
         })
         const alvo = cortaveis[0]
-        if (alvo.series > 2) alvo.series--
+        if (alvo.series > SERIES_PADRAO) alvo.series--
         else dia.itens.splice(dia.itens.indexOf(alvo), 1)
       }
     }
@@ -423,25 +432,25 @@ function completarComSobra(ctx: ContextoMotor, dias: DiaTrabalho[], alvos: Recor
     while (contarVolume(dias)[g] < alvos[g] && seguranca-- > 0) {
       // 1º: mais uma série num exercício do grupo que tenha menos de 4
       const comItem = diasG
-        .flatMap((d) => d.itens.filter((i) => i.papel === 'trabalho' && i.ex.grupo === g && i.series < 4).map((i) => ({ d, i })))
+        .flatMap((d) => d.itens.filter((i) => i.papel === 'trabalho' && i.ex.grupo === g && i.series < maxSeries(ctx)).map((i) => ({ d, i })))
         .find(({ d, i }) => cabe(d, MIN_POR_SERIE[i.ex.tipo]))
       if (comItem) {
         comItem.i.series++
         continue
       }
-      // 2º: um exercício novo de 2 séries num dia com tempo livre
-      const diaLivre = diasG.find((d) => cabe(d, 2 * MIN_POR_SERIE.composto))
+      // 2º: um exercício novo de 3 séries num dia com tempo livre
+      const diaLivre = diasG.find((d) => cabe(d, SERIES_PADRAO * MIN_POR_SERIE.composto))
       if (!diaLivre) {
         diasG.forEach((d) => fechados.add(d))
         break
       }
       const ex = sel.escolher(g, diaLivre)
       if (!ex) break
-      if (!cabe(diaLivre, 2 * MIN_POR_SERIE[ex.tipo])) {
+      if (!cabe(diaLivre, SERIES_PADRAO * MIN_POR_SERIE[ex.tipo])) {
         sel.devolver(ex)
         break
       }
-      diaLivre.itens.push({ ex, series: 2, papel: 'trabalho' })
+      diaLivre.itens.push({ ex, series: SERIES_PADRAO, papel: 'trabalho' })
       // o 1º exercício de empurrar com limitação de ombro traz o aquecimento específico junto
       if (minutos(ctx, diaLivre) > ctx.perfil.duracaoMin) {
         diaLivre.itens.pop()
@@ -462,18 +471,21 @@ function completarComSobra(ctx: ContextoMotor, dias: DiaTrabalho[], alvos: Recor
  */
 function encherTempo(ctx: ContextoMotor, dias: DiaTrabalho[], alvos: Record<Grupo, number>, sel: Seletor) {
   const enfase = gruposDaEnfase(ctx.perfil.enfases)
-  const teto = (g: Grupo) => Math.max(alvos[g], Math.round(VOLUME_MAXIMO_GRANDE * (enfase.includes(g) ? MULT_ENFASE : 1)))
+  // C23: teto semanal de 20 séries por músculo (faixa de 12 a 24 usada em programas de hipertrofia), +35% com ênfase
+  const teto = (g: Grupo) => Math.max(alvos[g], Math.round(TETO_SEMANAL_ENCHER * (enfase.includes(g) ? MULT_ENFASE : 1)))
   const maxExercicios = (g: Grupo) => (GRANDES.includes(g) ? 4 : 3)
   const cabe = (dia: DiaTrabalho, extra: number) => minutos(ctx, dia) + extra <= ctx.perfil.duracaoMin
   for (const dia of dias) {
-    if (dia.tipo === 'pernas' || dia.tipo === 'costas_biceps_pernas') continue
     const grupos = dia.grupos.filter((g) => (g === 'core' ? dia.temCore : alvos[g] > 0))
+    // foco em superiores: pernas ficam com uns 3 exercícios (C8); só ganham séries
+    const pernasFixas = focoSuperior(ctx.perfil.enfases) && dia.tipo !== 'personalizado'
+    const podeNovo = (g: Grupo) => !(pernasFixas && (g === 'quadriceps' || g === 'posteriores'))
     const qtd = (g: Grupo) => dia.itens.filter((i) => i.papel === 'trabalho' && i.ex.grupo === g).length
     const esgotados = new Set<Grupo>()
     for (let seguranca = 0; seguranca < 30; seguranca++) {
       const vol = contarVolume(dias)
       const candidatos = grupos
-        .filter((g) => !esgotados.has(g) && qtd(g) < maxExercicios(g) && vol[g] + 3 * dia.ocorrencias <= teto(g))
+        .filter((g) => podeNovo(g) && !esgotados.has(g) && qtd(g) < maxExercicios(g) && vol[g] + SERIES_PADRAO * dia.ocorrencias <= teto(g))
         .sort((a, b) => qtd(a) - qtd(b) || Number(enfase.includes(b)) - Number(enfase.includes(a)) || ORDEM_PREENCHIMENTO.indexOf(a) - ORDEM_PREENCHIMENTO.indexOf(b))
       let mudou = false
       for (const g of candidatos) {
@@ -498,7 +510,7 @@ function encherTempo(ctx: ContextoMotor, dias: DiaTrabalho[], alvos: Record<Grup
       if (mudou) continue
       // sem espaço para exercício novo: mais uma série nos que têm menos de 4
       const vol2 = contarVolume(dias)
-      const item = dia.itens.find((i) => i.papel === 'trabalho' && i.series < 4 && grupos.includes(i.ex.grupo) && vol2[i.ex.grupo] + dia.ocorrencias <= teto(i.ex.grupo) && cabe(dia, MIN_POR_SERIE[i.ex.tipo]))
+      const item = dia.itens.find((i) => i.papel === 'trabalho' && i.series < maxSeries(ctx) && grupos.includes(i.ex.grupo) && vol2[i.ex.grupo] + dia.ocorrencias <= teto(i.ex.grupo) && cabe(dia, MIN_POR_SERIE[i.ex.tipo]))
       if (!item) break
       item.series++
     }
@@ -509,7 +521,7 @@ function encherTempo(ctx: ContextoMotor, dias: DiaTrabalho[], alvos: Record<Grup
 
 /**
  * C9: a readaptação monta o mesmo treino da fase normal (mesma divisão e
- * exercícios) e só reduz para 2 séries na 1ª semana e 3 depois (§6.1, A4).
+ * exercícios), com no máximo 3 séries por exercício (§6.1, C22).
  */
 function aplicarReadaptacao(ctx: ContextoMotor, dias: DiaTrabalho[]) {
   const series = seriesReadaptacao(ctx.semanaReadaptacao)
@@ -614,7 +626,7 @@ export function gerarPlano(ctx: ContextoMotor): PlanoGerado {
   const aquecOmbro = aquecimentoOmbro(ctx)
   for (const dia of dias) {
     if (precisaAquecimentoOmbro(ctx, dia)) {
-      dia.itens.unshift(...aquecOmbro.map((ex) => ({ ex, series: AQUECIMENTO_OMBRO.series, papel: 'aquecimento_ombro' as const })))
+      dia.itens.unshift(...aquecOmbro.filter((ex) => !dia.itens.some((i) => i.ex.id === ex.id)).map((ex) => ({ ex, series: AQUECIMENTO_OMBRO.series, papel: 'aquecimento_ombro' as const })))
     }
   }
 

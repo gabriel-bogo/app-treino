@@ -4,7 +4,7 @@
 // ───────────────────────── Perfil (§4) ─────────────────────────
 
 export type Sexo = 'feminino' | 'masculino'
-export type Nivel = 'iniciante' | 'retornando' | 'intermediario'
+export type Nivel = 'iniciante' | 'retornando' | 'intermediario' | 'avancado'
 export type Objetivo = 'hipertrofia' | 'emagrecimento' | 'saude'
 /** Parte do corpo com mais volume. Nenhuma marcada = equilibrado (C2). */
 export type Enfase = 'inferior' | 'superior' | 'gluteos'

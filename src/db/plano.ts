@@ -23,7 +23,7 @@ export function semanaDaReadaptacao(treinosNaFase: number, diasSemana: number): 
 }
 
 /** Muda quando as regras do motor mudam: o plano salvo é refeito na próxima abertura. */
-const VERSAO_MOTOR = 5
+const VERSAO_MOTOR = 6
 
 function assinatura(ctx: ContextoMotor): string {
   const marcados = [...ctx.ajustes.values()]

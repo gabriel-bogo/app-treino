@@ -149,6 +149,13 @@ const DESCANSO: Record<Objetivo, { composto: number; isolado: number }> = {
   saude: { composto: 90, isolado: 60 },
 }
 
+/** C23: teto semanal por músculo ao usar o tempo que sobra (C13). */
+export const TETO_SEMANAL_ENCHER = 20
+
+/** C22: séries por exercício: 3 como padrão (4 no máximo, quando sobra tempo). */
+export const SERIES_PADRAO = 3
+export const SERIES_MAXIMO = 4
+
 /** C20: descanso mínimo entre séries, em segundos. */
 export const DESCANSO_MINIMO = 60
 
@@ -169,15 +176,20 @@ export function descansoSegundos(objetivos: readonly Objetivo[], tipo: 'composto
   return Math.max(DESCANSO_MINIMO, arredondar5(sexo === 'feminino' ? base * MULT_DESCANSO_FEMININO : base))
 }
 
-/** §6.1 + A4: 2 séries na primeira semana de readaptação, 3 depois. */
-export function seriesReadaptacao(semana: number): number {
-  return semana <= 0 ? 2 : 3
+/** C22: 3 séries também na readaptação (antes: 2 na 1ª semana, A4). */
+export function seriesReadaptacao(_semana: number): number {
+  return SERIES_PADRAO
 }
 
 /** Níveis de exercício compatíveis com o nível da pessoa. */
 export function niveisCompativeis(nivel: Nivel): NivelExercicio[] {
-  return nivel === 'iniciante' ? ['iniciante'] : ['iniciante', 'intermediario']
+  if (nivel === 'iniciante') return ['iniciante']
+  // C21: avançado também recebe os exercícios de nível avançado
+  return nivel === 'avancado' ? ['iniciante', 'intermediario', 'avancado'] : ['iniciante', 'intermediario']
 }
+
+/** C21: avançado começa no topo da faixa inicial de volume (§6.3: 8 a 10 séries). */
+export const VOLUME_INICIAL_AVANCADO = 10
 
 /** Quantos treinos dura a readaptação (A4: 3 semanas de treino; C9: na divisão escolhida). */
 export function totalTreinosReadaptacao(diasSemana: number): number {

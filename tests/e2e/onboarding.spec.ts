@@ -67,8 +67,11 @@ test('C7: IMC antes do objetivo, em vermelho, com a classificação e o objetivo
   await page.getByRole('radiogroup', { name: 'Dias por semana' }).getByRole('radio', { name: '5', exact: true }).click()
   const treinos = page.getByRole('radiogroup', { name: 'Quantos treinos diferentes?' })
   await expect(treinos.getByRole('radio')).toHaveCount(4) // 2 a 5
-  await expect(treinos.getByRole('radio', { name: /^3 treinos/ })).toHaveAttribute('aria-checked', 'true')
-  await expect(treinos.getByRole('radio', { name: /^3 treinos/ })).toContainText('Recomendado')
+  // C24: com mais dias, a sugestão acompanha (5 dias → A, B, C, D, E)
+  await expect(treinos.getByRole('radio', { name: /^5 treinos/ })).toHaveAttribute('aria-checked', 'true')
+  await expect(treinos.getByRole('radio', { name: /^5 treinos/ })).toContainText('Recomendado')
+  await expect(page.getByText(/A, B, C, D, E…/)).toBeVisible()
+  await treinos.getByRole('radio', { name: /^3 treinos/ }).click()
   await expect(page.getByText(/A, B, C, A, B…/)).toBeVisible()
   await treinos.getByRole('radio', { name: /^2 treinos/ }).click()
   await expect(page.getByText(/A, B, A, B, A…/)).toBeVisible()
@@ -81,12 +84,12 @@ test('C7: IMC antes do objetivo, em vermelho, com a classificação e o objetivo
 })
 
 test('C5: depois do onboarding mostra o plano para aprovar, trocar exercício ou mudar as escolhas', async ({ page }) => {
-  await fazerOnboarding(page, { nivel: 'Iniciante', dias: '5', enfases: ['Superiores'], aprovar: false })
+  await fazerOnboarding(page, { nivel: 'Iniciante', dias: '5', treinos: 3, enfases: ['Superiores'], aprovar: false })
   // C8/C9: só "Superiores" → ficha com foco em superiores, já na readaptação (sem full body)
   await expect(page.getByText('Primeiro: 3 semanas de readaptação')).toBeVisible()
   await expect(page.getByText(/os primeiros 15 treinos são mais leves/)).toBeVisible()
   await expect(page.getByText('Foco em superiores (readaptação)', { exact: true })).toBeVisible()
-  // C10: 5 dias com a sugestão de 3 treinos → A, B, C revezando
+  // C10: 5 dias com 3 treinos → A, B, C revezando
   for (const nome of ['Treino A · Ombros e tríceps', 'Treino B · Peito, costas e bíceps', 'Treino C · Pernas']) {
     await expect(page.getByText(nome, { exact: true })).toBeVisible()
   }
