@@ -283,7 +283,12 @@ export interface ItemTreino {
   status: StatusItemTreino
   /** flag de dor marcada na sessão (§7 setLogs) */
   dor?: boolean
+  /** C27: esforço percebido ao terminar o exercício (1 super tranquilo … 5 muito difícil); null = pulou a pergunta */
+  esforco?: Esforco | null
 }
+
+/** C27: esforço percebido no exercício. */
+export type Esforco = 1 | 2 | 3 | 4 | 5
 
 export interface TimerDescanso {
   /** descanso entre séries ou o aquecimento geral de 5 min (§6.11) */

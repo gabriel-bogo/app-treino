@@ -15,7 +15,7 @@
 // - Carga diferente da sugerida (A5): vale a menor carga das séries; maior
 //   → vira carga nova (alvo no início da faixa); menor → o treino não conta.
 
-import type { EstadoProgressao, Fase, TipoEvento } from '../tipos'
+import type { Esforco, EstadoProgressao, Fase, TipoEvento } from '../tipos'
 import { cargaAbaixo, proximaCargaAcima } from './carga'
 import { FAIXA_NORMAL, FAIXA_READAPTACAO, MINIMO_PESO_CORPO } from '../motor/regras'
 
@@ -134,7 +134,7 @@ function descerDegrau(e: EstadoProgressao, cfg: ConfigProgressao, eventos: Event
   eventos.push({ tipo: 'regressao', de, para: passo(e) })
 }
 
-function aplicarModoCarga(estado: EstadoProgressao, series: SerieFeita[], cfg: ConfigProgressao): ResultadoProgressao {
+function aplicarModoCarga(estado: EstadoProgressao, series: SerieFeita[], cfg: ConfigProgressao, esforco?: Esforco | null): ResultadoProgressao {
   const e: EstadoProgressao = { ...estado }
   const eventos: EventoGerado[] = []
   const comCarga = series.filter((s): s is { carga: number; reps: number } => s.carga !== null)
@@ -166,16 +166,34 @@ function aplicarModoCarga(estado: EstadoProgressao, series: SerieFeita[], cfg: C
   }
 
   const c = classificar(e.alvo!, comCarga.map((s) => s.reps))
-  if (c === 'sucesso') {
+  const ajuste = ajustePorEsforco(c, esforco)
+  if (ajuste === 'subir') subirDegrau(e, cfg, eventos)
+  else if (ajuste === 'descer') descerDegrau(e, cfg, eventos)
+  else if (ajuste === 'contar') {
     e.confirmacoes++
     if (e.confirmacoes >= (e.segurando ? cfg.n + 1 : cfg.n)) subirDegrau(e, cfg, eventos)
-  } else if (c === 'falha') {
-    descerDegrau(e, cfg, eventos)
   }
   return { estado: e, classificacao: c, eventos }
 }
 
-function aplicarModoReps(estado: EstadoProgressao, series: SerieFeita[], cfg: ConfigProgressao): ResultadoProgressao {
+/**
+ * C27: o esforço percebido ajusta o ciclo, sem perguntar nada na hora:
+ * - 1 (super tranquilo) + bateu o alvo → sobe um degrau já no próximo treino;
+ * - 2 e 3 → regra normal;
+ * - 4 (difícil) + bateu o alvo → não conta como confirmação (repete o degrau);
+ * - 5 (muito difícil) → desce um degrau (menos repetições ou menos carga).
+ * Falha continua descendo um degrau (A6), qualquer que seja o esforço.
+ */
+export function ajustePorEsforco(c: Classificacao, esforco: Esforco | null | undefined): 'subir' | 'descer' | 'contar' | 'nada' {
+  if (c === 'falha') return 'descer'
+  if (esforco === 5) return 'descer'
+  if (c !== 'sucesso') return 'nada'
+  if (esforco === 1) return 'subir'
+  if (esforco === 4) return 'nada'
+  return 'contar'
+}
+
+function aplicarModoReps(estado: EstadoProgressao, series: SerieFeita[], cfg: ConfigProgressao, esforco?: Esforco | null): ResultadoProgressao {
   const e: EstadoProgressao = { ...estado }
   const eventos: EventoGerado[] = []
   const reps = series.map((s) => s.reps)
@@ -195,9 +213,10 @@ function aplicarModoReps(estado: EstadoProgressao, series: SerieFeita[], cfg: Co
   }
 
   const c = classificar(e.alvo, reps)
-  if (c === 'sucesso') {
-    e.confirmacoes++
-    if (e.confirmacoes >= (e.segurando ? cfg.n + 1 : cfg.n)) {
+  const ajuste = ajustePorEsforco(c, esforco)
+  if (ajuste === 'subir' || ajuste === 'contar') {
+    if (ajuste === 'contar') e.confirmacoes++
+    if (ajuste === 'subir' || e.confirmacoes >= (e.segurando ? cfg.n + 1 : cfg.n)) {
       if (e.alvo < teto) {
         const de = passo(e)
         e.alvo++
@@ -209,7 +228,7 @@ function aplicarModoReps(estado: EstadoProgressao, series: SerieFeita[], cfg: Co
       e.confirmacoes = 0
       e.segurando = false
     }
-  } else if (c === 'falha') {
+  } else if (ajuste === 'descer') {
     const de = passo(e)
     e.alvo = Math.max(1, e.alvo - 1)
     e.confirmacoes = 0
@@ -221,8 +240,8 @@ function aplicarModoReps(estado: EstadoProgressao, series: SerieFeita[], cfg: Co
 }
 
 /** Aplica um treino (séries planejadas e marcadas) ao estado do exercício. */
-export function aplicarTreino(estado: EstadoProgressao, series: SerieFeita[], cfg: ConfigProgressao, data: string): ResultadoProgressao {
-  const r = estado.modo === 'reps' ? aplicarModoReps(estado, series, cfg) : aplicarModoCarga(estado, series, cfg)
+export function aplicarTreino(estado: EstadoProgressao, series: SerieFeita[], cfg: ConfigProgressao, data: string, esforco?: Esforco | null): ResultadoProgressao {
+  const r = estado.modo === 'reps' ? aplicarModoReps(estado, series, cfg, esforco) : aplicarModoCarga(estado, series, cfg, esforco)
   if (r.classificacao === 'nao_conta' && !r.eventos.length) return r
   return { ...r, estado: { ...r.estado, ultimaData: data } }
 }

@@ -3,7 +3,7 @@
 // imediatamente no IndexedDB (nada se perde se o app fechar).
 
 import { novoId } from '../ids'
-import type { EstadoTreino, ItemTreino, MotivoTroca, SerieTreino, TimerDescanso } from '../tipos'
+import type { Esforco, EstadoTreino, ItemTreino, MotivoTroca, SerieTreino, TimerDescanso } from '../tipos'
 
 export const SEGUNDOS_AJUSTE_TIMER = 15
 
@@ -334,4 +334,18 @@ export function pularExercicio(estado: EstadoTreino, itemUid: string): EstadoTre
 /** Ids de todos os exercícios do treino do dia, inclusive os originais já trocados. */
 export function idsDoDia(estado: EstadoTreino): string[] {
   return [...new Set(estado.itens.flatMap((i) => [i.exercicioId, ...(i.originalId ? [i.originalId] : [])]))]
+}
+
+/** C27: guarda o esforço percebido de um exercício (null = a pessoa pulou a pergunta). */
+export function registrarEsforco(estado: EstadoTreino, itemUid: string, esforco: Esforco | null): EstadoTreino {
+  const e = clonar(estado)
+  const i = e.itens.find((x) => x.uid === itemUid)
+  if (!i) return estado
+  i.esforco = esforco
+  return e
+}
+
+/** C27: exercício terminado que ainda não teve o esforço perguntado. */
+export function itemSemEsforco(estado: EstadoTreino): ItemTreino | undefined {
+  return estado.itens.find((i) => i.papel === 'trabalho' && i.status === 'concluido' && i.esforco === undefined && i.series.some((s) => s.feita))
 }

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { aplicarTreino, classificar, estadoInicial, passarParaCargaExtra, prepararParaFase, type ConfigProgressao, type SerieFeita } from './ciclo'
+import { ajustePorEsforco, aplicarTreino, classificar, estadoInicial, passarParaCargaExtra, prepararParaFase, type ConfigProgressao, type SerieFeita } from './ciclo'
 import { arredondarParaBaixo, cargaAbaixo, ehMultiplo, incrementoEfetivo, modoConservador, proximaCargaAcima, descreverCarga } from './carga'
 import { aplicarPausa, regraDePausa } from './pausa'
 import { configDoExercicio, sugestaoParaTreino } from './sugestao'
@@ -153,6 +153,44 @@ describe('ciclo 8 → 12 (§6.8, critério da seção 11)', () => {
   it('ao sair da readaptação: entra no ciclo em 8 com carga a confirmar e referência (§6.8)', () => {
     const e = prepararParaFase(estado(20, 14, { fase: 'readaptacao' }), 'normal')
     expect([e.carga, e.alvo, e.cargaReferencia, e.fase]).toEqual([null, 8, 20, 'normal'])
+  })
+})
+
+describe('esforço percebido (C27)', () => {
+  const com = (e: EstadoProgressao, s: SerieFeita[], esforco: 1 | 2 | 3 | 4 | 5 | null) => aplicarTreino(e, s, CFG, '2026-01-01', esforco).estado
+  it('tabela: falha sempre desce; 5 desce; 1 com sucesso sobe; 4 não conta; 2/3/sem resposta seguem a regra normal', () => {
+    expect(ajustePorEsforco('falha', 1)).toBe('descer')
+    expect(ajustePorEsforco('sucesso', 5)).toBe('descer')
+    expect(ajustePorEsforco('manter', 5)).toBe('descer')
+    expect(ajustePorEsforco('sucesso', 1)).toBe('subir')
+    expect(ajustePorEsforco('manter', 1)).toBe('nada')
+    expect(ajustePorEsforco('sucesso', 4)).toBe('nada')
+    expect(ajustePorEsforco('sucesso', 3)).toBe('contar')
+    expect(ajustePorEsforco('sucesso', 2)).toBe('contar')
+    expect(ajustePorEsforco('sucesso', null)).toBe('contar')
+    expect(ajustePorEsforco('sucesso', undefined)).toBe('contar')
+  })
+  it('1 (super tranquilo) + bateu o alvo: sobe já no próximo treino, sem esperar N', () => {
+    expect(com(estado(40, 9), series(40, 9, 9, 9), 1)).toMatchObject({ carga: 40, alvo: 10, confirmacoes: 0 })
+    // no topo da faixa: carga nova com alvo 8
+    expect(com(estado(40, 12), series(40, 12, 12, 12), 1)).toMatchObject({ carga: 42, alvo: 8, cargaAnterior: 40 })
+  })
+  it('4 (difícil) + bateu o alvo: repete o mesmo degrau, sem contar confirmação', () => {
+    expect(com(estado(40, 9, { confirmacoes: 1 }), series(40, 9, 9, 9), 4)).toMatchObject({ carga: 40, alvo: 9, confirmacoes: 1 })
+  })
+  it('5 (muito difícil): desce um degrau mesmo batendo o alvo', () => {
+    expect(com(estado(40, 10), series(40, 10, 10, 10), 5)).toMatchObject({ carga: 40, alvo: 9, segurando: true })
+    expect(com(estado(42, 8, { cargaAnterior: 40 }), series(42, 8, 8, 8), 5)).toMatchObject({ carga: 40, alvo: 12 })
+  })
+  it('3 (na medida) segue a regra de N confirmações', () => {
+    const e1 = com(estado(40, 9), series(40, 9, 9, 9), 3)
+    expect(e1).toMatchObject({ alvo: 9, confirmacoes: 1 })
+    expect(com(e1, series(40, 9, 9, 9), 3)).toMatchObject({ alvo: 10, confirmacoes: 0 })
+  })
+  it('peso do corpo: 1 sobe +1 rep na hora, 5 desce 1 rep', () => {
+    const pc = (alvo: number) => ({ ...estado(null, alvo), modo: 'reps' as const })
+    expect(com(pc(10), series(null, 10, 10, 10), 1)).toMatchObject({ alvo: 11 })
+    expect(com(pc(10), series(null, 10, 10, 10), 5)).toMatchObject({ alvo: 9, segurando: true })
   })
 })
 

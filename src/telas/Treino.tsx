@@ -22,16 +22,18 @@ import {
   iniciarAquecimentoGeral,
   irPara,
   itemAtual,
+  itemSemEsforco,
   marcarSerie,
   progresso,
   pularAquecimento,
   pularExercicio,
   pularTimer,
+  registrarEsforco,
   removerSerie,
   substituirExercicio,
   temTrabalhoFeito,
 } from '../domain/treino/sessao'
-import type { EstadoTreino, ItemTreino, Sessao } from '../domain/tipos'
+import type { Esforco, EstadoTreino, ItemTreino, Sessao } from '../domain/tipos'
 import { Botao, Cartao, Etiqueta, Texto } from '../components/ui'
 import { Dialogo } from '../components/Dialogo'
 import { ComoFazer } from '../components/ComoFazer'
@@ -98,6 +100,7 @@ export function Treino() {
 
   const atual = itemAtual(estado)
   const prog = progresso(estado)
+  const semEsforco = itemSemEsforco(estado)
   const decorrido = (agora.getTime() - new Date(sessao.inicio).getTime()) / 1000
   const som = config?.som ?? true
 
@@ -274,6 +277,13 @@ export function Treino() {
         />
       )}
 
+      {semEsforco && (
+        <DialogoEsforco
+          nome={exercicioPorId(semEsforco.exercicioId)?.nome ?? ''}
+          aoResponder={(n) => aplicar((e) => registrarEsforco(e, semEsforco.uid, n))}
+        />
+      )}
+
       <Dialogo
         aberto={confirmarPularAquec}
         titulo="Pular o aquecimento?"
@@ -363,6 +373,53 @@ export function Treino() {
         <p>As séries marcadas hoje não serão salvas nem contarão na progressão.</p>
       </Dialogo>
     </div>
+  )
+}
+
+// C27: esforço percebido ao terminar todas as séries de um exercício. Não mostra
+// sugestão nenhuma: o ajuste (carga ou repetições) já aparece no próximo treino.
+const ESFORCOS: { n: Esforco; emoji: string; rotulo: string }[] = [
+  { n: 1, emoji: '😌', rotulo: 'Super tranquilo' },
+  { n: 2, emoji: '🙂', rotulo: 'Tranquilo' },
+  { n: 3, emoji: '😐', rotulo: 'Na medida' },
+  { n: 4, emoji: '😓', rotulo: 'Difícil' },
+  { n: 5, emoji: '🥵', rotulo: 'Muito difícil' },
+]
+
+function DialogoEsforco({ nome, aoResponder }: { nome: string; aoResponder: (n: Esforco | null) => void }) {
+  return (
+    <Dialogo
+      aberto
+      titulo={`Como foi ${nome}?`}
+      aoFechar={() => aoResponder(null)}
+      acoes={
+        <Botao variante="fantasma" onClick={() => aoResponder(null)}>
+          Pular
+        </Botao>
+      }
+    >
+      <p>De 1 (super tranquilo) a 5 (muito difícil).</p>
+      <div className="grid grid-cols-5 gap-2" data-testid="medidor-esforco">
+        {ESFORCOS.map((x) => (
+          <button
+            key={x.n}
+            type="button"
+            onClick={() => aoResponder(x.n)}
+            aria-label={`Esforço ${x.n}: ${x.rotulo}`}
+            className="flex min-h-16 flex-col items-center justify-center rounded-2xl bg-slate-100 py-2 active:bg-emerald-100 dark:bg-slate-800 dark:active:bg-emerald-900"
+          >
+            <span className="text-3xl" aria-hidden>
+              {x.emoji}
+            </span>
+            <span className="text-sm font-bold">{x.n}</span>
+          </button>
+        ))}
+      </div>
+      <div className="flex justify-between text-xs text-slate-500 dark:text-slate-400">
+        <span>Super tranquilo</span>
+        <span>Muito difícil</span>
+      </div>
+    </Dialogo>
   )
 }
 

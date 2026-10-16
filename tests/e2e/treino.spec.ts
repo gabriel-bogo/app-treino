@@ -1,5 +1,5 @@
 import { test, expect, type Page } from '@playwright/test'
-import { fazerOnboarding } from './ajudantes'
+import { fazerOnboarding, responderEsforco } from './ajudantes'
 
 async function comecar(page: Page) {
   await page.getByRole('button', { name: 'Começar treino' }).click()
@@ -54,6 +54,7 @@ test('finalizar grava o treino, mostra o resumo e avança para o próximo da seq
   await comecar(page)
   // marca todas as séries de todos os exercícios (preenche carga onde estiver vazia)
   for (let i = 0; i < 60; i++) {
+    await responderEsforco(page)
     const botao = page.getByRole('button', { name: /Marcar série \d+ como feita/ }).first()
     if (!(await botao.count())) break
     const cargaVazia = page.getByRole('textbox', { name: /carga da série/ }).first()
@@ -63,6 +64,7 @@ test('finalizar grava o treino, mostra o resumo e avança para o próximo da seq
     }
     await botao.click()
   }
+  await responderEsforco(page)
   await page.getByRole('button', { name: 'Finalizar' }).first().click()
   await page.getByRole('button', { name: 'Finalizar e salvar' }).click()
   await expect(page.getByText('Treino concluído')).toBeVisible()
@@ -79,4 +81,31 @@ test('fora da ordem: deixar pra depois e tocar em outro exercício', async ({ pa
   await expect(page.getByTestId('nome-exercicio')).not.toHaveText(primeiro!)
   await page.getByRole('button', { name: new RegExp(primeiro!) }).click()
   await expect(page.getByTestId('nome-exercicio')).toHaveText(primeiro!)
+})
+
+test('C27: ao terminar todas as séries de um exercício, pergunta o esforço de 1 a 5 e não mostra sugestão', async ({ page }) => {
+  await fazerOnboarding(page, { nivel: 'Intermediário', dias: '4', duracao: 45 })
+  await comecar(page)
+  const nome = (await page.getByTestId('nome-exercicio').textContent())!
+  for (let i = 0; i < 6; i++) {
+    const cargaVazia = page.getByRole('textbox', { name: /carga da série/ }).first()
+    if ((await cargaVazia.count()) && !(await cargaVazia.inputValue())) {
+      await cargaVazia.fill('10')
+      await cargaVazia.blur()
+    }
+    const botao = page.getByRole('button', { name: /Marcar série \d+ como feita/ }).first()
+    if ((await page.getByTestId('medidor-esforco').count()) || !(await botao.count())) break
+    await botao.click()
+  }
+  const dialogo = page.getByRole('dialog', { name: `Como foi ${nome}?` })
+  await expect(dialogo).toBeVisible()
+  await expect(dialogo.getByRole('button', { name: /^Esforço \d:/ })).toHaveCount(5)
+  await dialogo.getByRole('button', { name: 'Esforço 1: Super tranquilo' }).click()
+  await expect(dialogo).toBeHidden()
+  // a resposta fica salva: recarregar não pergunta de novo
+  await page.waitForTimeout(300)
+  await page.goto('/')
+  await page.getByRole('dialog').getByRole('button', { name: 'Continuar treino' }).click()
+  await expect(page.getByTestId('nome-exercicio')).toBeVisible()
+  await expect(page.getByTestId('medidor-esforco')).toHaveCount(0)
 })

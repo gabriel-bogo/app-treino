@@ -102,11 +102,18 @@ export async function importarBackup(page: Page, tabelas: Record<string, unknown
   await expect(page.getByText('Backup importado com sucesso.')).toBeVisible()
 }
 
+/** C27: responde o medidor de esforço, se ele estiver aberto (3 = na medida, regra normal). */
+export async function responderEsforco(page: Page, n = 3) {
+  const medidor = page.getByTestId('medidor-esforco')
+  if (await medidor.count()) await medidor.getByRole('button', { name: new RegExp(`^Esforço ${n}:`) }).click()
+}
+
 /** Faz o treino do dia marcando todas as séries (preenche carga vazia com 10) e finaliza. */
 export async function fazerTreinoCompleto(page: Page) {
   await page.getByRole('button', { name: 'Começar treino' }).click()
   await expect(page.getByTestId('nome-exercicio')).toBeVisible()
   for (let i = 0; i < 80; i++) {
+    await responderEsforco(page)
     const botao = page.getByRole('button', { name: /^Marcar série .+ como feita$/ }).first()
     if (!(await botao.count())) break
     const cargaVazia = page.getByRole('textbox', { name: /carga da série \d+$/ }).first()
@@ -123,6 +130,7 @@ export async function fazerTreinoCompleto(page: Page) {
     }
     await botao.click()
   }
+  await responderEsforco(page)
   await page.getByRole('button', { name: 'Finalizar', exact: true }).click()
   await page.getByRole('button', { name: 'Finalizar e salvar' }).click()
   await expect(page.getByText('Treino concluído')).toBeVisible()

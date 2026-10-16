@@ -28,7 +28,7 @@ export async function aplicarProgressaoDaSessao(sessao: Sessao, perfil: Perfil):
       const salvo = await db.progressao.get(ex.id)
       const atual = salvo ? prepararParaFase(salvo, sessao.fase) : estadoInicial(ex.id, sessao.fase, ex.tipoCarga === 'pesoCorpo')
       const cfg = configDoExercicio(ex, perfil, ajustes.get(ex.id), sessao.fase)
-      const r = aplicarTreino(atual, feitas, cfg, sessao.inicio)
+      const r = aplicarTreino(atual, feitas, cfg, sessao.inicio, item.esforco)
       await db.progressao.put(r.estado)
       for (const ev of r.eventos) {
         const evento: EventoProgressao = { id: novoId(), exercicioId: ex.id, data: sessao.inicio, sessaoId: sessao.id, ...ev }
