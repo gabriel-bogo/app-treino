@@ -7,11 +7,25 @@ import type { Enfase, Fase, Grupo, Nivel, NivelExercicio, Objetivo, Sexo, TipoDi
 /** §6.4: minutos reservados para o aquecimento geral + séries de aproximação. */
 export const MIN_AQUECIMENTO = 8
 
-/** §6.4: estimativa por série (execução + descanso), em minutos. */
-export const MIN_POR_SERIE = { composto: 3, isolado: 2 } as const
+/**
+ * C28: tempo de execução de uma série (8 a 12 repetições + ajeitar o peso), em
+ * segundos. A estimativa por série é execução + o descanso do próprio exercício.
+ * Antes eram 3 min (composto) e 2 min (isolado) fixos, o que superestimava o
+ * treino quando o descanso é curto (treino real de 15 séries levou ~36 min com
+ * o plano prevendo ~52).
+ */
+export const EXECUCAO_SEG = { composto: 40, isolado: 30 } as const
 
-/** B14: o aquecimento específico de ombro (4 séries de isolado) entra no tempo do treino. */
-export const MIN_AQUECIMENTO_OMBRO = 4 * MIN_POR_SERIE.isolado
+/** C28: minutos de uma série (execução + descanso). */
+export function minutosPorSerie(tipo: 'composto' | 'isolado', descansoSeg: number): number {
+  return (EXECUCAO_SEG[tipo] + descansoSeg) / 60
+}
+
+/** C28: avisa quando o treino fica pelo menos isso abaixo do tempo escolhido. */
+export const FOLGA_AVISO_CURTO = 10
+
+/** B14 + C28: aquecimento específico de ombro (2 exercícios × 2 séries leves, ~1 min cada). */
+export const MIN_AQUECIMENTO_OMBRO = 4
 
 /** A1: na Fase 1 todo exercício usa o ciclo 8→12 (§6.8). */
 export const FAIXA_NORMAL = { min: 8, max: 12 } as const

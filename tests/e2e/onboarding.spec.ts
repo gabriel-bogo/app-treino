@@ -187,7 +187,7 @@ test('C14: "+ incluir exercício" lista o músculo com o tempo e dá para remove
   await treinoA.getByRole('button', { name: 'Incluir exercício de Tríceps' }).click()
   const dialogo = page.getByRole('dialog')
   await expect(dialogo.getByText(/Treino A hoje tem ~\d+ min; seu tempo é de 60 min/)).toBeVisible()
-  await expect(dialogo.getByTestId('lista-incluir').getByText(/3 séries · ~6 min/).first()).toBeVisible()
+  await expect(dialogo.getByTestId('lista-incluir').getByText(/3 séries · ~\d+ min/).first()).toBeVisible()
   const botao = dialogo.getByRole('button', { name: /^Incluir / }).first()
   const nome = (await botao.getAttribute('aria-label'))!.replace('Incluir ', '')
   await botao.click()

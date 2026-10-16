@@ -3,7 +3,7 @@ import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '../db/banco'
 import { incluirNoPlano } from '../db/plano'
 import { BIBLIOTECA, mapaAjustes, NOME_EQUIPAMENTO, NOME_GRUPO, exercicioPermitido } from '../domain/biblioteca'
-import { MIN_POR_SERIE } from '../domain/motor/regras'
+import { descansoSegundos, minutosPorSerie } from '../domain/motor/regras'
 import type { Grupo } from '../domain/tipos'
 import { Botao, Etiqueta } from './ui'
 import { Dialogo } from './Dialogo'
@@ -26,6 +26,7 @@ export function useIncluirNoPlano() {
   const [alvo, setAlvo] = useState<Alvo | null>(null)
   const [aberto, setAberto] = useState<string | null>(null)
   const perfil = useLiveQuery(() => db.perfil.get('perfil'))
+  const fase = useLiveQuery(() => db.plano.toCollection().first())?.fase ?? 'normal'
   const ajustes = mapaAjustes(useLiveQuery(() => db.ajustesExercicio.toArray()))
 
   const lista =
@@ -55,7 +56,7 @@ export function useIncluirNoPlano() {
         ) : (
           <ul className="divide-y divide-slate-100 dark:divide-slate-800" data-testid="lista-incluir">
             {lista.map((e) => {
-              const min = SERIES * MIN_POR_SERIE[e.tipo]
+              const min = Math.round(SERIES * minutosPorSerie(e.tipo, descansoSegundos(perfil.objetivos, e.tipo, perfil.sexo, fase)))
               const passa = alvo.minutos + min > perfil.duracaoMin
               return (
                 <li key={e.id} className="py-2">

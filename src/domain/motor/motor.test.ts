@@ -49,7 +49,7 @@ function problemas(ctx: ContextoMotor, plano: PlanoGerado): string[] {
     const ids = dia.exercicios.map((e) => e.exercicioId)
     if (new Set(ids).size !== ids.length) p.push(`${dia.nome}: exercício repetido`)
     const temAquecOmbro = dia.exercicios.some((e) => e.papel === 'aquecimento_ombro')
-    const minutos = minutosDoDia(dia.exercicios.map((e) => ({ ex: ex(e.exercicioId), series: e.series, papel: e.papel })), temAquecOmbro)
+    const minutos = minutosDoDia(dia.exercicios.map((e) => ({ ex: ex(e.exercicioId), series: e.series, papel: e.papel, descansoSeg: e.descansoSeg })), temAquecOmbro)
     if (minutos > perfil.duracaoMin) p.push(`${dia.nome}: ${minutos} min > ${perfil.duracaoMin}`)
     if (minutos !== dia.minutosEstimados) p.push(`${dia.nome}: estimativa inconsistente`)
     const temEmpurrar = trabalho.some((e) => ['empurrar_horizontal', 'empurrar_vertical'].includes(ex(e.exercicioId).padrao))
@@ -186,7 +186,8 @@ describe('divisão (§6.2)', () => {
         expect(nomes(read)).toEqual(nomes(normal))
         // mesmos músculos em cada treino (os exercícios extras podem variar, porque a readaptação usa no máximo 3 séries e completa o tempo com mais exercícios)
         const grupos = (p: PlanoGerado) => p.dias.map((d) => [...new Set(d.exercicios.filter((e) => e.papel === 'trabalho').map((e) => ex(e.exercicioId).grupo))].sort())
-        expect(grupos(read).map((g) => g.filter((x) => x !== 'core'))).toEqual(grupos(normal).map((g) => g.filter((x) => x !== 'core')))
+        // C28: a readaptação descansa menos (cabe mais no tempo), então pode ganhar um músculo a mais, nunca perder
+        grupos(normal).forEach((g, i) => expect(grupos(read)[i]).toEqual(expect.arrayContaining(g.filter((x) => x !== 'core'))))
         expect(read.divisao).toBe(`${normal.divisao} (readaptação)`)
       }
     }
@@ -281,8 +282,31 @@ describe('divisão (§6.2)', () => {
         for (const nivel of NIVEIS)
           for (const fase of ['normal', 'readaptacao'] as const) {
             const p = gerarPlano(contexto({ diasSemana, treinos: treinosRecomendados(diasSemana), duracaoMin, nivel }, { fase }))
-            for (const d of p.dias) expect(d.minutosEstimados, `${duracaoMin}min ${diasSemana}d ${nivel} ${fase} ${d.nome}`).toBeGreaterThanOrEqual(duracaoMin * 0.75)
+            // C28: treino curto só quando o volume semanal não deixa encher, e com aviso
+            for (const d of p.dias)
+              if (d.minutosEstimados < duracaoMin * 0.75) expect(p.avisos.join(' '), `${duracaoMin}min ${diasSemana}d ${nivel} ${fase} ${d.nome}`).toContain(`${d.nome.split(' · ')[0]} ~${d.minutosEstimados} min`)
           }
+  })
+  it('C28: estimativa usa o descanso de cada exercício (treino real de 15 séries com descanso curto ≈ 37 min)', () => {
+    // 2 compostos + 3 isolados × 3 séries, descanso 75 s / 60 s, com aquecimento de ombro
+    const itens = [
+      ...['puxada-frontal', 'desenvolvimento-halter'].map((id) => ({ ex: ex(id), series: 3, papel: 'trabalho', descansoSeg: 75 })),
+      ...['elevacao-lateral', 'rosca-alternada', 'rosca-w'].map((id) => ({ ex: ex(id), series: 3, papel: 'trabalho', descansoSeg: 60 })),
+    ]
+    expect(itens.every((i) => i.ex)).toBe(true)
+    const m = minutosDoDia(itens, true)
+    expect(m).toBeGreaterThanOrEqual(34)
+    expect(m).toBeLessThanOrEqual(40)
+    // descanso maior = treino mais longo
+    expect(minutosDoDia(itens.map((i) => ({ ...i, descansoSeg: i.descansoSeg * 2 })), true)).toBeGreaterThan(m + 10)
+  })
+  it('C28: o tempo que sobra é dividido em rodízio (os dois Pull têm bíceps)', () => {
+    for (const fase of ['normal', 'readaptacao'] as const) {
+      const p = gerarPlano(contexto({ diasSemana: 6, nivel: 'retornando' }, { fase }))
+      for (const d of p.dias.filter((x) => x.nome.endsWith('Pull'))) {
+        expect(d.exercicios.some((e) => ex(e.exercicioId).grupo === 'biceps'), `${fase} ${d.nome}`).toBe(true)
+      }
+    }
   })
   it('C8: só "Superiores" marcado vira ficha com foco em superiores', () => {
     const d = (diasSemana: DiasSemana) => nomes(gerarPlano(contexto({ diasSemana, enfases: ['superior'] })))
@@ -332,7 +356,7 @@ describe('volume semanal (§6.3, §6.6)', () => {
         const p = gerarPlano(contexto({ diasSemana, duracaoMin: 90, enfases }))
         if (focoSuperior(enfases)) continue // C8: pernas com volume fixo, conferido no teste da divisão
         for (const [g, alvo] of Object.entries(p.alvos)) expect(p.volume[g as keyof typeof p.volume], `${diasSemana}d ${enfases.join('+')} ${g}`).toBeGreaterThanOrEqual(alvo)
-        expect(p.avisos).toEqual([])
+        expect(p.avisos.filter((a) => !a.includes('volume semanal recomendado'))).toEqual([])
       }
     }
   })
