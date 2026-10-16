@@ -189,6 +189,8 @@ export interface Plano {
   treinosNaFase: number
   /** índice (em diasPlano.ordem) do próximo treino da sequência (§6.2) */
   proximoIndice: number
+  /** C26: posições anteriores a cada "Pular treino", para desfazer (zera ao concluir um treino) */
+  pulos?: number[]
   /** séries semanais base por grupo grande antes dos multiplicadores (A3) */
   nivelVolume: Partial<Record<Grupo, number>>
   /** data ISO da última revisão de volume (a cada 3 semanas, A3) */

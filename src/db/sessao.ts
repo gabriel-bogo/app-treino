@@ -146,6 +146,7 @@ export async function finalizarSessao(sessaoId: string, agora: Date = new Date()
         ...plano,
         treinosNaFase: plano.fase === sessao.fase ? plano.treinosNaFase + 1 : plano.treinosNaFase,
         proximoIndice: totalDias ? (ordemFeita + 1) % totalDias : 0,
+        pulos: [],
       })
     }
   })

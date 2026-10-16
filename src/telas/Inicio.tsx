@@ -4,7 +4,7 @@ import { db } from '../db/banco'
 import { sessaoEmAndamento } from '../db/sessao'
 import { gruposTreinadosRecentemente, textoAviso48h } from '../domain/treino/descanso48h'
 import { ComecarTreino } from '../components/ComecarTreino'
-import { pularTreino } from '../db/plano'
+import { desfazerPulo, pularTreino } from '../db/plano'
 import { usePlano } from '../app/usePlano'
 import { dispensarMensagemFase } from '../db/plano'
 import { exercicioPorId } from '../domain/biblioteca'
@@ -74,6 +74,11 @@ export function Inicio() {
           {dados!.dias.length > 1 && (
             <Botao variante="secundario" className="mt-2 w-full" onClick={() => void pularTreino()}>
               Pular treino
+            </Botao>
+          )}
+          {(plano?.pulos?.length ?? 0) > 0 && (
+            <Botao variante="fantasma" className="mt-1 w-full" onClick={() => void desfazerPulo()}>
+              Desfazer pulo (voltar para {dados!.dias.find((d) => d.ordem === plano!.pulos![plano!.pulos!.length - 1])?.nome.split(' · ')[0] ?? 'o anterior'})
             </Botao>
           )}
           <Botao variante="fantasma" className="mt-1 w-full" onClick={() => navegar('/plano')}>

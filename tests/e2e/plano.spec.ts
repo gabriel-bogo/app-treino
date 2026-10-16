@@ -54,4 +54,8 @@ test('C25: pular treino mostra o seguinte no lugar', async ({ page }) => {
   await expect(page.getByText('Treino B · Inferior', { exact: true })).toBeVisible()
   await page.reload()
   await expect(page.getByText('Treino B · Inferior', { exact: true })).toBeVisible()
+  // C26: desfazer
+  await page.getByRole('button', { name: 'Desfazer pulo (voltar para Treino A)' }).click()
+  await expect(page.getByText('Treino A · Superior', { exact: true })).toBeVisible()
+  await expect(page.getByRole('button', { name: /^Desfazer pulo/ })).toHaveCount(0)
 })

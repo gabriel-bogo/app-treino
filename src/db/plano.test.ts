@@ -1,7 +1,7 @@
 import 'fake-indexeddb/auto'
 import { beforeEach, describe, expect, it } from 'vitest'
 import { apagarTudo, db } from './banco'
-import { garantirPlano, precisaReadaptacao, pularTreino, semanaDaReadaptacao } from './plano'
+import { desfazerPulo, garantirPlano, precisaReadaptacao, pularTreino, semanaDaReadaptacao } from './plano'
 import type { Perfil, Sessao } from '../domain/tipos'
 
 // Dados fictícios.
@@ -160,6 +160,20 @@ describe('plano ativo', () => {
     const depois = (await db.plano.get('atual'))!
     expect(depois.proximoIndice).toBe(0)
     expect(depois.treinosNaFase).toBe(antes.treinosNaFase)
+  })
+
+  it('C26: desfazer volta pulo a pulo', async () => {
+    await db.perfil.put(perfil)
+    await garantirPlano()
+    await pularTreino()
+    await pularTreino()
+    expect((await db.plano.get('atual'))!.proximoIndice).toBe(2)
+    await desfazerPulo()
+    expect((await db.plano.get('atual'))!.proximoIndice).toBe(1)
+    await desfazerPulo()
+    expect((await db.plano.get('atual'))!.proximoIndice).toBe(0)
+    await desfazerPulo() // nada para desfazer
+    expect((await db.plano.get('atual'))!.proximoIndice).toBe(0)
   })
 
   it('revisa o volume a cada 3 semanas conforme a progressão (A3)', async () => {

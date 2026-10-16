@@ -222,6 +222,18 @@ export async function pularTreino() {
     const plano = await db.plano.get('atual')
     const total = await db.diasPlano.count()
     if (!plano || total < 2) return
-    await db.plano.put({ ...plano, proximoIndice: (plano.proximoIndice + 1) % total })
+    await db.plano.put({ ...plano, proximoIndice: (plano.proximoIndice + 1) % total, pulos: [...(plano.pulos ?? []), plano.proximoIndice] })
+  })
+}
+
+/** C26: desfaz o último "Pular treino". */
+export async function desfazerPulo() {
+  await db.transaction('rw', db.plano, db.diasPlano, async () => {
+    const plano = await db.plano.get('atual')
+    const pulos = plano?.pulos ?? []
+    if (!plano || !pulos.length) return
+    const anterior = pulos[pulos.length - 1]
+    const total = await db.diasPlano.count()
+    await db.plano.put({ ...plano, proximoIndice: anterior < total ? anterior : 0, pulos: pulos.slice(0, -1) })
   })
 }
