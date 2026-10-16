@@ -72,14 +72,25 @@ export function Inicio() {
           )}
           <ComecarTreino />
           {dados!.dias.length > 1 && (
-            <Botao variante="secundario" className="mt-2 w-full" onClick={() => void pularTreino()}>
-              Pular treino
-            </Botao>
-          )}
-          {(plano?.pulos?.length ?? 0) > 0 && (
-            <Botao variante="fantasma" className="mt-1 w-full" onClick={() => void desfazerPulo()}>
-              Desfazer pulo (voltar para {dados!.dias.find((d) => d.ordem === plano!.pulos![plano!.pulos!.length - 1])?.nome.split(' · ')[0] ?? 'o anterior'})
-            </Botao>
+            <div className="mt-2 flex gap-2">
+              <Botao variante="secundario" className="flex-1" onClick={() => void pularTreino()}>
+                Pular treino
+              </Botao>
+              {(plano?.pulos?.length ?? 0) > 0 && (
+                <Botao
+                  variante="secundario"
+                  className="w-12 shrink-0 px-0"
+                  onClick={() => void desfazerPulo()}
+                  aria-label={`Desfazer pulo (voltar para ${dados!.dias.find((d) => d.ordem === plano!.pulos![plano!.pulos!.length - 1])?.nome.split(' · ')[0] ?? 'o treino anterior'})`}
+                  title="Desfazer pulo"
+                >
+                  <svg viewBox="0 0 24 24" className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                    <path d="M3 12a9 9 0 1 0 3-6.7" />
+                    <path d="M3 4v5h5" />
+                  </svg>
+                </Botao>
+              )}
+            </div>
           )}
           <Botao variante="fantasma" className="mt-1 w-full" onClick={() => navegar('/plano')}>
             Ver plano da semana
