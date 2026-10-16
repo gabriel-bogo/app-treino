@@ -1,7 +1,7 @@
 import 'fake-indexeddb/auto'
 import { beforeEach, describe, expect, it } from 'vitest'
 import { apagarTudo, db } from './banco'
-import { garantirPlano, precisaReadaptacao, semanaDaReadaptacao } from './plano'
+import { garantirPlano, precisaReadaptacao, pularTreino, semanaDaReadaptacao } from './plano'
 import type { Perfil, Sessao } from '../domain/tipos'
 
 // Dados fictícios.
@@ -145,6 +145,21 @@ describe('plano ativo', () => {
     await db.perfil.put({ ...perfil, nivel: 'iniciante', diasSemana: 5, treinos: 5 })
     await garantirPlano()
     expect((await db.plano.get('atual'))!.fase).toBe('normal')
+  })
+
+  it('C25: pular treino passa para o seguinte e volta ao A depois do último, sem contar como feito', async () => {
+    await db.perfil.put(perfil) // 4 treinos
+    await garantirPlano()
+    const antes = (await db.plano.get('atual'))!
+    expect(antes.proximoIndice).toBe(0)
+    await pularTreino()
+    expect((await db.plano.get('atual'))!.proximoIndice).toBe(1)
+    await pularTreino()
+    await pularTreino()
+    await pularTreino()
+    const depois = (await db.plano.get('atual'))!
+    expect(depois.proximoIndice).toBe(0)
+    expect(depois.treinosNaFase).toBe(antes.treinosNaFase)
   })
 
   it('revisa o volume a cada 3 semanas conforme a progressão (A3)', async () => {

@@ -46,3 +46,12 @@ test('mudar o perfil refaz o plano', async ({ page }) => {
   await page.goto('/#/plano')
   await expect(page.getByText('Superior / Inferior', { exact: true })).toBeVisible()
 })
+
+test('C25: pular treino mostra o seguinte no lugar', async ({ page }) => {
+  await fazerOnboarding(page, { nivel: 'Intermediário', dias: '4' })
+  await expect(page.getByText('Treino A · Superior', { exact: true })).toBeVisible()
+  await page.getByRole('button', { name: 'Pular treino' }).click()
+  await expect(page.getByText('Treino B · Inferior', { exact: true })).toBeVisible()
+  await page.reload()
+  await expect(page.getByText('Treino B · Inferior', { exact: true })).toBeVisible()
+})

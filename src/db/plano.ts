@@ -212,3 +212,16 @@ export async function desfazerExclusao(variante: string, exercicioId: string) {
   await db.configuracoes.put({ ...config, excluidosNoPlano: lista })
   await garantirPlano()
 }
+
+/**
+ * C25: "Pular treino": o próximo treino da sequência passa a ser o seguinte
+ * (ex: era A, vira B). Não conta como treino feito (nem na readaptação).
+ */
+export async function pularTreino() {
+  await db.transaction('rw', db.plano, db.diasPlano, async () => {
+    const plano = await db.plano.get('atual')
+    const total = await db.diasPlano.count()
+    if (!plano || total < 2) return
+    await db.plano.put({ ...plano, proximoIndice: (plano.proximoIndice + 1) % total })
+  })
+}

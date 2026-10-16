@@ -74,6 +74,7 @@ Mudanças de regra aprovadas depois de usar o app. Onde elas contradizem a espec
 | C22 | 3 séries por exercício | 3 séries é o padrão de todo exercício (4 no máximo, quando sobra tempo). Na readaptação, 3 séries desde a 1ª semana (antes eram 2, A4). O corte por tempo tira exercício em vez de deixar com 2 séries. |
 | C23 | Usar o tempo | A readaptação também usa o tempo (completa com mais exercícios, já que o máximo lá é 3 séries). O teto semanal ao completar o tempo subiu para 20 séries por músculo (+35% com ênfase). Até 60 min, todo treino sugerido usa pelo menos 75% do tempo; acima disso o teto pode deixar alguns treinos mais curtos. No foco em superiores, o dia de pernas continua com 3 exercícios (só ganha séries). |
 | C24 | Sugestão de treinos | Com mais dias, a sugestão acompanha: 4 dias → 4 treinos, 5 → 5, 6 → 6 (A a F). 3 dias continua com 2 treinos (C19: com 3 treinos cada músculo treinaria só 1×/semana). |
+| C25 | Pular treino | Botão "Pular treino" no Início, abaixo de "Começar treino": o próximo da sequência passa a ser o seguinte (depois do último, volta ao A). Não conta como treino feito nem avança a readaptação. |
 
 O banco local passou para a versão 2 (e depois 3, com o número de treinos). Quem já tinha o app instalado tem o perfil convertido automaticamente: objetivo vira lista de um item, "Equilibrado" vira nenhuma ênfase e a duração é mantida. Backups da versão 1 continuam podendo ser importados.
 

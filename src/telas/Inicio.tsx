@@ -4,6 +4,7 @@ import { db } from '../db/banco'
 import { sessaoEmAndamento } from '../db/sessao'
 import { gruposTreinadosRecentemente, textoAviso48h } from '../domain/treino/descanso48h'
 import { ComecarTreino } from '../components/ComecarTreino'
+import { pularTreino } from '../db/plano'
 import { usePlano } from '../app/usePlano'
 import { dispensarMensagemFase } from '../db/plano'
 import { exercicioPorId } from '../domain/biblioteca'
@@ -70,6 +71,11 @@ export function Inicio() {
             <p className="mt-3 rounded-lg bg-amber-50 px-3 py-2 text-sm text-amber-800 dark:bg-amber-950/40 dark:text-amber-200">{textoAviso48h(aviso48h)}</p>
           )}
           <ComecarTreino />
+          {dados!.dias.length > 1 && (
+            <Botao variante="secundario" className="mt-2 w-full" onClick={() => void pularTreino()}>
+              Pular treino
+            </Botao>
+          )}
           <Botao variante="fantasma" className="mt-1 w-full" onClick={() => navegar('/plano')}>
             Ver plano da semana
           </Botao>
